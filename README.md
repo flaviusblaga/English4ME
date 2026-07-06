@@ -12,6 +12,7 @@ Aplicație privată de familie pentru exersat engleza. V1 acoperă un singur pro
 4. La **Authorized JavaScript origins**, adaugă URL-ul unde va fi găzduit GitHub Pages, de ex. `https://<username-github>.github.io`. Pentru testare locală, adaugă și `http://localhost:PORT` (portul folosit de serverul local).
 5. Copiază **Client ID**-ul generat (arată ca `123...apps.googleusercontent.com`) și pune-l în [`js/config.js`](js/config.js), câmpul `GOOGLE_CLIENT_ID`.
 6. **Nu ai nevoie de Client Secret** — fluxul folosit (token client) e sigur din browser fără el.
+   
 
 ### 2. Cheia API Anthropic
 
