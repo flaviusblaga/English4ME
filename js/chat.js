@@ -2,11 +2,14 @@ import { sendChatMessage } from "./worker-client.js";
 import { saveState } from "./drive.js";
 import { ACTIVE_PROFILE } from "./profile.js";
 import { SCENARIOS } from "./scenarios-client.js";
+import { initDocumentsUi, refreshDocumentsSummary } from "./documents-ui.js";
 import {
   isSpeechRecognitionSupported,
   isSpeechSynthesisSupported,
   isTtsMuted,
   setTtsMuted,
+  getVoiceGenderPreference,
+  setVoiceGenderPreference,
   initVoiceInput,
   startListening,
   stopListening,
@@ -41,12 +44,31 @@ export function initChat({ accessToken, userEmail, displayName, fileId, state })
     }
   });
   el("debug-data-btn").addEventListener("click", () => {
-    el("debug-data-output").textContent = JSON.stringify(session.state, null, 2);
-    el("debug-data-output").hidden = false;
+    const output = el("debug-data-output");
+    if (!output.hidden) {
+      output.hidden = true;
+      return;
+    }
+    output.textContent = JSON.stringify(session.state, null, 2);
+    output.hidden = false;
   });
 
   initScenarioSelect();
   initVoiceUi();
+  initDocumentsUi({
+    userEmail: session.userEmail,
+    getScenarioId: () => currentScenarioId,
+    getScenarioLabel: () =>
+      currentScenarioId ? SCENARIOS.find((s) => s.id === currentScenarioId).label : "Free conversation",
+    onSaved: (scenarioId, entry) => {
+      session.state.documentContext = session.state.documentContext || {};
+      session.state.documentContext[scenarioId] = entry;
+      saveState(session.accessToken, session.fileId, session.state);
+      refreshDocumentsSummary(entry);
+      appendSystemNotice(`Documents saved for ${SCENARIOS.find((s) => s.id === scenarioId).label}: ${entry.files.map((f) => f.filename).join(", ")}`);
+    },
+  });
+  refreshDocumentsSummary((session.state.documentContext || {})[currentScenarioId]);
 }
 
 function initScenarioSelect() {
@@ -83,6 +105,8 @@ function handleScenarioChange(scenarioId) {
     ? SCENARIOS.find((s) => s.id === scenarioId).label
     : "Free conversation";
   appendSystemNotice(`Starting: ${label}`);
+
+  refreshDocumentsSummary((session.state.documentContext || {})[scenarioId]);
 }
 
 function initVoiceUi() {
@@ -114,6 +138,8 @@ function initVoiceUi() {
     micBtn.hidden = true;
   }
 
+  const genderSelect = el("voice-gender-select");
+
   if (isSpeechSynthesisSupported()) {
     ttsBtn.hidden = false;
     updateTtsButtonLabel();
@@ -121,8 +147,15 @@ function initVoiceUi() {
       setTtsMuted(!isTtsMuted());
       updateTtsButtonLabel();
     });
+
+    genderSelect.hidden = false;
+    genderSelect.value = getVoiceGenderPreference();
+    genderSelect.addEventListener("change", () => {
+      setVoiceGenderPreference(genderSelect.value);
+    });
   } else {
     ttsBtn.hidden = true;
+    genderSelect.hidden = true;
   }
 }
 
@@ -185,12 +218,14 @@ async function handleSend() {
     .map((turn) => ({ role: turn.role, content: turn.text }));
 
   try {
+    const documentEntry = (session.state.documentContext || {})[currentScenarioId];
     const result = await sendChatMessage({
       userEmail: session.userEmail,
       profileId: ACTIVE_PROFILE.id,
       messages: rollingWindow,
       conversationSummary: session.state.conversation.summary,
       scenarioId: currentScenarioId,
+      documentContext: documentEntry ? documentEntry.text : null,
     });
 
     if (result.budgetStatus === "soft_block") {

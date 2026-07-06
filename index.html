@@ -32,11 +32,35 @@
       </div>
       <div class="chat-header-right">
         <span id="budget-indicator" class="budget-indicator"></span>
+        <select id="voice-gender-select" class="voice-gender-select" title="Interlocutor voice">
+          <option value="female">👩 Female voice</option>
+          <option value="male">👨 Male voice</option>
+        </select>
         <button id="tts-mute-btn" class="btn btn-small" aria-pressed="false">🔊 Voice on</button>
         <button id="debug-data-btn" class="btn btn-small">Show saved data</button>
         <button id="logout-btn" class="btn btn-small">Sign out</button>
       </div>
     </header>
+
+    <div id="scenario-documents" class="scenario-documents" hidden>
+      <div class="scenario-documents-summary">
+        <span id="scenario-documents-label"></span>
+        <button id="scenario-documents-manage-btn" class="btn btn-small">Manage documents</button>
+      </div>
+
+      <div id="scenario-documents-panel" class="scenario-documents-panel" hidden>
+        <ul id="scenario-documents-list" class="scenario-documents-list"></ul>
+        <input id="scenario-documents-file-input" type="file" multiple
+               accept=".pdf,.png,.jpg,.jpeg,.webp,.txt" />
+        <p class="hint">PDF, photos/screenshots, or .txt only — up to 4 files, 4 MB each.
+           Word docs: please save as PDF first (File → Save As → PDF in Word).</p>
+        <div class="scenario-documents-actions">
+          <button id="scenario-documents-save-btn" class="btn btn-primary">Save documents</button>
+          <button id="scenario-documents-cancel-btn" class="btn btn-small">Cancel</button>
+        </div>
+        <p id="scenario-documents-status" class="hint" hidden></p>
+      </div>
+    </div>
 
     <p id="budget-warning" class="banner banner-warn" hidden></p>
 

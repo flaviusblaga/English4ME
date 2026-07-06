@@ -3,6 +3,7 @@
 
 const SpeechRecognitionCtor = window.SpeechRecognition || window.webkitSpeechRecognition;
 const TTS_MUTE_KEY = "engleza-familie-tts-muted";
+const VOICE_GENDER_KEY = "engleza-familie-voice-gender"; // "female" | "male"
 
 let recognizer = null;
 let onInterimCallback = null;
@@ -80,12 +81,104 @@ export function setTtsMuted(muted) {
   localStorage.setItem(TTS_MUTE_KEY, muted ? "true" : "false");
 }
 
+// Defaults to female (matches the previous default voice) until the user
+// picks a preference.
+export function getVoiceGenderPreference() {
+  return localStorage.getItem(VOICE_GENDER_KEY) || "female";
+}
+
+export function setVoiceGenderPreference(gender) {
+  localStorage.setItem(VOICE_GENDER_KEY, gender === "male" ? "male" : "female");
+}
+
+// Kept at module scope — Chrome silently drops speech if the
+// SpeechSynthesisUtterance object is garbage-collected before it finishes
+// (a long-standing browser bug), which easily happens if the only reference
+// is a local variable inside a function that has already returned.
+let currentUtterance = null;
+
+// The Web Speech API exposes no official gender field, so we classify by
+// name against common voice names across Windows/macOS/iOS/Android/Chrome.
+// Not exhaustive, but covers the voices people actually see in practice.
+const FEMALE_NAME_HINTS = [
+  "zira", "hazel", "susan", "catherine", "samantha", "victoria", "karen",
+  "moira", "tessa", "fiona", "kate", "serena", "allison", "ava", "female",
+];
+const MALE_NAME_HINTS = [
+  "david", "mark", "george", "ryan", "alex", "daniel", "fred", "oliver",
+  "james", "thomas", "male",
+];
+
+function classifyVoiceGender(voice) {
+  const name = voice.name.toLowerCase();
+  if (name === "google us english") return "female"; // Chrome's only en-US network voice, sounds female, no "female" in its name
+  if (name.includes("female")) return "female";
+  if (name.includes("male")) return "male";
+  if (FEMALE_NAME_HINTS.some((hint) => name.includes(hint))) return "female";
+  if (MALE_NAME_HINTS.some((hint) => name.includes(hint))) return "male";
+  return "unknown";
+}
+
+// The default voice picked by most browsers (e.g. Windows' local SAPI voice)
+// sounds noticeably robotic. Prefer a network/cloud voice — Chrome's "Google
+// US English" in particular sounds far more natural — over the local OS one.
+// `gender` ("female" | "male") narrows the pool before applying the rest of
+// the preference order; if nothing matches that gender, falls back to any
+// available voice rather than failing silently.
+function pickBestVoice(gender) {
+  const voices = window.speechSynthesis.getVoices();
+  if (!voices.length) return null;
+
+  // Prefer an exact en-US match (what we ask for) before falling back to any
+  // English voice, then to whatever's available at all.
+  const usVoices = voices.filter((v) => v.lang === "en-US");
+  const englishVoices = voices.filter((v) => v.lang && v.lang.startsWith("en"));
+  const langCandidates = usVoices.length ? usVoices : englishVoices.length ? englishVoices : voices;
+
+  const genderMatches = langCandidates.filter((v) => classifyVoiceGender(v) === gender);
+  const candidates = genderMatches.length ? genderMatches : langCandidates;
+
+  const preferredNames =
+    gender === "male"
+      ? ["Google UK English Male", "Microsoft David - English (United States)"]
+      : ["Google US English", "Google UK English Female", "Microsoft Zira - English (United States)"];
+  for (const name of preferredNames) {
+    const match = candidates.find((v) => v.name === name);
+    if (match) return match;
+  }
+
+  // Any other non-local (cloud-rendered) voice tends to sound better than
+  // the local OS engine.
+  const networkVoice = candidates.find((v) => v.localService === false);
+  if (networkVoice) return networkVoice;
+
+  return candidates[0];
+}
+
 // No-op if unsupported or muted. Cancels any in-flight utterance first so
 // replies don't queue up and read out of order if the user sends fast.
 export function speak(text) {
   if (!isSpeechSynthesisSupported() || isTtsMuted() || !text) return;
+
   window.speechSynthesis.cancel();
-  const utterance = new SpeechSynthesisUtterance(text);
-  utterance.lang = "en-US";
-  window.speechSynthesis.speak(utterance);
+
+  currentUtterance = new SpeechSynthesisUtterance(text);
+  currentUtterance.lang = "en-US";
+  const voice = pickBestVoice(getVoiceGenderPreference());
+  if (voice) currentUtterance.voice = voice;
+  currentUtterance.onend = () => {
+    currentUtterance = null;
+  };
+  currentUtterance.onerror = () => {
+    currentUtterance = null;
+  };
+
+  // Calling speak() immediately after cancel() can silently no-op in Chrome
+  // (cancel() clears the queue asynchronously); yielding one tick first makes
+  // the new utterance reliably start.
+  setTimeout(() => {
+    if (currentUtterance) {
+      window.speechSynthesis.speak(currentUtterance);
+    }
+  }, 0);
 }
