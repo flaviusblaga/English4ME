@@ -15,6 +15,7 @@ function defaultState({ profileId, userEmail, displayName, level }) {
     level,
     createdAt: now,
     lastUpdatedAt: now,
+    lastScenarioId: null,
     conversation: { summary: "", recentTurns: [] },
     progress: {
       sessionsCompleted: 0,
