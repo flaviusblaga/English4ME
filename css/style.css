@@ -1,0 +1,173 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+  background: #f4f1ea;
+  color: #222;
+}
+
+.screen {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.screen[hidden] {
+  display: none;
+}
+
+/* Login screen */
+#screen-login {
+  align-items: center;
+  justify-content: center;
+}
+
+.card {
+  background: #fff;
+  border-radius: 12px;
+  padding: 2.5rem;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  text-align: center;
+  max-width: 360px;
+}
+
+.card h1 {
+  margin: 0 0 0.25rem;
+  font-size: 1.5rem;
+}
+
+.subtitle {
+  color: #666;
+  margin: 0 0 1.5rem;
+}
+
+/* Buttons */
+.btn {
+  border: none;
+  border-radius: 8px;
+  padding: 0.6rem 1.2rem;
+  font-size: 0.95rem;
+  cursor: pointer;
+}
+
+.btn-primary {
+  background: #2f6f4f;
+  color: #fff;
+}
+
+.btn-primary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.btn-small {
+  background: #e4e0d6;
+  color: #333;
+  font-size: 0.8rem;
+  padding: 0.4rem 0.8rem;
+}
+
+.error {
+  color: #b0402f;
+  font-size: 0.85rem;
+}
+
+/* Chat screen */
+.chat-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  background: #fff;
+  border-bottom: 1px solid #e4e0d6;
+}
+
+.profile-tag {
+  display: block;
+  font-size: 0.8rem;
+  color: #666;
+}
+
+.chat-header-right {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.budget-indicator {
+  font-size: 0.8rem;
+  color: #555;
+}
+
+.banner {
+  margin: 0;
+  padding: 0.6rem 1rem;
+  font-size: 0.85rem;
+}
+
+.banner-warn {
+  background: #fbe9c8;
+  color: #6b4f12;
+}
+
+.chat-log {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.chat-bubble {
+  max-width: 70%;
+  padding: 0.55rem 0.85rem;
+  border-radius: 12px;
+  line-height: 1.4;
+  font-size: 0.95rem;
+  white-space: pre-wrap;
+}
+
+.chat-bubble--user {
+  align-self: flex-end;
+  background: #2f6f4f;
+  color: #fff;
+}
+
+.chat-bubble--assistant {
+  align-self: flex-start;
+  background: #fff;
+  border: 1px solid #e4e0d6;
+}
+
+.chat-input-row {
+  display: flex;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  background: #fff;
+  border-top: 1px solid #e4e0d6;
+}
+
+#chat-input {
+  flex: 1;
+  resize: none;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  padding: 0.5rem;
+  font-family: inherit;
+  font-size: 0.95rem;
+}
+
+.debug-output {
+  margin: 0 1rem 1rem;
+  padding: 0.75rem;
+  background: #222;
+  color: #b7f0b7;
+  font-size: 0.75rem;
+  overflow-x: auto;
+  max-height: 200px;
+  border-radius: 8px;
+}
