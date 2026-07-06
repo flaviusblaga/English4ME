@@ -18,6 +18,40 @@ export function isSpeechSynthesisSupported() {
   return "speechSynthesis" in window;
 }
 
+// Chrome (and others) load the voice list asynchronously in the background —
+// the very first call to getVoices() in a page's lifetime commonly returns an
+// empty array, before the "voiceschanged" event fires. If speak() picks a
+// voice against an empty list, it silently gets no explicit voice at all and
+// the browser falls back to its own default (often not the gender the user
+// picked). This warms the list up as early as possible so it's ready by the
+// time the first reply needs to be spoken.
+let voicesReadyPromise = null;
+
+function ensureVoicesLoaded() {
+  if (!isSpeechSynthesisSupported()) return Promise.resolve();
+  if (voicesReadyPromise) return voicesReadyPromise;
+
+  voicesReadyPromise = new Promise((resolve) => {
+    if (window.speechSynthesis.getVoices().length > 0) {
+      resolve();
+      return;
+    }
+    window.speechSynthesis.onvoiceschanged = () => resolve();
+    // Fallback in case "voiceschanged" never fires on some browser — proceed
+    // anyway rather than waiting forever (speak() still works, just may not
+    // find a gender match if the list is genuinely still empty).
+    setTimeout(resolve, 1000);
+  });
+
+  return voicesReadyPromise;
+}
+
+// Call once at boot (before any speak() call) so the voice list has a head
+// start on loading instead of only starting to load on the first reply.
+if (isSpeechSynthesisSupported()) {
+  ensureVoicesLoaded();
+}
+
 // Call once at boot. Callbacks:
 //   onInterim(text) — fired repeatedly while the user speaks (interim results)
 //   onFinal(text)   — fired once with the final recognized text
@@ -157,8 +191,12 @@ function pickBestVoice(gender) {
 
 // No-op if unsupported or muted. Cancels any in-flight utterance first so
 // replies don't queue up and read out of order if the user sends fast.
-export function speak(text) {
+// Async so it can wait for the voice list — chat.js calls this without
+// awaiting it, which is fine, speaking happens in the background either way.
+export async function speak(text) {
   if (!isSpeechSynthesisSupported() || isTtsMuted() || !text) return;
+
+  await ensureVoicesLoaded();
 
   window.speechSynthesis.cancel();
 
