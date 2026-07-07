@@ -1,7 +1,8 @@
 import { saveState } from "./drive.js";
 import { syncProgress } from "./worker-client.js";
 import { updateGamificationAfterLesson, BADGES } from "./gamification.js";
-import { recordTurnForParentSync, todayLocalDateString } from "./chat.js";
+import { recordTurnForParentSync, todayLocalDateString, KIDS_VOICE_OPTIONS } from "./chat.js";
+import { speak } from "./voice.js";
 import {
   LESSONS,
   getLesson,
@@ -118,6 +119,16 @@ function renderQuestion() {
   stem.textContent = question.type === "picture" ? question.word.en : question.word.ro;
   stem.className = `lesson-question-stem lesson-question-stem--${question.type}`;
 
+  // Only speak the word itself for "picture" questions — the English word is
+  // already shown as the stem, so hearing it reinforces pronunciation without
+  // giving away the answer (the answer is the picture). For "translation"
+  // questions the stem is Romanian, which the app's TTS (hardcoded en-US)
+  // would mispronounce, so it's read aloud after the answer instead (see
+  // handleAnswer), never here.
+  if (question.type === "picture") {
+    speak(question.word.en, KIDS_VOICE_OPTIONS);
+  }
+
   const optionsGrid = el("lesson-options-grid");
   optionsGrid.innerHTML = "";
   for (const option of question.options) {
@@ -156,7 +167,15 @@ function handleAnswer(chosenOption, chosenBtn) {
   const reactionAvatar = el("lesson-reaction-avatar");
   reactionAvatar.hidden = false;
   setMascotAvatar(reactionAvatar, wasCorrect ? "Bobo" : "Fizz");
-  el("lesson-reaction-text").textContent = getRandomLine(wasCorrect ? CORRECT_REACTION_LINES : INCORRECT_REACTION_LINES);
+  const reactionLine = getRandomLine(wasCorrect ? CORRECT_REACTION_LINES : INCORRECT_REACTION_LINES);
+  el("lesson-reaction-text").textContent = reactionLine;
+
+  // Always speak the actual English word out loud here (not just the
+  // flavor line) — this is the one moment every question guarantees the
+  // child hears the correct word pronounced, whether they got it right or
+  // not, and whether the question was picture- or translation-based.
+  const spokenReaction = reactionLine.replace(/^(Bobo|Fizz):\s*/, "");
+  speak(`${spokenReaction} ${question.word.en}.`, KIDS_VOICE_OPTIONS);
 
   const isLast = currentIndex === currentQueue.length - 1;
   const nextBtn = el("lesson-next-btn");

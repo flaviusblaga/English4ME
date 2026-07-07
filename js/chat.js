@@ -40,8 +40,9 @@ function setMascotPreference(pref) {
 
 // Kid-appropriate TTS tuning — a single playful voice via pitch/rate, not the
 // adult gender dropdown (which frames a professional roleplay counterpart,
-// not a cartoon mascot).
-const KIDS_VOICE_OPTIONS = { pitch: 1.35, rate: 1.05 };
+// not a cartoon mascot). Exported: js/lessons.js reuses the same tuning so
+// the lesson screens sound consistent with free-chat.
+export const KIDS_VOICE_OPTIONS = { pitch: 1.35, rate: 1.05 };
 
 function parseMascotLines(text) {
   return text
