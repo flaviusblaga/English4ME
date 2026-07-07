@@ -193,7 +193,7 @@ function pickBestVoice(gender) {
 // replies don't queue up and read out of order if the user sends fast.
 // Async so it can wait for the voice list — chat.js calls this without
 // awaiting it, which is fine, speaking happens in the background either way.
-export async function speak(text) {
+export async function speak(text, { pitch = 1.0, rate = 1.0 } = {}) {
   if (!isSpeechSynthesisSupported() || isTtsMuted() || !text) return;
 
   await ensureVoicesLoaded();
@@ -202,6 +202,8 @@ export async function speak(text) {
 
   currentUtterance = new SpeechSynthesisUtterance(text);
   currentUtterance.lang = "en-US";
+  currentUtterance.pitch = pitch;
+  currentUtterance.rate = rate;
   const voice = pickBestVoice(getVoiceGenderPreference());
   if (voice) currentUtterance.voice = voice;
   currentUtterance.onend = () => {

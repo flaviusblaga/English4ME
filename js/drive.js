@@ -51,6 +51,13 @@ function defaultState({ profileId, userEmail, displayName, level, features }) {
     };
   }
 
+  if (features && features.lessons) {
+    state.lessons = {
+      lastLessonId: null,
+      completed: {}, // lessonId -> { bestScore, attempts, lastCompletedAt, wordsEverCorrect: [] }
+    };
+  }
+
   return state;
 }
 

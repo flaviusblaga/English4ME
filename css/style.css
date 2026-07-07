@@ -389,7 +389,15 @@ body.profile-kids-primar .chat-bubble--assistant {
 }
 
 body.profile-kids-primar .mascot-line {
-  margin: 0.2rem 0;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  margin: 0.5rem 0;
+}
+
+body.profile-kids-primar .mascot-text {
+  flex: 1;
+  padding-top: 0.3rem;
 }
 
 body.profile-kids-primar .mascot-name {
@@ -406,11 +414,172 @@ body.profile-kids-primar #chat-send {
 }
 
 body.profile-kids-primar .mascot-avatar {
-  width: 1.3em;
-  height: 1.3em;
-  vertical-align: middle;
+  width: 92px;
+  height: auto;
+  flex-shrink: 0;
   object-fit: contain;
-  border-radius: 50%;
+  border-radius: 14px;
+  background: #fff;
+  border: 2px solid #ffb84d;
+}
+
+body.profile-kids-primar .mascot-avatar--emoji-fallback {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 92px;
+  height: 92px;
+  font-size: 3rem;
+  border-radius: 14px;
+}
+
+body.profile-kids-primar .mascot-avatar--tiny {
+  width: 44px;
+  border-radius: 8px;
+}
+
+/* Mascot selector — lets the child choose who to chat with */
+.mascot-select-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.6rem 1rem;
+  background: #fff4e0;
+  border-bottom: 1px solid #e4e0d6;
+}
+
+.mascot-select-label {
+  font-size: 0.85rem;
+  color: #666;
+  font-weight: 600;
+}
+
+.mascot-select-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.3rem 0.8rem 0.3rem 0.3rem;
+  border: 2px solid #e4e0d6;
+  border-radius: 999px;
+  background: #fff;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.85rem;
+}
+
+.mascot-select-btn--active {
+  border-color: #ff9d4d;
+  background: #fff2d9;
+}
+
+/* Lesson screens */
+.lesson-mascot-intro,
+.lesson-mascot-prompt,
+.lesson-mascot-reaction {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 1rem;
+}
+
+.lesson-menu-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 0.75rem;
+  padding: 0 1rem 1rem;
+}
+
+.lesson-card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.25rem;
+  padding: 1rem;
+  border: 2px solid #e4e0d6;
+  border-radius: 12px;
+  background: #fff;
+  cursor: pointer;
+  text-align: left;
+  font: inherit;
+}
+
+.lesson-card:hover {
+  border-color: #ff9d4d;
+}
+
+.lesson-card span {
+  color: #888;
+  font-size: 0.8rem;
+}
+
+.lesson-progress-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  font-size: 0.85rem;
+  color: #666;
+}
+
+.lesson-question-stem {
+  font-size: 2.2rem;
+  font-weight: 700;
+  text-align: center;
+  padding: 0.5rem 1rem 1rem;
+}
+
+.lesson-question-stem--picture {
+  font-size: 1.6rem;
+}
+
+.lesson-options-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.75rem;
+  padding: 0 1rem;
+}
+
+.lesson-option-btn {
+  padding: 1rem;
+  font-size: 1.5rem;
+  border: 2px solid #e4e0d6;
+  border-radius: 12px;
+  background: #fff;
+  cursor: pointer;
+}
+
+.lesson-option-btn:disabled {
+  cursor: default;
+}
+
+.lesson-option-btn--correct {
+  border-color: #2f9e44;
+  background: #ebfbee;
+}
+
+.lesson-option-btn--incorrect {
+  border-color: #e03131;
+  background: #fff5f5;
+}
+
+.lesson-score {
+  font-size: 1.3rem;
+  font-weight: 700;
+  text-align: center;
+  padding: 0 1rem;
+}
+
+.lesson-complete-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  align-items: center;
+  padding: 1rem;
+}
+
+#lesson-next-btn {
+  display: block;
+  margin: 1rem auto;
 }
 
 /* Parent view screen */

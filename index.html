@@ -49,6 +49,7 @@
           <option value="male">👨 Male voice</option>
         </select>
         <button id="tts-mute-btn" class="btn btn-small" aria-pressed="false">🔊 Voice on</button>
+        <button id="back-to-lessons-btn" class="btn btn-small" hidden>← Back to lessons</button>
         <button id="view-child-progress-btn" class="btn btn-small" hidden>👀 View child's progress</button>
         <button id="debug-data-btn" class="btn btn-small">Show saved data</button>
         <button id="logout-btn" class="btn btn-small">Sign out</button>
@@ -56,6 +57,21 @@
     </header>
 
     <div id="gamification-badges-panel" class="gamification-badges-panel" hidden></div>
+
+    <div id="mascot-select-bar" class="mascot-select-bar" hidden>
+      <span class="mascot-select-label">Talk to:</span>
+      <button id="mascot-select-bobo" type="button" class="mascot-select-btn">
+        <img class="mascot-avatar mascot-avatar--tiny" src="assets/socatei/bobo.png" alt="Bobo"
+             onerror="this.replaceWith(Object.assign(document.createElement('span'),{textContent:'🦫'}))" />
+        Bobo
+      </button>
+      <button id="mascot-select-fizz" type="button" class="mascot-select-btn">
+        <img class="mascot-avatar mascot-avatar--tiny" src="assets/socatei/fizz.png" alt="Fizz"
+             onerror="this.replaceWith(Object.assign(document.createElement('span'),{textContent:'🐿️'}))" />
+        Fizz
+      </button>
+      <button id="mascot-select-both" type="button" class="mascot-select-btn">👥 Both</button>
+    </div>
 
     <div id="scenario-documents" class="scenario-documents" hidden>
       <div class="scenario-documents-summary">
@@ -88,6 +104,61 @@
     </footer>
 
     <pre id="debug-data-output" class="debug-output" hidden></pre>
+  </main>
+
+  <main id="screen-lesson" class="screen" hidden>
+    <header class="chat-header">
+      <div>
+        <strong id="lesson-user-name"></strong>
+        <span class="profile-tag">Socatei — English with Bobo &amp; Fizz</span>
+      </div>
+      <div class="chat-header-right">
+        <div id="lesson-gamification-bar" class="gamification-bar">
+          <span id="lesson-gamification-points" class="gamification-points">⭐ 0</span>
+          <span id="lesson-gamification-streak" class="gamification-streak">🔥 0</span>
+        </div>
+        <button id="lesson-just-chat-btn" class="btn btn-small">💬 Just chat with Bobo &amp; Fizz</button>
+        <button id="lesson-logout-btn" class="btn btn-small">Sign out</button>
+      </div>
+    </header>
+
+    <div id="lesson-menu-view">
+      <div class="lesson-mascot-intro">
+        <img id="lesson-menu-avatar" class="mascot-avatar" alt="Bobo" />
+        <p id="lesson-menu-intro-line" class="mascot-text"></p>
+      </div>
+      <div id="lesson-menu-grid" class="lesson-menu-grid"></div>
+    </div>
+
+    <div id="lesson-exercise-view" hidden>
+      <div class="lesson-progress-bar">
+        <span id="lesson-progress-label"></span>
+        <button id="lesson-exit-btn" class="btn btn-small">← Back to lessons</button>
+      </div>
+      <div class="lesson-mascot-prompt">
+        <img id="lesson-prompt-avatar" class="mascot-avatar" alt="" />
+        <p id="lesson-prompt-text" class="mascot-text"></p>
+      </div>
+      <div id="lesson-question-stem" class="lesson-question-stem"></div>
+      <div id="lesson-options-grid" class="lesson-options-grid"></div>
+      <div class="lesson-mascot-reaction">
+        <img id="lesson-reaction-avatar" class="mascot-avatar" alt="" hidden />
+        <p id="lesson-reaction-text" class="mascot-text"></p>
+      </div>
+      <button id="lesson-next-btn" class="btn btn-primary" hidden>Next →</button>
+    </div>
+
+    <div id="lesson-complete-view" hidden>
+      <div class="lesson-mascot-intro">
+        <img id="lesson-complete-avatar" class="mascot-avatar" alt="Fizz" />
+        <p id="lesson-complete-line" class="mascot-text"></p>
+      </div>
+      <p id="lesson-complete-score" class="lesson-score"></p>
+      <div class="lesson-complete-actions">
+        <button id="lesson-chat-about-it-btn" class="btn btn-primary">💬 Chat about it with Bobo &amp; Fizz</button>
+        <button id="lesson-back-to-menu-btn" class="btn btn-small">← Back to lessons</button>
+      </div>
+    </div>
   </main>
 
   <main id="screen-parent-view" class="screen" hidden>

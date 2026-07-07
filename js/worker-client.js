@@ -1,6 +1,6 @@
 import { CONFIG } from "./config.js";
 
-export async function sendChatMessage({ userEmail, profileId, messages, conversationSummary, scenarioId, documentContext }) {
+export async function sendChatMessage({ userEmail, profileId, messages, conversationSummary, scenarioId, documentContext, lessonWordList }) {
   const response = await fetch(`${CONFIG.WORKER_URL}/chat`, {
     method: "POST",
     headers: { "content-type": "application/json" },
@@ -11,6 +11,7 @@ export async function sendChatMessage({ userEmail, profileId, messages, conversa
       conversationSummary,
       scenarioId: scenarioId || null,
       documentContext: documentContext || null,
+      lessonWordList: lessonWordList || null,
     }),
   });
   if (!response.ok) {

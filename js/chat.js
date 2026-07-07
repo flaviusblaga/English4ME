@@ -24,39 +24,97 @@ const MASCOT_AVATARS = {
   Fizz: { emoji: "🐿️", img: "assets/socatei/fizz.png" },
 };
 
-let session = null; // { accessToken, userEmail, displayName, fileId, state, profile }
+// Which mascot(s) the child wants to see/hear talk. Claude still always
+// replies with both lines (no prompt/Worker change needed) — this is a
+// purely presentational filter applied at render/speak time, so switching
+// preference mid-conversation is instant and never loses conversation data.
+const MASCOT_PREFERENCE_KEY = "engleza-familie-mascot-preference"; // "Bobo" | "Fizz" | "both"
+
+function getMascotPreference() {
+  return localStorage.getItem(MASCOT_PREFERENCE_KEY) || "both";
+}
+
+function setMascotPreference(pref) {
+  localStorage.setItem(MASCOT_PREFERENCE_KEY, pref);
+}
+
+// Kid-appropriate TTS tuning — a single playful voice via pitch/rate, not the
+// adult gender dropdown (which frames a professional roleplay counterpart,
+// not a cartoon mascot).
+const KIDS_VOICE_OPTIONS = { pitch: 1.35, rate: 1.05 };
+
+function parseMascotLines(text) {
+  return text
+    .split("\n")
+    .map((line) => line.match(/^(Bobo|Fizz):\s*(.*)$/))
+    .filter(Boolean)
+    .map((match) => ({ name: match[1], line: match[2] }));
+}
+
+let session = null; // { accessToken, userEmail, displayName, fileId, state, profile, lessonWordList }
 let currentScenarioId = null; // null = free conversation
+let listenersInitialized = false; // guards one-time listener attachment across repeated initChat calls
 
 function el(id) {
   return document.getElementById(id);
 }
 
-export function initChat({ accessToken, userEmail, displayName, fileId, state, profile }) {
-  session = { accessToken, userEmail, displayName, fileId, state, profile };
+export function initChat({ accessToken, userEmail, displayName, fileId, state, profile, lessonWordList, onBackToLessons }) {
+  session = { accessToken, userEmail, displayName, fileId, state, profile, lessonWordList: lessonWordList || null };
 
-  el("chat-log").innerHTML = "";
-  for (const turn of state.conversation.recentTurns) {
-    appendMessageToLog(turn.role, turn.text, profile);
-  }
-
+  rerenderChatLog();
   renderBudgetIndicator();
 
-  el("chat-send").addEventListener("click", handleSend);
-  el("chat-input").addEventListener("keydown", (e) => {
-    if (e.key === "Enter" && !e.shiftKey) {
-      e.preventDefault();
-      handleSend();
+  // Attached once per page lifetime — chat.js/lessons.js now navigate back
+  // and forth (initChat can be called more than once per session), and
+  // inline-arrow listeners would otherwise accumulate duplicate handlers on
+  // every re-entry. All handlers read the live `session`/`profile` closure
+  // variables, so re-attaching on later calls is unnecessary, not just safe.
+  if (!listenersInitialized) {
+    listenersInitialized = true;
+
+    el("chat-send").addEventListener("click", handleSend);
+    el("chat-input").addEventListener("keydown", (e) => {
+      if (e.key === "Enter" && !e.shiftKey) {
+        e.preventDefault();
+        handleSend();
+      }
+    });
+    el("debug-data-btn").addEventListener("click", () => {
+      const output = el("debug-data-output");
+      if (!output.hidden) {
+        output.hidden = true;
+        return;
+      }
+      output.textContent = JSON.stringify(session.state, null, 2);
+      output.hidden = false;
+    });
+    el("gamification-badges-btn").addEventListener("click", () => {
+      const panel = el("gamification-badges-panel");
+      panel.hidden = !panel.hidden;
+    });
+    initVoiceUi();
+
+    for (const pref of ["Bobo", "Fizz", "both"]) {
+      el(`mascot-select-${pref.toLowerCase()}`).addEventListener("click", () => {
+        setMascotPreference(pref);
+        updateMascotSelectUi();
+        rerenderChatLog();
+      });
     }
-  });
-  el("debug-data-btn").addEventListener("click", () => {
-    const output = el("debug-data-output");
-    if (!output.hidden) {
-      output.hidden = true;
-      return;
-    }
-    output.textContent = JSON.stringify(session.state, null, 2);
-    output.hidden = false;
-  });
+  }
+
+  el("back-to-lessons-btn").hidden = !profile.features.lessons;
+  el("back-to-lessons-btn").onclick = () => {
+    if (onBackToLessons) onBackToLessons();
+  };
+
+  // Profile-dependent UI that must be recomputed on every call (not just the
+  // first) — a user can sign out and pick a different profile without a full
+  // page reload, so this can't live behind the one-time listener guard above.
+  el("mascot-select-bar").hidden = profile.id !== "kids-primar";
+  if (profile.id === "kids-primar") updateMascotSelectUi();
+  el("voice-gender-select").hidden = !isSpeechSynthesisSupported() || profile.id === "kids-primar";
 
   if (profile.features.scenarios) {
     el("scenario-select-wrap").hidden = false;
@@ -65,8 +123,6 @@ export function initChat({ accessToken, userEmail, displayName, fileId, state, p
     el("scenario-select-wrap").hidden = true;
     currentScenarioId = null;
   }
-
-  initVoiceUi();
 
   if (profile.features.documents) {
     el("scenario-documents").hidden = false;
@@ -92,10 +148,6 @@ export function initChat({ accessToken, userEmail, displayName, fileId, state, p
     el("gamification-bar").hidden = false;
     renderGamificationBar();
     renderBadgesPanel();
-    el("gamification-badges-btn").addEventListener("click", () => {
-      const panel = el("gamification-badges-panel");
-      panel.hidden = !panel.hidden;
-    });
   } else {
     el("gamification-bar").hidden = true;
     el("gamification-badges-panel").hidden = true;
@@ -197,6 +249,22 @@ function updateTtsButtonLabel() {
   el("tts-mute-btn").setAttribute("aria-pressed", String(muted));
 }
 
+function updateMascotSelectUi() {
+  const preference = getMascotPreference();
+  for (const pref of ["Bobo", "Fizz", "both"]) {
+    el(`mascot-select-${pref.toLowerCase()}`).classList.toggle("mascot-select-btn--active", pref === preference);
+  }
+}
+
+// Re-renders the whole log from stored history so a mascot-preference change
+// applies immediately to past turns too, not just future replies.
+function rerenderChatLog() {
+  el("chat-log").innerHTML = "";
+  for (const turn of session.state.conversation.recentTurns) {
+    appendMessageToLog(turn.role, turn.text, session.profile);
+  }
+}
+
 function appendMessageToLog(role, text, profile) {
   const log = el("chat-log");
   const bubble = document.createElement("div");
@@ -214,43 +282,55 @@ function appendMessageToLog(role, text, profile) {
 
 function renderMascotLines(text) {
   const wrap = document.createElement("div");
-  const lines = text.split("\n").filter((l) => l.trim());
-  let matchedAny = false;
+  const parsed = parseMascotLines(text);
+  const preference = getMascotPreference();
+  const visible = preference === "both" ? parsed : parsed.filter((p) => p.name === preference);
 
-  for (const line of lines) {
-    const match = line.match(/^(Bobo|Fizz):\s*(.*)$/);
-    if (match) {
-      matchedAny = true;
-      const name = match[1];
-      const avatar = MASCOT_AVATARS[name];
-      const p = document.createElement("p");
-      p.className = "mascot-line";
+  for (const { name, line } of visible) {
+    const avatar = MASCOT_AVATARS[name];
+    const row = document.createElement("div");
+    row.className = "mascot-line";
 
-      const nameSpan = document.createElement("span");
-      nameSpan.className = "mascot-name";
+    const img = document.createElement("img");
+    img.src = avatar.img;
+    img.alt = name;
+    img.className = "mascot-avatar";
+    img.onerror = function () {
+      // Real PNG missing/broken — fall back to a big emoji, never a
+      // broken-image icon.
+      const fallback = document.createElement("span");
+      fallback.className = "mascot-avatar mascot-avatar--emoji-fallback";
+      fallback.textContent = avatar.emoji;
+      this.replaceWith(fallback);
+    };
 
-      const img = document.createElement("img");
-      img.src = avatar.img;
-      img.alt = name;
-      img.className = "mascot-avatar";
-      img.onerror = function () {
-        // Real PNG missing/broken — fall back to the emoji inline, never a
-        // broken-image icon.
-        this.replaceWith(document.createTextNode(avatar.emoji + " "));
-      };
+    const bubble = document.createElement("div");
+    bubble.className = "mascot-text";
+    const nameSpan = document.createElement("span");
+    nameSpan.className = "mascot-name";
+    nameSpan.textContent = `${name}:`;
+    bubble.appendChild(nameSpan);
+    bubble.appendChild(document.createTextNode(` ${line}`));
 
-      nameSpan.appendChild(img);
-      nameSpan.appendChild(document.createTextNode(` ${name}:`));
-      p.appendChild(nameSpan);
-      p.appendChild(document.createTextNode(` ${match[2]}`));
-      wrap.appendChild(p);
-    }
+    row.appendChild(img);
+    row.appendChild(bubble);
+    wrap.appendChild(row);
   }
 
-  if (!matchedAny) {
+  if (parsed.length === 0) {
     wrap.textContent = text; // graceful fallback if the format wasn't followed
   }
   return wrap;
+}
+
+// Plain spoken text for TTS — only the selected mascot's line(s), without the
+// "Name:" prefix (reads more naturally out loud than the on-screen label).
+function extractSpokenText(text) {
+  const parsed = parseMascotLines(text);
+  if (parsed.length === 0) return text;
+  const preference = getMascotPreference();
+  const visible = preference === "both" ? parsed : parsed.filter((p) => p.name === preference);
+  return visible.map((p) => p.line).join(" ");
 }
 
 function appendSystemNotice(text) {
@@ -295,7 +375,7 @@ function hideBanner() {
   el("budget-warning").hidden = true;
 }
 
-function todayLocalDateString() {
+export function todayLocalDateString() {
   const now = new Date();
   if (window.__debugForceYesterday) {
     now.setDate(now.getDate() - 1); // manual test hook — see plan verification step C.3
@@ -306,7 +386,9 @@ function todayLocalDateString() {
 // Mirrors every turn into a same-day accumulator that is NOT trimmed by
 // MAX_STORED_TURNS, so a busy day's early turns survive long enough to reach
 // the parent-progress sync — resets only when the calendar day changes.
-function recordTurnForParentSync(state, turn) {
+// Exported: js/lessons.js also calls this to log lesson activity into the
+// same daily-turns mechanism the parent dashboard reads.
+export function recordTurnForParentSync(state, turn) {
   if (!state.parentSync) return;
   const today = todayLocalDateString();
   if (state.parentSync.todayDate !== today) {
@@ -342,13 +424,18 @@ async function handleSend() {
       conversationSummary: session.state.conversation.summary,
       scenarioId: currentScenarioId,
       documentContext: documentEntry ? documentEntry.text : null,
+      lessonWordList: session.lessonWordList,
     });
 
     if (result.budgetStatus === "soft_block") {
       showBanner(result.message);
     } else {
       appendMessageToLog("assistant", result.reply, session.profile);
-      speak(result.reply);
+      if (session.profile.id === "kids-primar") {
+        speak(extractSpokenText(result.reply), KIDS_VOICE_OPTIONS);
+      } else {
+        speak(result.reply);
+      }
       const assistantTurn = { role: "assistant", text: result.reply, ts: new Date().toISOString() };
       session.state.conversation.recentTurns.push(assistantTurn);
       recordTurnForParentSync(session.state, assistantTurn);

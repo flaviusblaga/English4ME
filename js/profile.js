@@ -14,7 +14,7 @@ export const PROFILES = [
     displayName: "Socatei — English with Bobo & Fizz",
     level: "beginner",
     description: "Playful English practice for kids (grades 1-4) with two silly mascot friends, Bobo & Fizz.",
-    features: { scenarios: false, documents: false, gamification: true, parentVisible: true },
+    features: { scenarios: false, documents: false, gamification: true, parentVisible: true, lessons: true },
   },
 ];
 
