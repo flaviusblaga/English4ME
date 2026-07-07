@@ -52,10 +52,14 @@ function setMascotAvatar(imgEl, name) {
   };
 }
 
-// Which mascot leads (asks questions, greets the menu): "both"/"Bobo" default
-// to Bobo asking; "Fizz" preference makes Fizz the asker instead.
-function activeMascotForAsking() {
-  return getMascotPreference() === "Fizz" ? "Fizz" : "Bobo";
+// Which mascot leads (asks the current question): a single-mascot preference
+// always uses that one; "both" alternates by question index so the child
+// actually sees both mascots take turns asking, not just Bobo dominating
+// with Fizz only ever showing up to react to a wrong answer.
+function activeMascotForAsking(questionIndex) {
+  const pref = getMascotPreference();
+  if (pref === "Bobo" || pref === "Fizz") return pref;
+  return questionIndex % 2 === 0 ? "Bobo" : "Fizz";
 }
 
 // Which mascot reacts to an answer: with "both" (the default), Bobo
@@ -121,7 +125,9 @@ function showMenu() {
   el("lesson-exercise-view").hidden = true;
   el("lesson-complete-view").hidden = true;
 
-  const asker = activeMascotForAsking();
+  // Not tied to a question index here (there isn't one yet) — pick randomly
+  // for "both" so repeat visits to the menu show some variety too.
+  const asker = activeMascotForAsking(Math.random() < 0.5 ? 0 : 1);
   setMascotAvatar(el("lesson-menu-avatar"), asker);
   el("lesson-menu-intro-line").textContent = `${asker}: ${getRandomLine(LESSON_MENU_INTRO_LINES)}`;
 
@@ -162,7 +168,7 @@ function renderQuestion() {
   const question = currentQueue[currentIndex];
   el("lesson-progress-label").textContent = `${currentLesson.label} — ${currentIndex + 1} / ${currentQueue.length}`;
 
-  const asker = activeMascotForAsking();
+  const asker = activeMascotForAsking(currentIndex);
   const promptAvatar = el("lesson-prompt-avatar");
   setMascotAvatar(promptAvatar, asker);
   el("lesson-prompt-text").textContent = `${asker}: ${getRandomLine(QUESTION_STEM_LINES[question.type])}`;
