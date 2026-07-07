@@ -1,7 +1,13 @@
 import { saveState } from "./drive.js";
 import { syncProgress } from "./worker-client.js";
 import { updateGamificationAfterLesson, BADGES } from "./gamification.js";
-import { recordTurnForParentSync, todayLocalDateString, KIDS_VOICE_OPTIONS } from "./chat.js";
+import {
+  recordTurnForParentSync,
+  todayLocalDateString,
+  KIDS_VOICE_OPTIONS,
+  getMascotPreference,
+  setMascotPreference,
+} from "./chat.js";
 import { speak } from "./voice.js";
 import {
   LESSONS,
@@ -23,6 +29,7 @@ const MASCOT_AVATARS = {
 let session = null; // { accessToken, userEmail, displayName, fileId, state, profile }
 let onJustChatCallback = null;
 let onChatAboutItCallback = null;
+let listenersInitialized = false;
 
 let currentQueue = [];
 let currentIndex = 0;
@@ -45,6 +52,32 @@ function setMascotAvatar(imgEl, name) {
   };
 }
 
+// Which mascot leads (asks questions, greets the menu): "both"/"Bobo" default
+// to Bobo asking; "Fizz" preference makes Fizz the asker instead.
+function activeMascotForAsking() {
+  return getMascotPreference() === "Fizz" ? "Fizz" : "Bobo";
+}
+
+// Which mascot reacts to an answer: with "both" (the default), Bobo
+// celebrates correct answers and Fizz softens incorrect ones (their original
+// personalities); picking a single mascot makes that one handle everything.
+function activeMascotForReaction(wasCorrect) {
+  const pref = getMascotPreference();
+  if (pref === "Bobo" || pref === "Fizz") return pref;
+  return wasCorrect ? "Bobo" : "Fizz";
+}
+
+function activeMascotForComplete() {
+  return getMascotPreference() === "Bobo" ? "Bobo" : "Fizz";
+}
+
+function updateLessonMascotSelectUi() {
+  const preference = getMascotPreference();
+  for (const pref of ["Bobo", "Fizz", "both"]) {
+    el(`lesson-mascot-select-${pref.toLowerCase()}`).classList.toggle("mascot-select-btn--active", pref === preference);
+  }
+}
+
 export function initLessons({ accessToken, userEmail, displayName, fileId, state, profile, onJustChat, onChatAboutIt }) {
   session = { accessToken, userEmail, displayName, fileId, state, profile };
   onJustChatCallback = onJustChat;
@@ -56,6 +89,22 @@ export function initLessons({ accessToken, userEmail, displayName, fileId, state
   };
   el("lesson-exit-btn").onclick = showMenu;
   el("lesson-back-to-menu-btn").onclick = showMenu;
+
+  if (!listenersInitialized) {
+    listenersInitialized = true;
+    for (const pref of ["Bobo", "Fizz", "both"]) {
+      el(`lesson-mascot-select-${pref.toLowerCase()}`).addEventListener("click", () => {
+        setMascotPreference(pref);
+        updateLessonMascotSelectUi();
+        // If the menu is the visible view, refresh its intro line/avatar
+        // immediately; mid-exercise, the next question already picks up the
+        // new preference on its own (see renderQuestion), so no refresh
+        // needed there.
+        if (!el("lesson-menu-view").hidden) showMenu();
+      });
+    }
+  }
+  updateLessonMascotSelectUi();
 
   renderGamificationBar();
   showMenu();
@@ -72,8 +121,9 @@ function showMenu() {
   el("lesson-exercise-view").hidden = true;
   el("lesson-complete-view").hidden = true;
 
-  setMascotAvatar(el("lesson-menu-avatar"), "Bobo");
-  el("lesson-menu-intro-line").textContent = getRandomLine(LESSON_MENU_INTRO_LINES);
+  const asker = activeMascotForAsking();
+  setMascotAvatar(el("lesson-menu-avatar"), asker);
+  el("lesson-menu-intro-line").textContent = `${asker}: ${getRandomLine(LESSON_MENU_INTRO_LINES)}`;
 
   const grid = el("lesson-menu-grid");
   grid.innerHTML = "";
@@ -112,8 +162,10 @@ function renderQuestion() {
   const question = currentQueue[currentIndex];
   el("lesson-progress-label").textContent = `${currentLesson.label} — ${currentIndex + 1} / ${currentQueue.length}`;
 
-  setMascotAvatar(el("lesson-prompt-avatar"), "Bobo");
-  el("lesson-prompt-text").textContent = getRandomLine(QUESTION_STEM_LINES[question.type]);
+  const asker = activeMascotForAsking();
+  const promptAvatar = el("lesson-prompt-avatar");
+  setMascotAvatar(promptAvatar, asker);
+  el("lesson-prompt-text").textContent = `${asker}: ${getRandomLine(QUESTION_STEM_LINES[question.type])}`;
 
   const stem = el("lesson-question-stem");
   stem.textContent = question.type === "picture" ? question.word.en : question.word.ro;
@@ -124,8 +176,14 @@ function renderQuestion() {
   // giving away the answer (the answer is the picture). For "translation"
   // questions the stem is Romanian, which the app's TTS (hardcoded en-US)
   // would mispronounce, so it's read aloud after the answer instead (see
-  // handleAnswer), never here.
-  if (question.type === "picture") {
+  // handleAnswer), never here. Also interactive: tapping the avatar/word
+  // replays it, for a child who wants to hear it again before answering.
+  const canReplayNow = question.type === "picture";
+  promptAvatar.style.cursor = canReplayNow ? "pointer" : "default";
+  promptAvatar.onclick = canReplayNow ? () => speak(question.word.en, KIDS_VOICE_OPTIONS) : null;
+  stem.style.cursor = canReplayNow ? "pointer" : "default";
+  stem.onclick = canReplayNow ? () => speak(question.word.en, KIDS_VOICE_OPTIONS) : null;
+  if (canReplayNow) {
     speak(question.word.en, KIDS_VOICE_OPTIONS);
   }
 
@@ -142,6 +200,7 @@ function renderQuestion() {
 
   el("lesson-reaction-avatar").hidden = true;
   el("lesson-reaction-text").textContent = "";
+  el("lesson-replay-btn").hidden = true;
   el("lesson-next-btn").hidden = true;
 }
 
@@ -164,18 +223,23 @@ function handleAnswer(chosenOption, chosenBtn) {
     optionButtons[correctIndex].classList.add("lesson-option-btn--correct");
   }
 
+  const reactor = activeMascotForReaction(wasCorrect);
   const reactionAvatar = el("lesson-reaction-avatar");
   reactionAvatar.hidden = false;
-  setMascotAvatar(reactionAvatar, wasCorrect ? "Bobo" : "Fizz");
+  setMascotAvatar(reactionAvatar, reactor);
   const reactionLine = getRandomLine(wasCorrect ? CORRECT_REACTION_LINES : INCORRECT_REACTION_LINES);
-  el("lesson-reaction-text").textContent = reactionLine;
+  el("lesson-reaction-text").textContent = `${reactor}: ${reactionLine}`;
 
-  // Always speak the actual English word out loud here (not just the
-  // flavor line) — this is the one moment every question guarantees the
-  // child hears the correct word pronounced, whether they got it right or
-  // not, and whether the question was picture- or translation-based.
-  const spokenReaction = reactionLine.replace(/^(Bobo|Fizz):\s*/, "");
-  speak(`${spokenReaction} ${question.word.en}.`, KIDS_VOICE_OPTIONS);
+  // Always speak the actual English word out loud here (not just the flavor
+  // line) — this is the one moment every question guarantees the child hears
+  // the correct word pronounced, whether they got it right or not, and
+  // whether the question was picture- or translation-based.
+  speak(`${reactionLine} ${question.word.en}.`, KIDS_VOICE_OPTIONS);
+
+  // Interactive replay — tap to hear the word again as many times as wanted.
+  const replayBtn = el("lesson-replay-btn");
+  replayBtn.hidden = false;
+  replayBtn.onclick = () => speak(question.word.en, KIDS_VOICE_OPTIONS);
 
   const isLast = currentIndex === currentQueue.length - 1;
   const nextBtn = el("lesson-next-btn");
@@ -245,8 +309,9 @@ function showComplete(score, total, newlyUnlocked) {
   el("lesson-exercise-view").hidden = true;
   el("lesson-complete-view").hidden = false;
 
-  setMascotAvatar(el("lesson-complete-avatar"), "Fizz");
-  el("lesson-complete-line").textContent = getLessonCompleteLine(score, total);
+  const closer = activeMascotForComplete();
+  setMascotAvatar(el("lesson-complete-avatar"), closer);
+  el("lesson-complete-line").textContent = `${closer}: ${getLessonCompleteLine(score, total)}`;
   el("lesson-complete-score").textContent = `You got ${score} out of ${total}! 🎉`;
 
   if (newlyUnlocked.length > 0) {

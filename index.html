@@ -122,6 +122,21 @@
       </div>
     </header>
 
+    <div id="lesson-mascot-select-bar" class="mascot-select-bar">
+      <span class="mascot-select-label">My teacher today:</span>
+      <button id="lesson-mascot-select-bobo" type="button" class="mascot-select-btn">
+        <img class="mascot-avatar mascot-avatar--tiny" src="assets/socatei/bobo.png" alt="Bobo"
+             onerror="this.replaceWith(Object.assign(document.createElement('span'),{textContent:'🦫'}))" />
+        Bobo
+      </button>
+      <button id="lesson-mascot-select-fizz" type="button" class="mascot-select-btn">
+        <img class="mascot-avatar mascot-avatar--tiny" src="assets/socatei/fizz.png" alt="Fizz"
+             onerror="this.replaceWith(Object.assign(document.createElement('span'),{textContent:'🐿️'}))" />
+        Fizz
+      </button>
+      <button id="lesson-mascot-select-both" type="button" class="mascot-select-btn">👥 Both</button>
+    </div>
+
     <div id="lesson-menu-view">
       <div class="lesson-mascot-intro">
         <img id="lesson-menu-avatar" class="mascot-avatar" alt="Bobo" />
@@ -145,6 +160,7 @@
         <img id="lesson-reaction-avatar" class="mascot-avatar" alt="" hidden />
         <p id="lesson-reaction-text" class="mascot-text"></p>
       </div>
+      <button id="lesson-replay-btn" class="btn btn-small" hidden>🔊 Hear it again</button>
       <button id="lesson-next-btn" class="btn btn-primary" hidden>Next →</button>
     </div>
 

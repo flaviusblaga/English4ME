@@ -30,11 +30,13 @@ const MASCOT_AVATARS = {
 // preference mid-conversation is instant and never loses conversation data.
 const MASCOT_PREFERENCE_KEY = "engleza-familie-mascot-preference"; // "Bobo" | "Fizz" | "both"
 
-function getMascotPreference() {
+// Exported: js/lessons.js reuses the same preference so choosing a mascot in
+// either screen (chat or lessons) stays consistent across both.
+export function getMascotPreference() {
   return localStorage.getItem(MASCOT_PREFERENCE_KEY) || "both";
 }
 
-function setMascotPreference(pref) {
+export function setMascotPreference(pref) {
   localStorage.setItem(MASCOT_PREFERENCE_KEY, pref);
 }
 

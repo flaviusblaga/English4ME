@@ -360,31 +360,49 @@ body {
   opacity: 0.35;
 }
 
-/* Kids — Primar profile theme (scoped; adult profile styles above are untouched) */
+/* Kids — Primar profile theme (scoped; adult profile styles above are untouched).
+   Bright, varied palette on purpose — not a single repeated brown/orange tone. */
 body.profile-kids-primar {
-  background: #fff4e0;
+  --kid-purple: #7c5cff;
+  --kid-purple-dark: #6247e0;
+  --kid-coral: #ff6b6b;
+  --kid-coral-dark: #ff5252;
+  --kid-teal: #00cec9;
+  --kid-yellow: #ffd93d;
+  --kid-pink: #ff8fc7;
+  --kid-blue: #4dabf7;
+  background: #eef6ff;
 }
 
 body.profile-kids-primar .chat-header {
-  background: #ffe0a3;
-  border-bottom: 3px solid #ff9d4d;
+  background: #d9ecff;
+  border-bottom: 4px solid var(--kid-purple);
 }
 
 body.profile-kids-primar .btn-primary {
-  background: #ff7a3d;
+  background: var(--kid-coral);
   font-size: 1.05rem;
   padding: 0.75rem 1.4rem;
   border-radius: 14px;
 }
 
+body.profile-kids-primar .btn-primary:hover {
+  background: var(--kid-coral-dark);
+}
+
+body.profile-kids-primar .btn-small {
+  background: #e6ddff;
+  color: #4a3b8c;
+}
+
 body.profile-kids-primar .chat-bubble--user {
-  background: #4f9dff;
+  background: var(--kid-blue);
   border-radius: 18px;
 }
 
 body.profile-kids-primar .chat-bubble--assistant {
-  background: #fffaf0;
-  border: 2px solid #ffb84d;
+  background: #fffdf7;
+  border: 2px solid var(--kid-teal);
   border-radius: 18px;
 }
 
@@ -420,7 +438,7 @@ body.profile-kids-primar .mascot-avatar {
   object-fit: contain;
   border-radius: 14px;
   background: #fff;
-  border: 2px solid #ffb84d;
+  border: 3px solid var(--kid-yellow);
 }
 
 body.profile-kids-primar .mascot-avatar--emoji-fallback {
@@ -444,8 +462,8 @@ body.profile-kids-primar .mascot-avatar--tiny {
   align-items: center;
   gap: 0.6rem;
   padding: 0.6rem 1rem;
-  background: #fff4e0;
-  border-bottom: 1px solid #e4e0d6;
+  background: #fff0fa;
+  border-bottom: 2px solid var(--kid-pink, #ff8fc7);
 }
 
 .mascot-select-bar[hidden] {
@@ -454,8 +472,8 @@ body.profile-kids-primar .mascot-avatar--tiny {
 
 .mascot-select-label {
   font-size: 0.85rem;
-  color: #666;
-  font-weight: 600;
+  color: #7a5c99;
+  font-weight: 700;
 }
 
 .mascot-select-btn {
@@ -463,17 +481,17 @@ body.profile-kids-primar .mascot-avatar--tiny {
   align-items: center;
   gap: 0.4rem;
   padding: 0.3rem 0.8rem 0.3rem 0.3rem;
-  border: 2px solid #e4e0d6;
+  border: 2px solid #e6ddff;
   border-radius: 999px;
   background: #fff;
   cursor: pointer;
-  font-weight: 600;
+  font-weight: 700;
   font-size: 0.85rem;
 }
 
 .mascot-select-btn--active {
-  border-color: #ff9d4d;
-  background: #fff2d9;
+  border-color: var(--kid-purple, #7c5cff);
+  background: #ece5ff;
 }
 
 /* Lesson screens */
@@ -499,7 +517,8 @@ body.profile-kids-primar .mascot-avatar--tiny {
   align-items: flex-start;
   gap: 0.25rem;
   padding: 1rem;
-  border: 2px solid #e4e0d6;
+  border: 2px solid #e6ddff;
+  border-top: 5px solid var(--kid-purple, #7c5cff);
   border-radius: 12px;
   background: #fff;
   cursor: pointer;
@@ -507,8 +526,22 @@ body.profile-kids-primar .mascot-avatar--tiny {
   font: inherit;
 }
 
+/* A little rainbow variety across the lesson grid instead of one repeated color. */
+.lesson-card:nth-child(4n+2) {
+  border-top-color: var(--kid-teal, #00cec9);
+}
+
+.lesson-card:nth-child(4n+3) {
+  border-top-color: var(--kid-coral, #ff6b6b);
+}
+
+.lesson-card:nth-child(4n+4) {
+  border-top-color: var(--kid-yellow, #ffd93d);
+}
+
 .lesson-card:hover {
-  border-color: #ff9d4d;
+  border-color: var(--kid-pink, #ff8fc7);
+  box-shadow: 0 2px 8px rgba(124, 92, 255, 0.2);
 }
 
 .lesson-card span {
@@ -530,6 +563,7 @@ body.profile-kids-primar .mascot-avatar--tiny {
   font-weight: 700;
   text-align: center;
   padding: 0.5rem 1rem 1rem;
+  color: var(--kid-purple-dark, #6247e0);
 }
 
 .lesson-question-stem--picture {
@@ -546,10 +580,14 @@ body.profile-kids-primar .mascot-avatar--tiny {
 .lesson-option-btn {
   padding: 1rem;
   font-size: 1.5rem;
-  border: 2px solid #e4e0d6;
+  border: 3px solid #e6ddff;
   border-radius: 12px;
   background: #fff;
   cursor: pointer;
+}
+
+.lesson-option-btn:not(:disabled):hover {
+  border-color: var(--kid-teal, #00cec9);
 }
 
 .lesson-option-btn:disabled {
@@ -587,6 +625,15 @@ body.profile-kids-primar .mascot-avatar--tiny {
 }
 
 #lesson-next-btn[hidden] {
+  display: none;
+}
+
+#lesson-replay-btn {
+  display: block;
+  margin: 0.5rem auto 0;
+}
+
+#lesson-replay-btn[hidden] {
   display: none;
 }
 

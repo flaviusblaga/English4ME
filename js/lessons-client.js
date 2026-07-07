@@ -153,46 +153,50 @@ export function getRandomLine(lines) {
   return lines[Math.floor(Math.random() * lines.length)];
 }
 
+// Deliberately NOT prefixed with "Bobo:"/"Fizz:" — whichever mascot the child
+// has selected (see js/lessons.js's mascot preference) delivers these lines,
+// so the pool has to work no matter who's speaking. Lines also avoid naming
+// the *other* mascot, for the same reason.
 export const QUESTION_STEM_LINES = {
   picture: [
-    "Bobo: Ooh, can you find the picture for this word?",
-    "Bobo: Quick, which picture matches?? Go go go!",
-    "Bobo: Let's see if you can spot it — ready?",
+    "Ooh, can you find the picture for this word?",
+    "Quick, which picture matches?? Go go go!",
+    "Let's see if you can spot it — ready?",
   ],
   translation: [
-    "Bobo: Do you know the English word for this one?",
-    "Bobo: Ooh, tricky! Which English word means this?",
-    "Bobo: Fizz says you can do this one — can you?",
+    "Do you know the English word for this one?",
+    "Ooh, tricky! Which English word means this?",
+    "I bet you know this one — can you?",
   ],
 };
 
 export const CORRECT_REACTION_LINES = [
-  "Bobo: YES! You got it! High paw!",
-  "Bobo: Whoa, you're SO fast! Nailed it!",
-  "Bobo: That's exactly right — you're basically an English expert now!",
-  "Bobo: Woohoo! Fizz, did you see that?!",
-  "Bobo: Yesss! Perfect! Let's keep going!",
-  "Bobo: Ha! Knew you had it! Great job!",
+  "YES! You got it! High paw!",
+  "Whoa, you're SO fast! Nailed it!",
+  "That's exactly right — you're basically an English expert now!",
+  "Woohoo! Did you see that?!",
+  "Yesss! Perfect! Let's keep going!",
+  "Ha! Knew you had it! Great job!",
 ];
 
 export const INCORRECT_REACTION_LINES = [
-  "Fizz: Ooh, close! It's actually this one — but hey, now you know it!",
-  "Fizz: Umm, not quite — it's this one! You'll get it next time for sure.",
-  "Fizz: That's okay! It's this one — one more word for your brain collection!",
-  "Fizz: Almost! The answer was this one — you're still doing great.",
-  "Fizz: No worries at all — it's this one. Even I mix these up sometimes!",
-  "Fizz: Eek, tricky one! It's this — but look how many you're getting right already!",
+  "Ooh, close! It's actually this one — but hey, now you know it!",
+  "Umm, not quite — it's this one! You'll get it next time for sure.",
+  "That's okay! It's this one — one more word for your brain collection!",
+  "Almost! The answer was this one — you're still doing great.",
+  "No worries at all — it's this one. Even I mix these up sometimes!",
+  "Eek, tricky one! It's this — but look how many you're getting right already!",
 ];
 
 export const LESSON_MENU_INTRO_LINES = [
-  "Bobo: Pick any lesson you want — Fizz and I will be right here!",
-  "Bobo: Ooh, so many lessons! Which one sounds fun today?",
-  "Bobo: You choose! There's no wrong lesson to start with!",
+  "Pick any lesson you want — I'll be right here with you!",
+  "Ooh, so many lessons! Which one sounds fun today?",
+  "You choose! There's no wrong lesson to start with!",
 ];
 
 export function getLessonCompleteLine(score, total) {
   const ratio = score / total;
-  if (ratio >= 0.75) return "Fizz: Wow, look at you go! That was amazing!";
-  if (ratio >= 0.4375) return "Fizz: Great practice! You're learning so many words!";
-  return "Fizz: Nice try! Want to play this lesson again? Practice makes it stick!";
+  if (ratio >= 0.75) return "Wow, look at you go! That was amazing!";
+  if (ratio >= 0.4375) return "Great practice! You're learning so many words!";
+  return "Nice try! Want to play this lesson again? Practice makes it stick!";
 }
