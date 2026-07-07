@@ -5,9 +5,9 @@ function fileNameForProfile(profileId) {
   return `engleza-familie-${profileId}.json`;
 }
 
-function defaultState({ profileId, userEmail, displayName, level }) {
+function defaultState({ profileId, userEmail, displayName, level, features }) {
   const now = new Date().toISOString();
-  return {
+  const state = {
     schemaVersion: 1,
     profileId,
     userEmail,
@@ -32,6 +32,26 @@ function defaultState({ profileId, userEmail, displayName, level }) {
       lastSyncedAt: now,
     },
   };
+
+  if (features && features.gamification) {
+    state.gamification = {
+      points: 0,
+      currentStreak: 0,
+      longestStreak: 0,
+      lastPracticeDate: null,
+      badges: [],
+    };
+  }
+
+  if (features && features.parentVisible) {
+    state.parentSync = {
+      todayDate: null,
+      todayTurns: [],
+      lastSyncedAt: null,
+    };
+  }
+
+  return state;
 }
 
 async function findFile(accessToken, filename) {
@@ -99,12 +119,12 @@ async function saveFileContent(accessToken, fileId, content) {
 }
 
 // Returns { fileId, data } — creates the file with default content on first use.
-export async function getOrCreateState(accessToken, { profileId, userEmail, displayName, level }) {
+export async function getOrCreateState(accessToken, { profileId, userEmail, displayName, level, features }) {
   const filename = fileNameForProfile(profileId);
   let fileId = await findFile(accessToken, filename);
 
   if (!fileId) {
-    const initial = defaultState({ profileId, userEmail, displayName, level });
+    const initial = defaultState({ profileId, userEmail, displayName, level, features });
     fileId = await createFile(accessToken, filename, initial);
     return { fileId, data: initial };
   }

@@ -100,6 +100,10 @@ body {
   font-size: 0.85rem;
 }
 
+.chat-header-center[hidden] {
+  display: none;
+}
+
 .scenario-label {
   color: #666;
 }
@@ -270,4 +274,211 @@ body {
   overflow-x: auto;
   max-height: 200px;
   border-radius: 8px;
+}
+
+/* Profile picker screen */
+.card-wide {
+  max-width: 480px;
+}
+
+.profile-picker-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.profile-card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.25rem;
+  padding: 1rem;
+  border: 2px solid #e4e0d6;
+  border-radius: 10px;
+  background: #fff;
+  cursor: pointer;
+  text-align: left;
+  font: inherit;
+}
+
+.profile-card:hover {
+  border-color: #2f6f4f;
+}
+
+.profile-card--remembered {
+  border-color: #2f6f4f;
+  box-shadow: 0 0 0 2px rgba(47, 111, 79, 0.2);
+}
+
+.profile-card span {
+  color: #666;
+  font-size: 0.85rem;
+}
+
+/* Gamification bar + badges */
+.gamification-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.85rem;
+}
+
+.gamification-bar[hidden] {
+  display: none;
+}
+
+.gamification-points,
+.gamification-streak {
+  background: #fff2d9;
+  border-radius: 999px;
+  padding: 0.2rem 0.6rem;
+  font-weight: 600;
+}
+
+.gamification-badges-panel {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  background: #fffaf0;
+  border-bottom: 1px solid #e4e0d6;
+}
+
+.gamification-badges-panel[hidden] {
+  display: none;
+}
+
+.gamification-badge-chip {
+  padding: 0.3rem 0.6rem;
+  border-radius: 999px;
+  background: #f0ede2;
+  font-size: 0.8rem;
+}
+
+.gamification-badge-chip--locked {
+  opacity: 0.35;
+}
+
+/* Kids — Primar profile theme (scoped; adult profile styles above are untouched) */
+body.profile-kids-primar {
+  background: #fff4e0;
+}
+
+body.profile-kids-primar .chat-header {
+  background: #ffe0a3;
+  border-bottom: 3px solid #ff9d4d;
+}
+
+body.profile-kids-primar .btn-primary {
+  background: #ff7a3d;
+  font-size: 1.05rem;
+  padding: 0.75rem 1.4rem;
+  border-radius: 14px;
+}
+
+body.profile-kids-primar .chat-bubble--user {
+  background: #4f9dff;
+  border-radius: 18px;
+}
+
+body.profile-kids-primar .chat-bubble--assistant {
+  background: #fffaf0;
+  border: 2px solid #ffb84d;
+  border-radius: 18px;
+}
+
+body.profile-kids-primar .mascot-line {
+  margin: 0.2rem 0;
+}
+
+body.profile-kids-primar .mascot-name {
+  font-weight: 700;
+}
+
+body.profile-kids-primar #chat-input {
+  font-size: 1.1rem;
+  padding: 0.75rem;
+}
+
+body.profile-kids-primar #chat-send {
+  min-width: 70px;
+}
+
+body.profile-kids-primar .mascot-avatar {
+  width: 1.3em;
+  height: 1.3em;
+  vertical-align: middle;
+  object-fit: contain;
+  border-radius: 50%;
+}
+
+/* Parent view screen */
+.parent-view-body {
+  padding: 1rem;
+  max-width: 640px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.parent-view-lookup {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-bottom: 1rem;
+}
+
+.parent-view-lookup input {
+  flex: 1;
+  min-width: 200px;
+  padding: 0.5rem;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+}
+
+.parent-view-summary {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+  margin-bottom: 0.75rem;
+  font-size: 0.9rem;
+}
+
+.parent-view-days {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.parent-view-day {
+  background: #fff;
+  border: 1px solid #e4e0d6;
+  border-radius: 8px;
+  padding: 0.5rem 0.75rem;
+}
+
+.parent-view-day summary {
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.parent-view-transcript {
+  margin-top: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.parent-view-line {
+  margin: 0;
+  font-size: 0.85rem;
+  padding: 0.3rem 0.5rem;
+  border-radius: 6px;
+  background: #f4f1ea;
+}
+
+.parent-view-line--user {
+  background: #e6f0ff;
 }
