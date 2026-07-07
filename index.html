@@ -18,29 +18,44 @@
     </div>
   </main>
 
+  <main id="screen-profile-picker" class="screen" hidden>
+    <div class="card card-wide">
+      <h1>Who's practicing today?</h1>
+      <div id="profile-picker-list" class="profile-picker-list"></div>
+    </div>
+  </main>
+
   <main id="screen-chat" class="screen" hidden>
     <header class="chat-header">
       <div>
         <strong id="current-user-name"></strong>
         <span id="current-profile-name" class="profile-tag"></span>
       </div>
-      <div class="chat-header-center">
+      <div id="scenario-select-wrap" class="chat-header-center" hidden>
         <label for="scenario-select" class="scenario-label">Practice:</label>
         <select id="scenario-select">
           <option value="">Free conversation</option>
         </select>
       </div>
       <div class="chat-header-right">
+        <div id="gamification-bar" class="gamification-bar" hidden>
+          <span id="gamification-points" class="gamification-points">⭐ 0</span>
+          <span id="gamification-streak" class="gamification-streak">🔥 0</span>
+          <button id="gamification-badges-btn" class="btn btn-small">🏅 Badges</button>
+        </div>
         <span id="budget-indicator" class="budget-indicator"></span>
         <select id="voice-gender-select" class="voice-gender-select" title="Interlocutor voice">
           <option value="female">👩 Female voice</option>
           <option value="male">👨 Male voice</option>
         </select>
         <button id="tts-mute-btn" class="btn btn-small" aria-pressed="false">🔊 Voice on</button>
+        <button id="view-child-progress-btn" class="btn btn-small" hidden>👀 View child's progress</button>
         <button id="debug-data-btn" class="btn btn-small">Show saved data</button>
         <button id="logout-btn" class="btn btn-small">Sign out</button>
       </div>
     </header>
+
+    <div id="gamification-badges-panel" class="gamification-badges-panel" hidden></div>
 
     <div id="scenario-documents" class="scenario-documents" hidden>
       <div class="scenario-documents-summary">
@@ -73,6 +88,38 @@
     </footer>
 
     <pre id="debug-data-output" class="debug-output" hidden></pre>
+  </main>
+
+  <main id="screen-parent-view" class="screen" hidden>
+    <header class="chat-header">
+      <strong>Parent view</strong>
+      <button id="parent-view-back-btn" class="btn btn-small">← Back to chat</button>
+    </header>
+
+    <div class="parent-view-body">
+      <div class="parent-view-lookup">
+        <label for="parent-view-email-input">Child's email:</label>
+        <input id="parent-view-email-input" type="email" placeholder="child@gmail.com" />
+        <select id="parent-view-profile-select">
+          <option value="kids-primar">Socatei — Bobo &amp; Fizz</option>
+        </select>
+        <button id="parent-view-load-btn" class="btn btn-primary">Load</button>
+      </div>
+
+      <p id="parent-view-status" class="hint" hidden></p>
+
+      <div id="parent-view-results" hidden>
+        <div class="parent-view-summary">
+          <span id="parent-view-name"></span>
+          <span id="parent-view-points">⭐ 0</span>
+          <span id="parent-view-streak">🔥 0</span>
+          <span id="parent-view-turns"></span>
+        </div>
+        <div id="parent-view-badges" class="gamification-badges-panel"></div>
+        <p id="parent-view-caps-note" class="hint" hidden></p>
+        <div id="parent-view-days" class="parent-view-days"></div>
+      </div>
+    </div>
   </main>
 
   <script type="module" src="js/app.js"></script>
