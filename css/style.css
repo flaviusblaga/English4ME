@@ -448,6 +448,10 @@ body.profile-kids-primar .mascot-avatar--tiny {
   border-bottom: 1px solid #e4e0d6;
 }
 
+.mascot-select-bar[hidden] {
+  display: none;
+}
+
 .mascot-select-label {
   font-size: 0.85rem;
   color: #666;
@@ -580,6 +584,10 @@ body.profile-kids-primar .mascot-avatar--tiny {
 #lesson-next-btn {
   display: block;
   margin: 1rem auto;
+}
+
+#lesson-next-btn[hidden] {
+  display: none;
 }
 
 /* Parent view screen */
