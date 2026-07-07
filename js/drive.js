@@ -5,6 +5,41 @@ function fileNameForProfile(profileId) {
   return `engleza-familie-${profileId}.json`;
 }
 
+// Fills in any feature-gated field a state object is missing, without
+// touching fields that already exist. Applied both to brand-new files
+// (defaultState) and to existing files loaded from Drive (getOrCreateState)
+// — a returning user's file predates whichever feature was added most
+// recently, so this is how older files pick up new fields without a real
+// migration step (matches this app's additive-only schema philosophy).
+function applyFeatureDefaults(state, features) {
+  if (features && features.gamification && !state.gamification) {
+    state.gamification = {
+      points: 0,
+      currentStreak: 0,
+      longestStreak: 0,
+      lastPracticeDate: null,
+      badges: [],
+    };
+  }
+
+  if (features && features.parentVisible && !state.parentSync) {
+    state.parentSync = {
+      todayDate: null,
+      todayTurns: [],
+      lastSyncedAt: null,
+    };
+  }
+
+  if (features && features.lessons && !state.lessons) {
+    state.lessons = {
+      lastLessonId: null,
+      completed: {}, // lessonId -> { bestScore, attempts, lastCompletedAt, wordsEverCorrect: [] }
+    };
+  }
+
+  return state;
+}
+
 function defaultState({ profileId, userEmail, displayName, level, features }) {
   const now = new Date().toISOString();
   const state = {
@@ -33,32 +68,7 @@ function defaultState({ profileId, userEmail, displayName, level, features }) {
     },
   };
 
-  if (features && features.gamification) {
-    state.gamification = {
-      points: 0,
-      currentStreak: 0,
-      longestStreak: 0,
-      lastPracticeDate: null,
-      badges: [],
-    };
-  }
-
-  if (features && features.parentVisible) {
-    state.parentSync = {
-      todayDate: null,
-      todayTurns: [],
-      lastSyncedAt: null,
-    };
-  }
-
-  if (features && features.lessons) {
-    state.lessons = {
-      lastLessonId: null,
-      completed: {}, // lessonId -> { bestScore, attempts, lastCompletedAt, wordsEverCorrect: [] }
-    };
-  }
-
-  return state;
+  return applyFeatureDefaults(state, features);
 }
 
 async function findFile(accessToken, filename) {
@@ -137,6 +147,7 @@ export async function getOrCreateState(accessToken, { profileId, userEmail, disp
   }
 
   const data = await loadFileContent(accessToken, fileId);
+  applyFeatureDefaults(data, features); // patch in any fields added since this file was created
   return { fileId, data };
 }
 
