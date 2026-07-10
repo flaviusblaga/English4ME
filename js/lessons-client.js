@@ -123,6 +123,258 @@ export function getLesson(lessonId) {
   return LESSONS.find((l) => l.id === lessonId) || null;
 }
 
+// Intermediate tier — simple-sentence-level content, not single words. Each
+// sentence is authored once (en, ro, emoji, blankWord, blankSentence,
+// distractorWords) and all 3 exercise types (fill-blank, unscramble,
+// picture-sentence) derive their options from that one record — see
+// buildSentenceExerciseQueue below.
+export const SENTENCE_LESSONS = [
+  {
+    id: "animals",
+    label: "Animals",
+    sentences: [
+      { en: "The dog runs in the park.", ro: "Câinele aleargă în parc.", emoji: "🐕",
+        blankWord: "runs", blankSentence: "The dog ____ in the park.",
+        distractorWords: ["sleeps", "swims", "sits"] },
+      { en: "The cat sleeps on the sofa.", ro: "Pisica doarme pe canapea.", emoji: "🐱",
+        blankWord: "sleeps", blankSentence: "The cat ____ on the sofa.",
+        distractorWords: ["jumps", "eats", "plays"] },
+      { en: "Birds fly in the sky.", ro: "Păsările zboară pe cer.", emoji: "🐦",
+        blankWord: "fly", blankSentence: "Birds ____ in the sky.",
+        distractorWords: ["walk", "swim", "sing"] },
+      { en: "Fish swim in the water.", ro: "Peștii înoată în apă.", emoji: "🐟",
+        blankWord: "swim", blankSentence: "Fish ____ in the water.",
+        distractorWords: ["fly", "run", "jump"] },
+      { en: "The rabbit eats a carrot.", ro: "Iepurele mănâncă un morcov.", emoji: "🐰",
+        blankWord: "eats", blankSentence: "The rabbit ____ a carrot.",
+        distractorWords: ["drinks", "throws", "finds"] },
+      { en: "The horse jumps over the fence.", ro: "Calul sare peste gard.", emoji: "🐴",
+        blankWord: "jumps", blankSentence: "The horse ____ over the fence.",
+        distractorWords: ["walks", "looks", "stops"] },
+      { en: "The duck swims in the pond.", ro: "Rața înoată în iaz.", emoji: "🦆",
+        blankWord: "swims", blankSentence: "The duck ____ in the pond.",
+        distractorWords: ["flies", "runs", "sleeps"] },
+      { en: "The frog jumps into the water.", ro: "Broasca sare în apă.", emoji: "🐸",
+        blankWord: "jumps", blankSentence: "The frog ____ into the water.",
+        distractorWords: ["walks", "swims", "sits"] },
+    ],
+  },
+  {
+    id: "family",
+    label: "Family",
+    sentences: [
+      { en: "My mother cooks dinner every day.", ro: "Mama mea gătește cina în fiecare zi.", emoji: "👩",
+        blankWord: "cooks", blankSentence: "My mother ____ dinner every day.",
+        distractorWords: ["buys", "eats", "cleans"] },
+      { en: "My father drives to work.", ro: "Tatăl meu conduce la muncă.", emoji: "👨",
+        blankWord: "drives", blankSentence: "My father ____ to work.",
+        distractorWords: ["walks", "runs", "flies"] },
+      { en: "My sister reads books every night.", ro: "Sora mea citește cărți în fiecare seară.", emoji: "👧",
+        blankWord: "reads", blankSentence: "My sister ____ books every night.",
+        distractorWords: ["writes", "buys", "draws"] },
+      { en: "My brother plays football on weekends.", ro: "Fratele meu joacă fotbal în weekend.", emoji: "👦",
+        blankWord: "plays", blankSentence: "My brother ____ football on weekends.",
+        distractorWords: ["watches", "buys", "draws"] },
+      { en: "My grandmother tells nice stories.", ro: "Bunica mea spune povești frumoase.", emoji: "👵",
+        blankWord: "tells", blankSentence: "My grandmother ____ nice stories.",
+        distractorWords: ["writes", "reads", "sings"] },
+      { en: "My grandfather works in the garden.", ro: "Bunicul meu lucrează în grădină.", emoji: "👴",
+        blankWord: "works", blankSentence: "My grandfather ____ in the garden.",
+        distractorWords: ["sleeps", "sits", "walks"] },
+      { en: "The baby sleeps in the crib.", ro: "Bebelușul doarme în pătuț.", emoji: "👶",
+        blankWord: "sleeps", blankSentence: "The baby ____ in the crib.",
+        distractorWords: ["plays", "cries", "eats"] },
+      { en: "Our family eats dinner together.", ro: "Familia noastră mănâncă cina împreună.", emoji: "👨‍👩‍👧‍👦",
+        blankWord: "eats", blankSentence: "Our family ____ dinner together.",
+        distractorWords: ["cooks", "buys", "makes"] },
+    ],
+  },
+  {
+    id: "daily-routines",
+    label: "Daily Routines",
+    sentences: [
+      { en: "I wake up at seven.", ro: "Mă trezesc la șapte.", emoji: "⏰",
+        blankWord: "wake", blankSentence: "I ____ up at seven.",
+        distractorWords: ["stay", "sit", "look"] },
+      { en: "She brushes her teeth.", ro: "Ea se spală pe dinți.", emoji: "🪥",
+        blankWord: "brushes", blankSentence: "She ____ her teeth.",
+        distractorWords: ["washes", "brings", "opens"] },
+      { en: "We eat breakfast together.", ro: "Mâncăm micul dejun împreună.", emoji: "🍳",
+        blankWord: "eat", blankSentence: "We ____ breakfast together.",
+        distractorWords: ["make", "buy", "want"] },
+      { en: "He goes to school by bus.", ro: "El merge la școală cu autobuzul.", emoji: "🚌",
+        blankWord: "goes", blankSentence: "He ____ to school by bus.",
+        distractorWords: ["runs", "walks", "rides"] },
+      { en: "I do my homework after school.", ro: "Îmi fac tema după școală.", emoji: "📚",
+        blankWord: "do", blankSentence: "I ____ my homework after school.",
+        distractorWords: ["make", "have", "take"] },
+      { en: "They play outside in the evening.", ro: "Ei se joacă afară seara.", emoji: "🌆",
+        blankWord: "play", blankSentence: "They ____ outside in the evening.",
+        distractorWords: ["stay", "walk", "run"] },
+      { en: "She takes a bath before bed.", ro: "Ea face baie înainte de culcare.", emoji: "🛁",
+        blankWord: "takes", blankSentence: "She ____ a bath before bed.",
+        distractorWords: ["makes", "does", "gets"] },
+      { en: "I go to sleep at nine.", ro: "Mă duc la culcare la nouă.", emoji: "🌙",
+        blankWord: "go", blankSentence: "I ____ to sleep at nine.",
+        distractorWords: ["fall", "am", "get"] },
+    ],
+  },
+  {
+    id: "school",
+    label: "School",
+    sentences: [
+      { en: "I read a book in class.", ro: "Citesc o carte în clasă.", emoji: "📖",
+        blankWord: "read", blankSentence: "I ____ a book in class.",
+        distractorWords: ["write", "draw", "buy"] },
+      { en: "She writes her name on the paper.", ro: "Ea își scrie numele pe hârtie.", emoji: "✏️",
+        blankWord: "writes", blankSentence: "She ____ her name on the paper.",
+        distractorWords: ["reads", "draws", "erases"] },
+      { en: "The teacher explains the lesson.", ro: "Profesoara explică lecția.", emoji: "🍎",
+        blankWord: "explains", blankSentence: "The teacher ____ the lesson.",
+        distractorWords: ["reads", "writes", "forgets"] },
+      { en: "We sit at our desks.", ro: "Ne așezăm la bănci.", emoji: "🪑",
+        blankWord: "sit", blankSentence: "We ____ at our desks.",
+        distractorWords: ["stand", "jump", "run"] },
+      { en: "I carry my backpack to school.", ro: "Îmi car ghiozdanul la școală.", emoji: "🎒",
+        blankWord: "carry", blankSentence: "I ____ my backpack to school.",
+        distractorWords: ["forget", "lose", "open"] },
+      { en: "Our classroom has big windows.", ro: "Clasa noastră are ferestre mari.", emoji: "🏫",
+        blankWord: "has", blankSentence: "Our classroom ____ big windows.",
+        distractorWords: ["needs", "sees", "makes"] },
+      { en: "My friend helps me with math.", ro: "Prietenul meu mă ajută la matematică.", emoji: "🧑‍🤝‍🧑",
+        blankWord: "helps", blankSentence: "My friend ____ me with math.",
+        distractorWords: ["watches", "asks", "tells"] },
+      { en: "I finish my homework at home.", ro: "Îmi termin tema acasă.", emoji: "📝",
+        blankWord: "finish", blankSentence: "I ____ my homework at home.",
+        distractorWords: ["start", "forget", "lose"] },
+    ],
+  },
+  {
+    id: "food",
+    label: "Food",
+    sentences: [
+      { en: "I eat an apple every morning.", ro: "Mănânc un măr în fiecare dimineață.", emoji: "🍎",
+        blankWord: "eat", blankSentence: "I ____ an apple every morning.",
+        distractorWords: ["drink", "buy", "cook"] },
+      { en: "She likes bananas a lot.", ro: "Ei îi plac foarte mult bananele.", emoji: "🍌",
+        blankWord: "likes", blankSentence: "She ____ bananas a lot.",
+        distractorWords: ["hates", "buys", "cooks"] },
+      { en: "We drink milk at breakfast.", ro: "Bem lapte la micul dejun.", emoji: "🥛",
+        blankWord: "drink", blankSentence: "We ____ milk at breakfast.",
+        distractorWords: ["eat", "buy", "pour"] },
+      { en: "My mother bakes bread on Sundays.", ro: "Mama mea coace pâine duminica.", emoji: "🍞",
+        blankWord: "bakes", blankSentence: "My mother ____ bread on Sundays.",
+        distractorWords: ["buys", "eats", "cuts"] },
+      { en: "I want a cookie, please.", ro: "Vreau un fursec, te rog.", emoji: "🍪",
+        blankWord: "want", blankSentence: "I ____ a cookie, please.",
+        distractorWords: ["make", "hide", "throw"] },
+      { en: "He cooks eggs for dinner.", ro: "El gătește ouă la cină.", emoji: "🥚",
+        blankWord: "cooks", blankSentence: "He ____ eggs for dinner.",
+        distractorWords: ["buys", "washes", "breaks"] },
+      { en: "We share cheese on the sandwich.", ro: "Împărțim brânză pe sandviș.", emoji: "🧀",
+        blankWord: "share", blankSentence: "We ____ cheese on the sandwich.",
+        distractorWords: ["buy", "cut", "find"] },
+      { en: "I drink water when I'm thirsty.", ro: "Beau apă când mi-e sete.", emoji: "💧",
+        blankWord: "drink", blankSentence: "I ____ water when I'm thirsty.",
+        distractorWords: ["eat", "pour", "buy"] },
+    ],
+  },
+  {
+    id: "weather",
+    label: "Weather",
+    sentences: [
+      { en: "The sun shines in the summer.", ro: "Soarele strălucește vara.", emoji: "☀️",
+        blankWord: "shines", blankSentence: "The sun ____ in the summer.",
+        distractorWords: ["falls", "runs", "hides"] },
+      { en: "It rains a lot in April.", ro: "Plouă mult în aprilie.", emoji: "🌧️",
+        blankWord: "rains", blankSentence: "It ____ a lot in April.",
+        distractorWords: ["snows", "shines", "blows"] },
+      { en: "Snow falls in winter.", ro: "Zăpada cade iarna.", emoji: "❄️",
+        blankWord: "falls", blankSentence: "Snow ____ in winter.",
+        distractorWords: ["melts", "shines", "blows"] },
+      { en: "The wind blows through the trees.", ro: "Vântul suflă printre copaci.", emoji: "💨",
+        blankWord: "blows", blankSentence: "The wind ____ through the trees.",
+        distractorWords: ["falls", "shines", "stops"] },
+      { en: "Clouds cover the sky today.", ro: "Norii acoperă cerul azi.", emoji: "☁️",
+        blankWord: "cover", blankSentence: "Clouds ____ the sky today.",
+        distractorWords: ["open", "clean", "paint"] },
+      { en: "I feel hot in the summer.", ro: "Simt cald vara.", emoji: "🥵",
+        blankWord: "feel", blankSentence: "I ____ hot in the summer.",
+        distractorWords: ["look", "find", "make"] },
+      { en: "We feel cold in winter.", ro: "Simțim frig iarna.", emoji: "🥶",
+        blankWord: "feel", blankSentence: "We ____ cold in winter.",
+        distractorWords: ["look", "find", "make"] },
+      { en: "A storm comes at night.", ro: "O furtună vine noaptea.", emoji: "⛈️",
+        blankWord: "comes", blankSentence: "A storm ____ at night.",
+        distractorWords: ["goes", "stops", "waits"] },
+    ],
+  },
+  {
+    id: "prepositions",
+    label: "Prepositions",
+    sentences: [
+      { en: "The cat is under the table.", ro: "Pisica este sub masă.", emoji: "🐱",
+        blankWord: "under", blankSentence: "The cat is ____ the table.",
+        distractorWords: ["on", "behind", "next to"] },
+      { en: "The book is on the desk.", ro: "Cartea este pe bancă.", emoji: "📖",
+        blankWord: "on", blankSentence: "The book is ____ the desk.",
+        distractorWords: ["under", "behind", "in"] },
+      { en: "The dog is next to the door.", ro: "Câinele este lângă ușă.", emoji: "🐕",
+        blankWord: "next to", blankSentence: "The dog is ____ the door.",
+        distractorWords: ["under", "in", "behind"] },
+      { en: "The ball is behind the sofa.", ro: "Mingea este în spatele canapelei.", emoji: "⚽",
+        blankWord: "behind", blankSentence: "The ball is ____ the sofa.",
+        distractorWords: ["on", "under", "next to"] },
+      { en: "The toy is in the box.", ro: "Jucăria este în cutie.", emoji: "🧸",
+        blankWord: "in", blankSentence: "The toy is ____ the box.",
+        distractorWords: ["on", "under", "behind"] },
+      { en: "The bird is on the roof.", ro: "Pasărea este pe acoperiș.", emoji: "🐦",
+        blankWord: "on", blankSentence: "The bird is ____ the roof.",
+        distractorWords: ["under", "in", "next to"] },
+      { en: "The shoes are under the bed.", ro: "Pantofii sunt sub pat.", emoji: "👟",
+        blankWord: "under", blankSentence: "The shoes are ____ the bed.",
+        distractorWords: ["on", "behind", "in"] },
+      { en: "The car is next to the house.", ro: "Mașina este lângă casă.", emoji: "🚗",
+        blankWord: "next to", blankSentence: "The car is ____ the house.",
+        distractorWords: ["under", "on", "in"] },
+    ],
+  },
+  {
+    id: "questions",
+    label: "Questions",
+    sentences: [
+      { en: "Where is the dog?", ro: "Unde este câinele?", emoji: "🐕",
+        blankWord: "Where", blankSentence: "____ is the dog?",
+        distractorWords: ["What", "Who", "When"] },
+      { en: "What is she eating?", ro: "Ce mănâncă ea?", emoji: "🍎",
+        blankWord: "What", blankSentence: "____ is she eating?",
+        distractorWords: ["Where", "Who", "Why"] },
+      { en: "Who is your best friend?", ro: "Cine e cel mai bun prieten al tău?", emoji: "🧑‍🤝‍🧑",
+        blankWord: "Who", blankSentence: "____ is your best friend?",
+        distractorWords: ["What", "Where", "When"] },
+      { en: "When is your birthday?", ro: "Când e ziua ta de naștere?", emoji: "🎂",
+        blankWord: "When", blankSentence: "____ is your birthday?",
+        distractorWords: ["Where", "What", "Who"] },
+      { en: "How are you today?", ro: "Ce mai faci azi?", emoji: "😊",
+        blankWord: "How", blankSentence: "____ are you today?",
+        distractorWords: ["What", "Where", "Who"] },
+      { en: "Why is she happy?", ro: "De ce este ea fericită?", emoji: "😃",
+        blankWord: "Why", blankSentence: "____ is she happy?",
+        distractorWords: ["Where", "When", "Who"] },
+      { en: "How many apples do you have?", ro: "Câte mere ai?", emoji: "🍎",
+        blankWord: "How many", blankSentence: "____ apples do you have?",
+        distractorWords: ["What", "Where", "Who"] },
+      { en: "Whose bag is this?", ro: "A cui geantă este asta?", emoji: "🎒",
+        blankWord: "Whose", blankSentence: "____ bag is this?",
+        distractorWords: ["What", "Where", "Who"] },
+    ],
+  },
+];
+
+export function getSentenceLesson(lessonId) {
+  return SENTENCE_LESSONS.find((l) => l.id === lessonId) || null;
+}
+
 function shuffle(arr) {
   const a = [...arr];
   for (let i = a.length - 1; i > 0; i--) {
@@ -149,6 +401,40 @@ export function buildExerciseQueue(lesson) {
   return shuffle(questions);
 }
 
+function buildBlankOptions(sentence) {
+  const options = [
+    { value: sentence.blankWord, isCorrect: true },
+    ...sentence.distractorWords.map((w) => ({ value: w, isCorrect: false })),
+  ];
+  return shuffle(options);
+}
+
+function buildPictureSentenceOptions(sentence) {
+  const options = [
+    { value: sentence.en, isCorrect: true },
+    ...sentence.distractorWords.map((w) => ({
+      value: sentence.blankSentence.replace("____", w),
+      isCorrect: false,
+    })),
+  ];
+  return shuffle(options);
+}
+
+// Builds the 24-question shuffled exercise queue for an Intermediate lesson
+// (8 sentences x 3 types: fill-blank, unscramble, picture-sentence). Every
+// exercise type derives its options from the same authored sentence record —
+// no separate distractor content needed per type (see SENTENCE_LESSONS
+// comment above buildBlankOptions' call sites for the reasoning).
+export function buildSentenceExerciseQueue(lesson) {
+  const questions = [];
+  for (const sentence of lesson.sentences) {
+    questions.push({ type: "fill-blank", sentence, options: buildBlankOptions(sentence) });
+    questions.push({ type: "unscramble", sentence, tokens: shuffle(sentence.en.split(" ")) });
+    questions.push({ type: "picture-sentence", sentence, options: buildPictureSentenceOptions(sentence) });
+  }
+  return shuffle(questions);
+}
+
 export function getRandomLine(lines) {
   return lines[Math.floor(Math.random() * lines.length)];
 }
@@ -167,6 +453,24 @@ export const QUESTION_STEM_LINES = {
     "Do you know the English word for this one?",
     "Ooh, tricky! Which English word means this?",
     "I bet you know this one — can you?",
+  ],
+};
+
+export const SENTENCE_QUESTION_STEM_LINES = {
+  "fill-blank": [
+    "Can you find the missing word?",
+    "Ooh, what word goes here?",
+    "Let's fill in the blank — ready?",
+  ],
+  unscramble: [
+    "Can you put these words in the right order?",
+    "Ooh, these words got all mixed up! Can you fix them?",
+    "Let's build the sentence together — tap the words in order!",
+  ],
+  "picture-sentence": [
+    "Which sentence matches this picture?",
+    "Can you pick the sentence that's really true?",
+    "Ooh, look closely — which one is right?",
   ],
 };
 

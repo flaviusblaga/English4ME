@@ -11,10 +11,19 @@ export const PROFILES = [
   },
   {
     id: "kids-primar",
-    displayName: "Socatei — English with Bobo & Fizz",
+    displayName: "Socatei — Beginner (Bobo & Fizz)",
     level: "beginner",
-    description: "Playful English practice for kids (grades 1-4) with two silly mascot friends, Bobo & Fizz.",
-    features: { scenarios: false, documents: false, gamification: true, parentVisible: true, lessons: true },
+    contentTier: "beginner",
+    description: "Just starting out with English. Playful practice with two silly mascot friends, Bobo & Fizz.",
+    features: { scenarios: false, documents: false, gamification: true, parentVisible: true, lessons: true, mascots: true },
+  },
+  {
+    id: "kids-intermediate",
+    displayName: "Socatei — Intermediate (Bobo & Fizz)",
+    level: "intermediate",
+    contentTier: "intermediate",
+    description: "Already know the basics — time to build full sentences with Bobo & Fizz.",
+    features: { scenarios: false, documents: false, gamification: true, parentVisible: true, lessons: true, mascots: true, lessonsIntermediate: true },
   },
 ];
 

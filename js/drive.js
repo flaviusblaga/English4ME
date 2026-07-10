@@ -37,6 +37,17 @@ function applyFeatureDefaults(state, features) {
     };
   }
 
+  // Separate from state.lessons on purpose — Intermediate's sentence lessons
+  // reuse the same lesson ids (e.g. "animals") for a different content bank
+  // with a different max score, so namespacing ids inside one shared object
+  // would risk badge-counting collisions between tiers.
+  if (features && features.lessonsIntermediate && !state.lessonsIntermediate) {
+    state.lessonsIntermediate = {
+      lastLessonId: null,
+      completed: {}, // lessonId -> { bestScore, attempts, lastCompletedAt, itemsEverCorrect: [] }
+    };
+  }
+
   return state;
 }
 

@@ -115,9 +115,9 @@ export function initChat({ accessToken, userEmail, displayName, fileId, state, p
   // Profile-dependent UI that must be recomputed on every call (not just the
   // first) — a user can sign out and pick a different profile without a full
   // page reload, so this can't live behind the one-time listener guard above.
-  el("mascot-select-bar").hidden = profile.id !== "kids-primar";
-  if (profile.id === "kids-primar") updateMascotSelectUi();
-  el("voice-gender-select").hidden = !isSpeechSynthesisSupported() || profile.id === "kids-primar";
+  el("mascot-select-bar").hidden = !profile.features.mascots;
+  if (profile.features.mascots) updateMascotSelectUi();
+  el("voice-gender-select").hidden = !isSpeechSynthesisSupported() || profile.features.mascots;
 
   if (profile.features.scenarios) {
     el("scenario-select-wrap").hidden = false;
@@ -273,7 +273,7 @@ function appendMessageToLog(role, text, profile) {
   const bubble = document.createElement("div");
   bubble.className = `chat-bubble chat-bubble--${role}`;
 
-  if (role === "assistant" && profile && profile.id === "kids-primar") {
+  if (role === "assistant" && profile && profile.features.mascots) {
     bubble.appendChild(renderMascotLines(text));
   } else {
     bubble.textContent = text;
@@ -434,7 +434,7 @@ async function handleSend() {
       showBanner(result.message);
     } else {
       appendMessageToLog("assistant", result.reply, session.profile);
-      if (session.profile.id === "kids-primar") {
+      if (session.profile.features.mascots) {
         speak(extractSpokenText(result.reply), KIDS_VOICE_OPTIONS);
       } else {
         speak(result.reply);

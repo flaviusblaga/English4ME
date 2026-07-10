@@ -13,8 +13,12 @@ import {
   LESSONS,
   getLesson,
   buildExerciseQueue,
-  getRandomLine,
   QUESTION_STEM_LINES,
+  SENTENCE_LESSONS,
+  getSentenceLesson,
+  buildSentenceExerciseQueue,
+  SENTENCE_QUESTION_STEM_LINES,
+  getRandomLine,
   CORRECT_REACTION_LINES,
   INCORRECT_REACTION_LINES,
   LESSON_MENU_INTRO_LINES,
@@ -24,6 +28,27 @@ import {
 const MASCOT_AVATARS = {
   Bobo: { emoji: "🦫", img: "assets/socatei/bobo.png" },
   Fizz: { emoji: "🐿️", img: "assets/socatei/fizz.png" },
+};
+
+// One entry per contentTier — the only place that needs to grow when a new
+// tier's lesson content ships (Beginner/Intermediate today).
+const TIER_CONFIG = {
+  beginner: {
+    lessonSet: LESSONS,
+    getLessonFn: getLesson,
+    buildQueue: buildExerciseQueue,
+    stemLines: QUESTION_STEM_LINES,
+    stateKey: "lessons",
+    masteryField: "wordsEverCorrect", // unchanged field name — matches existing saved Beginner data
+  },
+  intermediate: {
+    lessonSet: SENTENCE_LESSONS,
+    getLessonFn: getSentenceLesson,
+    buildQueue: buildSentenceExerciseQueue,
+    stemLines: SENTENCE_QUESTION_STEM_LINES,
+    stateKey: "lessonsIntermediate",
+    masteryField: "itemsEverCorrect",
+  },
 };
 
 let session = null; // { accessToken, userEmail, displayName, fileId, state, profile }
@@ -38,6 +63,37 @@ let currentLesson = null;
 
 function el(id) {
   return document.getElementById(id);
+}
+
+function currentTierConfig() {
+  return TIER_CONFIG[session.profile.contentTier];
+}
+
+function currentStateBucket() {
+  return session.state[currentTierConfig().stateKey];
+}
+
+// A stable identifying label per exercise item (word or sentence), used for
+// scoring/mastery tracking and parent-transcript lines — three different
+// question *types* can test the same sentence, so mastery is tracked per
+// item, not per question instance.
+function getItemLabel(question) {
+  return question.word ? question.word.en : question.sentence.en;
+}
+
+function getSpokenAnswer(question) {
+  return question.word ? question.word.en : question.sentence.en;
+}
+
+function questionTypeLabel(type) {
+  switch (type) {
+    case "picture": return "Picture match";
+    case "translation": return "Translation match";
+    case "fill-blank": return "Fill-in-the-blank";
+    case "unscramble": return "Word order";
+    case "picture-sentence": return "Picture-sentence match";
+    default: return "Answered";
+  }
 }
 
 function setMascotAvatar(imgEl, name) {
@@ -88,6 +144,7 @@ export function initLessons({ accessToken, userEmail, displayName, fileId, state
   onChatAboutItCallback = onChatAboutIt;
 
   el("lesson-user-name").textContent = displayName;
+  el("lesson-profile-tag").textContent = profile.displayName;
   el("lesson-just-chat-btn").onclick = () => {
     if (onJustChatCallback) onJustChatCallback(null);
   };
@@ -131,17 +188,20 @@ function showMenu() {
   setMascotAvatar(el("lesson-menu-avatar"), asker);
   el("lesson-menu-intro-line").textContent = `${asker}: ${getRandomLine(LESSON_MENU_INTRO_LINES)}`;
 
+  const tier = currentTierConfig();
+  const bucket = currentStateBucket();
   const grid = el("lesson-menu-grid");
   grid.innerHTML = "";
-  for (const lesson of LESSONS) {
-    const record = session.state.lessons.completed[lesson.id];
+  for (const lesson of tier.lessonSet) {
+    const record = bucket.completed[lesson.id];
+    const maxScore = lesson.words ? lesson.words.length * 2 : lesson.sentences.length * 3;
     const card = document.createElement("button");
     card.type = "button";
     card.className = "lesson-card";
     const title = document.createElement("strong");
     title.textContent = lesson.label;
     const sub = document.createElement("span");
-    sub.textContent = record ? `Best: ${record.bestScore}/16` : "Not started yet";
+    sub.textContent = record ? `Best: ${record.bestScore}/${maxScore}` : "Not started yet";
     card.appendChild(title);
     card.appendChild(sub);
     card.addEventListener("click", () => startLesson(lesson.id));
@@ -150,12 +210,13 @@ function showMenu() {
 }
 
 function startLesson(lessonId) {
-  currentLesson = getLesson(lessonId);
-  currentQueue = buildExerciseQueue(currentLesson);
+  const tier = currentTierConfig();
+  currentLesson = tier.getLessonFn(lessonId);
+  currentQueue = tier.buildQueue(currentLesson);
   currentIndex = 0;
   currentScore = 0;
 
-  session.state.lessons.lastLessonId = lessonId;
+  currentStateBucket().lastLessonId = lessonId;
 
   el("lesson-menu-view").hidden = true;
   el("lesson-exercise-view").hidden = false;
@@ -166,68 +227,166 @@ function startLesson(lessonId) {
 
 function renderQuestion() {
   const question = currentQueue[currentIndex];
+  const tier = currentTierConfig();
   el("lesson-progress-label").textContent = `${currentLesson.label} — ${currentIndex + 1} / ${currentQueue.length}`;
 
   const asker = activeMascotForAsking(currentIndex);
   const promptAvatar = el("lesson-prompt-avatar");
   setMascotAvatar(promptAvatar, asker);
-  el("lesson-prompt-text").textContent = `${asker}: ${getRandomLine(QUESTION_STEM_LINES[question.type])}`;
+  el("lesson-prompt-text").textContent = `${asker}: ${getRandomLine(tier.stemLines[question.type])}`;
+
+  // Reset per-question interactive state shared by every type.
+  el("lesson-reaction-avatar").hidden = true;
+  el("lesson-reaction-text").textContent = "";
+  el("lesson-replay-btn").hidden = true;
+  el("lesson-next-btn").hidden = true;
+  promptAvatar.style.cursor = "default";
+  promptAvatar.onclick = null;
 
   const stem = el("lesson-question-stem");
-  stem.textContent = question.type === "picture" ? question.word.en : question.word.ro;
-  stem.className = `lesson-question-stem lesson-question-stem--${question.type}`;
+  const optionsGrid = el("lesson-options-grid");
+  const unscrambleArea = el("lesson-unscramble-area");
 
-  // Only speak the word itself for "picture" questions — the English word is
-  // already shown as the stem, so hearing it reinforces pronunciation without
-  // giving away the answer (the answer is the picture). For "translation"
-  // questions the stem is Romanian, which the app's TTS (hardcoded en-US)
-  // would mispronounce, so it's read aloud after the answer instead (see
-  // handleAnswer), never here. Also interactive: tapping the avatar/word
-  // replays it, for a child who wants to hear it again before answering.
-  const canReplayNow = question.type === "picture";
-  promptAvatar.style.cursor = canReplayNow ? "pointer" : "default";
-  promptAvatar.onclick = canReplayNow ? () => speak(question.word.en, KIDS_VOICE_OPTIONS) : null;
-  stem.style.cursor = canReplayNow ? "pointer" : "default";
-  stem.onclick = canReplayNow ? () => speak(question.word.en, KIDS_VOICE_OPTIONS) : null;
-  if (canReplayNow) {
-    speak(question.word.en, KIDS_VOICE_OPTIONS);
+  if (question.type === "unscramble") {
+    stem.hidden = true;
+    optionsGrid.hidden = true;
+    unscrambleArea.hidden = false;
+    renderUnscramble(question);
+    return;
   }
 
-  const optionsGrid = el("lesson-options-grid");
+  stem.hidden = false;
+  optionsGrid.hidden = false;
+  unscrambleArea.hidden = true;
+
+  let spokenTarget = null;
+  let canReplayNow = false;
+
+  if (question.type === "picture") {
+    stem.textContent = question.word.en;
+    spokenTarget = question.word.en;
+    canReplayNow = true;
+  } else if (question.type === "translation") {
+    stem.textContent = question.word.ro;
+  } else if (question.type === "fill-blank") {
+    stem.textContent = question.sentence.blankSentence;
+  } else if (question.type === "picture-sentence") {
+    stem.textContent = question.sentence.emoji;
+  }
+  stem.className = `lesson-question-stem lesson-question-stem--${question.type}`;
+
+  // Only "picture" (Beginner) questions are replayable pre-answer — the
+  // English word is already shown as the stem, so hearing it reinforces
+  // pronunciation without giving away the answer (the answer is the
+  // picture/sentence). Fill-blank/translation/picture-sentence would reveal
+  // or mispronounce (Romanian, en-US TTS) the answer if spoken before
+  // answering, so they stay silent until the reaction (see finalizeAnswer).
+  if (canReplayNow) {
+    promptAvatar.style.cursor = "pointer";
+    promptAvatar.onclick = () => speak(spokenTarget, KIDS_VOICE_OPTIONS);
+    stem.style.cursor = "pointer";
+    stem.onclick = () => speak(spokenTarget, KIDS_VOICE_OPTIONS);
+    speak(spokenTarget, KIDS_VOICE_OPTIONS);
+  } else {
+    stem.style.cursor = "default";
+    stem.onclick = null;
+  }
+
+  // Full-sentence options need a single column and smaller text to stay
+  // readable; word/emoji options keep the bigger two-column layout.
+  optionsGrid.classList.toggle("lesson-options-grid--sentences", question.type === "picture-sentence");
+
   optionsGrid.innerHTML = "";
   for (const option of question.options) {
     const btn = document.createElement("button");
     btn.type = "button";
     btn.className = "lesson-option-btn";
     btn.textContent = option.value;
-    btn.addEventListener("click", () => handleAnswer(option, btn));
+    btn.addEventListener("click", () => handleOptionAnswer(option, btn));
     optionsGrid.appendChild(btn);
   }
-
-  el("lesson-reaction-avatar").hidden = true;
-  el("lesson-reaction-text").textContent = "";
-  el("lesson-replay-btn").hidden = true;
-  el("lesson-next-btn").hidden = true;
 }
 
-function handleAnswer(chosenOption, chosenBtn) {
+// Word-chip tap-to-build interaction for the "unscramble" exercise type —
+// tap a bank chip to move it into the build strip (in tap order), tap a
+// build-strip chip to send it back, then "Check" validates exact order.
+function renderUnscramble(question) {
+  const bank = el("lesson-unscramble-bank");
+  const build = el("lesson-unscramble-build");
+  const checkBtn = el("lesson-unscramble-check-btn");
+  const placedIndexes = [];
+
+  function draw() {
+    bank.innerHTML = "";
+    question.tokens.forEach((token, idx) => {
+      if (placedIndexes.includes(idx)) return;
+      const chip = document.createElement("button");
+      chip.type = "button";
+      chip.className = "word-chip";
+      chip.textContent = token;
+      chip.addEventListener("click", () => {
+        placedIndexes.push(idx);
+        draw();
+      });
+      bank.appendChild(chip);
+    });
+
+    build.innerHTML = "";
+    placedIndexes.forEach((idx, pos) => {
+      const chip = document.createElement("button");
+      chip.type = "button";
+      chip.className = "word-chip word-chip--placed";
+      chip.textContent = question.tokens[idx];
+      chip.addEventListener("click", () => {
+        placedIndexes.splice(pos, 1);
+        draw();
+      });
+      build.appendChild(chip);
+    });
+  }
+
+  draw();
+  checkBtn.disabled = false;
+
+  checkBtn.onclick = () => {
+    checkBtn.disabled = true;
+    const builtSentence = placedIndexes.map((idx) => question.tokens[idx]).join(" ");
+    const wasCorrect = builtSentence === question.sentence.en;
+    if (!wasCorrect) {
+      build.querySelectorAll(".word-chip").forEach((c) => c.classList.add("word-chip--wrong-order"));
+    }
+    [...bank.children, ...build.children].forEach((c) => {
+      c.disabled = true;
+    });
+    finalizeAnswer(question, wasCorrect);
+  };
+}
+
+function handleOptionAnswer(chosenOption, chosenBtn) {
   const question = currentQueue[currentIndex];
   const optionButtons = [...el("lesson-options-grid").children];
-
   for (const btn of optionButtons) {
     btn.disabled = true;
   }
 
   const wasCorrect = chosenOption.isCorrect;
-  question.wasCorrect = wasCorrect; // recorded for the lesson-completion mastery summary
   if (wasCorrect) {
-    currentScore += 1;
     chosenBtn.classList.add("lesson-option-btn--correct");
   } else {
     chosenBtn.classList.add("lesson-option-btn--incorrect");
     const correctIndex = question.options.findIndex((o) => o.isCorrect);
     optionButtons[correctIndex].classList.add("lesson-option-btn--correct");
   }
+
+  finalizeAnswer(question, wasCorrect);
+}
+
+// Shared by every exercise type once an answer is locked in: scoring,
+// mascot reaction, TTS, the replay button, advancing, and parent-sync
+// logging.
+function finalizeAnswer(question, wasCorrect) {
+  question.wasCorrect = wasCorrect; // recorded for the lesson-completion mastery summary
+  if (wasCorrect) currentScore += 1;
 
   const reactor = activeMascotForReaction(wasCorrect);
   const reactionAvatar = el("lesson-reaction-avatar");
@@ -236,16 +395,16 @@ function handleAnswer(chosenOption, chosenBtn) {
   const reactionLine = getRandomLine(wasCorrect ? CORRECT_REACTION_LINES : INCORRECT_REACTION_LINES);
   el("lesson-reaction-text").textContent = `${reactor}: ${reactionLine}`;
 
-  // Always speak the actual English word out loud here (not just the flavor
-  // line) — this is the one moment every question guarantees the child hears
-  // the correct word pronounced, whether they got it right or not, and
-  // whether the question was picture- or translation-based.
-  speak(`${reactionLine} ${question.word.en}.`, KIDS_VOICE_OPTIONS);
+  // Always speak the actual correct answer out loud here (not just the
+  // flavor line) — this is the one moment every question guarantees the
+  // child hears it pronounced, whether they got it right or not.
+  const spokenAnswer = getSpokenAnswer(question);
+  speak(`${reactionLine} ${spokenAnswer}.`, KIDS_VOICE_OPTIONS);
 
-  // Interactive replay — tap to hear the word again as many times as wanted.
+  // Interactive replay — tap to hear the answer again as many times as wanted.
   const replayBtn = el("lesson-replay-btn");
   replayBtn.hidden = false;
-  replayBtn.onclick = () => speak(question.word.en, KIDS_VOICE_OPTIONS);
+  replayBtn.onclick = () => speak(spokenAnswer, KIDS_VOICE_OPTIONS);
 
   const isLast = currentIndex === currentQueue.length - 1;
   const nextBtn = el("lesson-next-btn");
@@ -255,7 +414,7 @@ function handleAnswer(chosenOption, chosenBtn) {
 
   recordTurnForParentSync(session.state, {
     role: "user",
-    text: `[Lesson: ${currentLesson.label}] Answered "${question.word.en}" — ${wasCorrect ? "correct!" : `incorrect (correct: "${question.word.en}")`}`,
+    text: `[Lesson: ${currentLesson.label}] ${questionTypeLabel(question.type)} "${getItemLabel(question)}" — ${wasCorrect ? "correct!" : "incorrect"}`,
     ts: new Date().toISOString(),
   });
 }
@@ -268,21 +427,23 @@ function advanceToNextQuestion() {
 function finishLesson() {
   const total = currentQueue.length;
   const score = currentScore;
+  const tier = currentTierConfig();
+  const bucket = currentStateBucket();
 
-  const existing = session.state.lessons.completed[currentLesson.id];
-  const wordsEverCorrect = new Set(existing ? existing.wordsEverCorrect : []);
-  // A word counts once it's been answered correctly at least once, in this or
-  // any past attempt — a simple accumulating mastery set, not a full
+  const existing = bucket.completed[currentLesson.id];
+  const masteredSet = new Set(existing ? existing[tier.masteryField] : []);
+  // An item counts once it's been answered correctly at least once, in this
+  // or any past attempt — a simple accumulating mastery set, not a full
   // per-attempt history (see plan's fast-follow for spaced repetition).
   for (const q of currentQueue) {
-    if (q.wasCorrect) wordsEverCorrect.add(q.word.en);
+    if (q.wasCorrect) masteredSet.add(getItemLabel(q));
   }
 
-  session.state.lessons.completed[currentLesson.id] = {
+  bucket.completed[currentLesson.id] = {
     bestScore: existing ? Math.max(existing.bestScore, score) : score,
     attempts: existing ? existing.attempts + 1 : 1,
     lastCompletedAt: new Date().toISOString(),
-    wordsEverCorrect: [...wordsEverCorrect],
+    [tier.masteryField]: [...masteredSet],
   };
 
   const newlyUnlocked = updateGamificationAfterLesson(session.state);
@@ -327,7 +488,8 @@ function showComplete(score, total, newlyUnlocked) {
 
   el("lesson-chat-about-it-btn").onclick = () => {
     if (onChatAboutItCallback) {
-      onChatAboutItCallback({ label: currentLesson.label, words: currentLesson.words.map((w) => w.en) });
+      const items = currentLesson.words || currentLesson.sentences;
+      onChatAboutItCallback({ label: currentLesson.label, words: items.map((w) => w.en) });
     }
   };
 }

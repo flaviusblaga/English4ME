@@ -15,6 +15,9 @@ export const BADGES = [
   { id: "points-100", label: "100 Points Club", emoji: "💯", check: (s) => s.gamification.points >= 100 },
   { id: "lesson-first", label: "First Lesson Done!", emoji: "📘", check: (s) => s.lessons && Object.keys(s.lessons.completed).length >= 1 },
   { id: "lesson-all-starter", label: "Lesson Explorer", emoji: "🗺️", check: (s) => s.lessons && Object.keys(s.lessons.completed).length >= 8 },
+  { id: "sentence-first", label: "First Sentence Lesson!", emoji: "📗", check: (s) => s.lessonsIntermediate && Object.keys(s.lessonsIntermediate.completed).length >= 1 },
+  { id: "sentence-all-starter", label: "Sentence Explorer", emoji: "🧭", check: (s) => s.lessonsIntermediate && Object.keys(s.lessonsIntermediate.completed).length >= 8 },
+  { id: "sentence-master", label: "Sentence Master", emoji: "🎓", check: (s) => s.lessonsIntermediate && Object.values(s.lessonsIntermediate.completed).some((l) => l.bestScore >= 22) },
 ];
 
 function todayLocalDateString() {

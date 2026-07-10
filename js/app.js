@@ -83,7 +83,7 @@ async function handleProfilePicked(profileId) {
     features: profile.features,
   });
 
-  document.body.className = `profile-${profile.id}`;
+  document.body.className = `profile-${profile.id}${profile.features.mascots ? " mascot-theme" : ""}`;
 
   el("current-user-name").textContent = currentUser.name;
   el("current-profile-name").textContent = profile.displayName;

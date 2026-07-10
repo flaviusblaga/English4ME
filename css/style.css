@@ -360,9 +360,10 @@ body {
   opacity: 0.35;
 }
 
-/* Kids — Primar profile theme (scoped; adult profile styles above are untouched).
-   Bright, varied palette on purpose — not a single repeated brown/orange tone. */
-body.profile-kids-primar {
+/* Mascot theme — shared by any profile with features.mascots (Beginner,
+   Intermediate); adult/no-mascot profiles above are untouched. Bright,
+   varied palette on purpose — not a single repeated brown/orange tone. */
+body.mascot-theme {
   --kid-purple: #7c5cff;
   --kid-purple-dark: #6247e0;
   --kid-coral: #ff6b6b;
@@ -374,64 +375,64 @@ body.profile-kids-primar {
   background: #eef6ff;
 }
 
-body.profile-kids-primar .chat-header {
+body.mascot-theme .chat-header {
   background: #d9ecff;
   border-bottom: 4px solid var(--kid-purple);
 }
 
-body.profile-kids-primar .btn-primary {
+body.mascot-theme .btn-primary {
   background: var(--kid-coral);
   font-size: 1.05rem;
   padding: 0.75rem 1.4rem;
   border-radius: 14px;
 }
 
-body.profile-kids-primar .btn-primary:hover {
+body.mascot-theme .btn-primary:hover {
   background: var(--kid-coral-dark);
 }
 
-body.profile-kids-primar .btn-small {
+body.mascot-theme .btn-small {
   background: #e6ddff;
   color: #4a3b8c;
 }
 
-body.profile-kids-primar .chat-bubble--user {
+body.mascot-theme .chat-bubble--user {
   background: var(--kid-blue);
   border-radius: 18px;
 }
 
-body.profile-kids-primar .chat-bubble--assistant {
+body.mascot-theme .chat-bubble--assistant {
   background: #fffdf7;
   border: 2px solid var(--kid-teal);
   border-radius: 18px;
 }
 
-body.profile-kids-primar .mascot-line {
+body.mascot-theme .mascot-line {
   display: flex;
   align-items: flex-start;
   gap: 0.5rem;
   margin: 0.5rem 0;
 }
 
-body.profile-kids-primar .mascot-text {
+body.mascot-theme .mascot-text {
   flex: 1;
   padding-top: 0.3rem;
 }
 
-body.profile-kids-primar .mascot-name {
+body.mascot-theme .mascot-name {
   font-weight: 700;
 }
 
-body.profile-kids-primar #chat-input {
+body.mascot-theme #chat-input {
   font-size: 1.1rem;
   padding: 0.75rem;
 }
 
-body.profile-kids-primar #chat-send {
+body.mascot-theme #chat-send {
   min-width: 70px;
 }
 
-body.profile-kids-primar .mascot-avatar {
+body.mascot-theme .mascot-avatar {
   width: 92px;
   height: auto;
   flex-shrink: 0;
@@ -441,7 +442,7 @@ body.profile-kids-primar .mascot-avatar {
   border: 3px solid var(--kid-yellow);
 }
 
-body.profile-kids-primar .mascot-avatar--emoji-fallback {
+body.mascot-theme .mascot-avatar--emoji-fallback {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -451,7 +452,7 @@ body.profile-kids-primar .mascot-avatar--emoji-fallback {
   border-radius: 14px;
 }
 
-body.profile-kids-primar .mascot-avatar--tiny {
+body.mascot-theme .mascot-avatar--tiny {
   width: 44px;
   border-radius: 8px;
 }
@@ -570,6 +571,10 @@ body.profile-kids-primar .mascot-avatar--tiny {
   font-size: 1.6rem;
 }
 
+.lesson-options-grid[hidden] {
+  display: none;
+}
+
 .lesson-options-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
@@ -590,6 +595,17 @@ body.profile-kids-primar .mascot-avatar--tiny {
   border-color: var(--kid-teal, #00cec9);
 }
 
+/* Full-sentence options (picture-sentence questions): one column, smaller
+   text, left-aligned — a 6-word sentence doesn't fit the big word grid. */
+.lesson-options-grid--sentences {
+  grid-template-columns: 1fr;
+}
+
+.lesson-options-grid--sentences .lesson-option-btn {
+  font-size: 1.05rem;
+  text-align: left;
+}
+
 .lesson-option-btn:disabled {
   cursor: default;
 }
@@ -600,6 +616,61 @@ body.profile-kids-primar .mascot-avatar--tiny {
 }
 
 .lesson-option-btn--incorrect {
+  border-color: #e03131;
+  background: #fff5f5;
+}
+
+.lesson-unscramble-area {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 0 1rem;
+  align-items: center;
+}
+
+.lesson-unscramble-area[hidden] {
+  display: none;
+}
+
+.lesson-unscramble-build {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  min-height: 3rem;
+  padding: 0.75rem;
+  width: 100%;
+  border: 2px dashed #e6ddff;
+  border-radius: 12px;
+  justify-content: center;
+  align-items: center;
+}
+
+.lesson-unscramble-bank {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  justify-content: center;
+}
+
+.word-chip {
+  padding: 0.5rem 1rem;
+  font-size: 1.2rem;
+  border: 2px solid #e6ddff;
+  border-radius: 999px;
+  background: #fff;
+  cursor: pointer;
+}
+
+.word-chip:hover {
+  border-color: var(--kid-teal, #00cec9);
+}
+
+.word-chip--placed {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.word-chip--wrong-order {
   border-color: #e03131;
   background: #fff5f5;
 }
