@@ -222,3 +222,36 @@ export async function speak(text, { pitch = 1.0, rate = 1.0 } = {}) {
     }
   }, 0);
 }
+
+// Kept at module scope for the same Chrome GC reason as currentUtterance.
+let currentSequence = [];
+
+// Speaks several segments back-to-back, each with its own pitch/rate — used
+// for the two-mascot chat replies so Bobo and Fizz get audibly different
+// voices within one reply. Cancels anything in flight once, then queues all
+// segments (the browser plays queued utterances in order).
+export async function speakLines(segments) {
+  if (!isSpeechSynthesisSupported() || isTtsMuted() || !segments || segments.length === 0) return;
+
+  await ensureVoicesLoaded();
+
+  window.speechSynthesis.cancel();
+
+  const voice = pickBestVoice(getVoiceGenderPreference());
+  currentSequence = segments
+    .filter((s) => s.text)
+    .map((segment) => {
+      const utterance = new SpeechSynthesisUtterance(segment.text);
+      utterance.lang = "en-US";
+      utterance.pitch = segment.pitch != null ? segment.pitch : 1.0;
+      utterance.rate = segment.rate != null ? segment.rate : 1.0;
+      if (voice) utterance.voice = voice;
+      return utterance;
+    });
+
+  setTimeout(() => {
+    for (const utterance of currentSequence) {
+      window.speechSynthesis.speak(utterance);
+    }
+  }, 0);
+}

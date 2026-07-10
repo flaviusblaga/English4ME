@@ -29,15 +29,20 @@ export const PROFILES = [
     id: "kids-advanced",
     displayName: "Socatei — Advanced",
     level: "advanced",
-    description: "Can already hold a conversation — free-form English practice on real topics, with natural corrections.",
-    features: { scenarios: false, documents: false, gamification: true, parentVisible: true, lessons: false, mascots: false },
+    contentTier: "advanced",
+    description: "Real conversations plus grammar challenges — past tenses, phrasal verbs, conditionals and more.",
+    // chatFirst: conversation is the primary mode; the lesson screen is
+    // reachable via the exercises button in the chat header instead of
+    // being the landing view like the mascot tiers.
+    features: { scenarios: false, documents: false, gamification: true, parentVisible: true, lessons: true, chatFirst: true, mascots: false, lessonsAdvanced: true },
   },
   {
     id: "kids-expert",
     displayName: "Socatei — Expert",
     level: "expert",
-    description: "Conversation, reading, and writing practice for a confident young English speaker.",
-    features: { scenarios: false, documents: false, gamification: true, parentVisible: true, lessons: false, mascots: false, reading: true },
+    contentTier: "expert",
+    description: "Conversation, reading stories, idioms and tricky-usage challenges for a confident young English speaker.",
+    features: { scenarios: false, documents: false, gamification: true, parentVisible: true, lessons: true, chatFirst: true, mascots: false, lessonsExpert: true, reading: true },
   },
 ];
 

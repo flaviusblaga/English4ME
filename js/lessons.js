@@ -5,6 +5,7 @@ import {
   recordTurnForParentSync,
   todayLocalDateString,
   KIDS_VOICE_OPTIONS,
+  MASCOT_VOICES,
   getMascotPreference,
   setMascotPreference,
 } from "./chat.js";
@@ -24,6 +25,14 @@ import {
   LESSON_MENU_INTRO_LINES,
   getLessonCompleteLine,
 } from "./lessons-client.js";
+import {
+  ADVANCED_LESSONS,
+  EXPERT_LESSONS,
+  getAdvancedLesson,
+  getExpertLesson,
+  buildGrammarExerciseQueue,
+  GRAMMAR_QUESTION_STEM_LINES,
+} from "./grammar-client.js";
 
 const MASCOT_AVATARS = {
   Bobo: { emoji: "🦫", img: "assets/socatei/bobo.png" },
@@ -31,7 +40,7 @@ const MASCOT_AVATARS = {
 };
 
 // One entry per contentTier — the only place that needs to grow when a new
-// tier's lesson content ships (Beginner/Intermediate today).
+// tier's lesson content ships.
 const TIER_CONFIG = {
   beginner: {
     lessonSet: LESSONS,
@@ -40,6 +49,7 @@ const TIER_CONFIG = {
     stemLines: QUESTION_STEM_LINES,
     stateKey: "lessons",
     masteryField: "wordsEverCorrect", // unchanged field name — matches existing saved Beginner data
+    maxScore: (lesson) => lesson.words.length * 2,
   },
   intermediate: {
     lessonSet: SENTENCE_LESSONS,
@@ -48,6 +58,25 @@ const TIER_CONFIG = {
     stemLines: SENTENCE_QUESTION_STEM_LINES,
     stateKey: "lessonsIntermediate",
     masteryField: "itemsEverCorrect",
+    maxScore: (lesson) => lesson.sentences.length * 3,
+  },
+  advanced: {
+    lessonSet: ADVANCED_LESSONS,
+    getLessonFn: getAdvancedLesson,
+    buildQueue: buildGrammarExerciseQueue,
+    stemLines: GRAMMAR_QUESTION_STEM_LINES,
+    stateKey: "lessonsAdvanced",
+    masteryField: "itemsEverCorrect",
+    maxScore: (lesson) => lesson.questions.length,
+  },
+  expert: {
+    lessonSet: EXPERT_LESSONS,
+    getLessonFn: getExpertLesson,
+    buildQueue: buildGrammarExerciseQueue,
+    stemLines: GRAMMAR_QUESTION_STEM_LINES,
+    stateKey: "lessonsExpert",
+    masteryField: "itemsEverCorrect",
+    maxScore: (lesson) => lesson.questions.length,
   },
 };
 
@@ -73,16 +102,20 @@ function currentStateBucket() {
   return session.state[currentTierConfig().stateKey];
 }
 
-// A stable identifying label per exercise item (word or sentence), used for
-// scoring/mastery tracking and parent-transcript lines — three different
-// question *types* can test the same sentence, so mastery is tracked per
+// A stable identifying label per exercise item (word, sentence, or grammar
+// question), used for scoring/mastery tracking and parent-transcript lines —
+// several question *types* can test the same item, so mastery is tracked per
 // item, not per question instance.
 function getItemLabel(question) {
-  return question.word ? question.word.en : question.sentence.en;
+  if (question.word) return question.word.en;
+  if (question.sentence) return question.sentence.en;
+  return question.mcq.q;
 }
 
 function getSpokenAnswer(question) {
-  return question.word ? question.word.en : question.sentence.en;
+  if (question.word) return question.word.en;
+  if (question.sentence) return question.sentence.en;
+  return question.options.find((o) => o.isCorrect).value;
 }
 
 function questionTypeLabel(type) {
@@ -92,6 +125,7 @@ function questionTypeLabel(type) {
     case "fill-blank": return "Fill-in-the-blank";
     case "unscramble": return "Word order";
     case "picture-sentence": return "Picture-sentence match";
+    case "grammar-mcq": return "Grammar challenge";
     default: return "Answered";
   }
 }
@@ -145,11 +179,18 @@ export function initLessons({ accessToken, userEmail, displayName, fileId, state
 
   el("lesson-user-name").textContent = displayName;
   el("lesson-profile-tag").textContent = profile.displayName;
+  el("lesson-just-chat-btn").textContent = profile.features.mascots
+    ? "💬 Just chat with Bobo & Fizz"
+    : "💬 Back to chat";
   el("lesson-just-chat-btn").onclick = () => {
     if (onJustChatCallback) onJustChatCallback(null);
   };
   el("lesson-exit-btn").onclick = showMenu;
   el("lesson-back-to-menu-btn").onclick = showMenu;
+
+  // Non-mascot tiers (Advanced/Expert) get a plain, grown-up presentation:
+  // no mascot picker, no avatars anywhere on this screen.
+  el("lesson-mascot-select-bar").hidden = !profile.features.mascots;
 
   if (!listenersInitialized) {
     listenersInitialized = true;
@@ -182,11 +223,17 @@ function showMenu() {
   el("lesson-exercise-view").hidden = true;
   el("lesson-complete-view").hidden = true;
 
-  // Not tied to a question index here (there isn't one yet) — pick randomly
-  // for "both" so repeat visits to the menu show some variety too.
-  const asker = activeMascotForAsking(Math.random() < 0.5 ? 0 : 1);
-  setMascotAvatar(el("lesson-menu-avatar"), asker);
-  el("lesson-menu-intro-line").textContent = `${asker}: ${getRandomLine(LESSON_MENU_INTRO_LINES)}`;
+  const menuIntroRow = el("lesson-menu-avatar").parentElement;
+  if (session.profile.features.mascots) {
+    menuIntroRow.hidden = false;
+    // Not tied to a question index here (there isn't one yet) — pick randomly
+    // for "both" so repeat visits to the menu show some variety too.
+    const asker = activeMascotForAsking(Math.random() < 0.5 ? 0 : 1);
+    setMascotAvatar(el("lesson-menu-avatar"), asker);
+    el("lesson-menu-intro-line").textContent = `${asker}: ${getRandomLine(LESSON_MENU_INTRO_LINES)}`;
+  } else {
+    menuIntroRow.hidden = true;
+  }
 
   const tier = currentTierConfig();
   const bucket = currentStateBucket();
@@ -194,7 +241,7 @@ function showMenu() {
   grid.innerHTML = "";
   for (const lesson of tier.lessonSet) {
     const record = bucket.completed[lesson.id];
-    const maxScore = lesson.words ? lesson.words.length * 2 : lesson.sentences.length * 3;
+    const maxScore = tier.maxScore(lesson);
     const card = document.createElement("button");
     card.type = "button";
     card.className = "lesson-card";
@@ -230,10 +277,17 @@ function renderQuestion() {
   const tier = currentTierConfig();
   el("lesson-progress-label").textContent = `${currentLesson.label} — ${currentIndex + 1} / ${currentQueue.length}`;
 
-  const asker = activeMascotForAsking(currentIndex);
+  const usesMascots = session.profile.features.mascots;
+  const asker = usesMascots ? activeMascotForAsking(currentIndex) : null;
   const promptAvatar = el("lesson-prompt-avatar");
-  setMascotAvatar(promptAvatar, asker);
-  el("lesson-prompt-text").textContent = `${asker}: ${getRandomLine(tier.stemLines[question.type])}`;
+  if (usesMascots) {
+    promptAvatar.hidden = false;
+    setMascotAvatar(promptAvatar, asker);
+    el("lesson-prompt-text").textContent = `${asker}: ${getRandomLine(tier.stemLines[question.type])}`;
+  } else {
+    promptAvatar.hidden = true;
+    el("lesson-prompt-text").textContent = getRandomLine(tier.stemLines[question.type]);
+  }
 
   // Reset per-question interactive state shared by every type.
   el("lesson-reaction-avatar").hidden = true;
@@ -272,6 +326,8 @@ function renderQuestion() {
     stem.textContent = question.sentence.blankSentence;
   } else if (question.type === "picture-sentence") {
     stem.textContent = question.sentence.emoji;
+  } else if (question.type === "grammar-mcq") {
+    stem.textContent = question.mcq.q;
   }
   stem.className = `lesson-question-stem lesson-question-stem--${question.type}`;
 
@@ -282,11 +338,13 @@ function renderQuestion() {
   // or mispronounce (Romanian, en-US TTS) the answer if spoken before
   // answering, so they stay silent until the reaction (see finalizeAnswer).
   if (canReplayNow) {
+    // Spoken in the asking mascot's own voice, so who you see is who you hear.
+    const askerVoice = MASCOT_VOICES[asker] || KIDS_VOICE_OPTIONS;
     promptAvatar.style.cursor = "pointer";
-    promptAvatar.onclick = () => speak(spokenTarget, KIDS_VOICE_OPTIONS);
+    promptAvatar.onclick = () => speak(spokenTarget, askerVoice);
     stem.style.cursor = "pointer";
-    stem.onclick = () => speak(spokenTarget, KIDS_VOICE_OPTIONS);
-    speak(spokenTarget, KIDS_VOICE_OPTIONS);
+    stem.onclick = () => speak(spokenTarget, askerVoice);
+    speak(spokenTarget, askerVoice);
   } else {
     stem.style.cursor = "default";
     stem.onclick = null;
@@ -294,7 +352,10 @@ function renderQuestion() {
 
   // Full-sentence options need a single column and smaller text to stay
   // readable; word/emoji options keep the bigger two-column layout.
-  optionsGrid.classList.toggle("lesson-options-grid--sentences", question.type === "picture-sentence");
+  const hasLongOptions =
+    question.type === "picture-sentence" ||
+    (question.type === "grammar-mcq" && question.options.some((o) => o.value.length > 18));
+  optionsGrid.classList.toggle("lesson-options-grid--sentences", hasLongOptions);
 
   optionsGrid.innerHTML = "";
   for (const option of question.options) {
@@ -388,23 +449,39 @@ function finalizeAnswer(question, wasCorrect) {
   question.wasCorrect = wasCorrect; // recorded for the lesson-completion mastery summary
   if (wasCorrect) currentScore += 1;
 
-  const reactor = activeMascotForReaction(wasCorrect);
+  const usesMascots = session.profile.features.mascots;
   const reactionAvatar = el("lesson-reaction-avatar");
-  reactionAvatar.hidden = false;
-  setMascotAvatar(reactionAvatar, reactor);
-  const reactionLine = getRandomLine(wasCorrect ? CORRECT_REACTION_LINES : INCORRECT_REACTION_LINES);
-  el("lesson-reaction-text").textContent = `${reactor}: ${reactionLine}`;
-
-  // Always speak the actual correct answer out loud here (not just the
-  // flavor line) — this is the one moment every question guarantees the
-  // child hears it pronounced, whether they got it right or not.
   const spokenAnswer = getSpokenAnswer(question);
-  speak(`${reactionLine} ${spokenAnswer}.`, KIDS_VOICE_OPTIONS);
+  let replayVoice;
+
+  if (usesMascots) {
+    const reactor = activeMascotForReaction(wasCorrect);
+    reactionAvatar.hidden = false;
+    setMascotAvatar(reactionAvatar, reactor);
+    const reactionLine = getRandomLine(wasCorrect ? CORRECT_REACTION_LINES : INCORRECT_REACTION_LINES);
+    el("lesson-reaction-text").textContent = `${reactor}: ${reactionLine}`;
+
+    // Always speak the actual correct answer out loud here (not just the
+    // flavor line) — this is the one moment every question guarantees the
+    // child hears it pronounced, whether they got it right or not. Spoken in
+    // the reacting mascot's own voice (Bobo vs Fizz sound different).
+    replayVoice = MASCOT_VOICES[reactor] || KIDS_VOICE_OPTIONS;
+    speak(`${reactionLine} ${spokenAnswer}.`, replayVoice);
+  } else {
+    // Grown-up tiers: no mascots, and the WHY matters more than cheering —
+    // show the authored explanation when the question has one.
+    reactionAvatar.hidden = true;
+    const verdict = wasCorrect ? "Correct!" : "Not quite.";
+    const explanation = question.mcq && question.mcq.explain ? ` ${question.mcq.explain}` : "";
+    el("lesson-reaction-text").textContent = `${verdict}${explanation}`;
+    replayVoice = {}; // default voice, normal pitch — no cartoon voice for teens
+    speak(spokenAnswer, replayVoice);
+  }
 
   // Interactive replay — tap to hear the answer again as many times as wanted.
   const replayBtn = el("lesson-replay-btn");
   replayBtn.hidden = false;
-  replayBtn.onclick = () => speak(spokenAnswer, KIDS_VOICE_OPTIONS);
+  replayBtn.onclick = () => speak(spokenAnswer, replayVoice);
 
   const isLast = currentIndex === currentQueue.length - 1;
   const nextBtn = el("lesson-next-btn");
@@ -476,9 +553,16 @@ function showComplete(score, total, newlyUnlocked) {
   el("lesson-exercise-view").hidden = true;
   el("lesson-complete-view").hidden = false;
 
-  const closer = activeMascotForComplete();
-  setMascotAvatar(el("lesson-complete-avatar"), closer);
-  el("lesson-complete-line").textContent = `${closer}: ${getLessonCompleteLine(score, total)}`;
+  const completeAvatar = el("lesson-complete-avatar");
+  if (session.profile.features.mascots) {
+    completeAvatar.hidden = false;
+    const closer = activeMascotForComplete();
+    setMascotAvatar(completeAvatar, closer);
+    el("lesson-complete-line").textContent = `${closer}: ${getLessonCompleteLine(score, total)}`;
+  } else {
+    completeAvatar.hidden = true;
+    el("lesson-complete-line").textContent = getLessonCompleteLine(score, total);
+  }
   el("lesson-complete-score").textContent = `You got ${score} out of ${total}! 🎉`;
 
   if (newlyUnlocked.length > 0) {
@@ -486,10 +570,18 @@ function showComplete(score, total, newlyUnlocked) {
     el("lesson-complete-score").textContent += ` New badge: ${badgeNames}!`;
   }
 
+  el("lesson-chat-about-it-btn").textContent = session.profile.features.mascots
+    ? "💬 Chat about it with Bobo & Fizz"
+    : "💬 Chat about what you practiced";
   el("lesson-chat-about-it-btn").onclick = () => {
     if (onChatAboutItCallback) {
-      const items = currentLesson.words || currentLesson.sentences;
-      onChatAboutItCallback({ label: currentLesson.label, words: items.map((w) => w.en) });
+      // What "today's words" means per tier: the word bank, the sentence
+      // bank, or (for grammar lessons) each question's correct answer.
+      let words;
+      if (currentLesson.words) words = currentLesson.words.map((w) => w.en);
+      else if (currentLesson.sentences) words = currentLesson.sentences.map((s) => s.en);
+      else words = currentLesson.questions.map((q) => q.options[q.correct]);
+      onChatAboutItCallback({ label: currentLesson.label, words });
     }
   };
 }

@@ -55,6 +55,20 @@ function applyFeatureDefaults(state, features) {
     };
   }
 
+  if (features && features.lessonsAdvanced && !state.lessonsAdvanced) {
+    state.lessonsAdvanced = {
+      lastLessonId: null,
+      completed: {}, // lessonId -> { bestScore, attempts, lastCompletedAt, itemsEverCorrect: [] }
+    };
+  }
+
+  if (features && features.lessonsExpert && !state.lessonsExpert) {
+    state.lessonsExpert = {
+      lastLessonId: null,
+      completed: {}, // lessonId -> { bestScore, attempts, lastCompletedAt, itemsEverCorrect: [] }
+    };
+  }
+
   return state;
 }
 

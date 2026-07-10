@@ -14,6 +14,7 @@ import {
   startListening,
   stopListening,
   speak,
+  speakLines,
 } from "./voice.js";
 
 const ROLLING_WINDOW_SIZE = 10; // messages (not turns) sent to the Worker each request
@@ -45,6 +46,17 @@ export function setMascotPreference(pref) {
 // not a cartoon mascot). Exported: js/lessons.js reuses the same tuning so
 // the lesson screens sound consistent with free-chat.
 export const KIDS_VOICE_OPTIONS = { pitch: 1.35, rate: 1.05 };
+
+// Per-mascot voices, in the spirit of the hyperactive possum-brothers energy
+// the characters are inspired by: Bobo is squeaky-high and fast (the
+// impulsive one), Fizz is lower and a touch slower (the nervous one). The
+// Web Speech API has no true character voices, so pitch/rate contrast on the
+// same base voice is how the two stay audibly distinct. Exported for
+// js/lessons.js so exercises use the same two voices.
+export const MASCOT_VOICES = {
+  Bobo: { pitch: 1.65, rate: 1.18 },
+  Fizz: { pitch: 1.15, rate: 0.98 },
+};
 
 function parseMascotLines(text) {
   return text
@@ -108,6 +120,9 @@ export function initChat({ accessToken, userEmail, displayName, fileId, state, p
   }
 
   el("back-to-lessons-btn").hidden = !profile.features.lessons;
+  // Chat-first tiers frame the same button as the way INTO exercises rather
+  // than the way back to a lesson menu they started from.
+  el("back-to-lessons-btn").textContent = profile.features.chatFirst ? "🎓 Exercises" : "← Back to lessons";
   el("back-to-lessons-btn").onclick = () => {
     if (onBackToLessons) onBackToLessons();
   };
@@ -326,14 +341,15 @@ function renderMascotLines(text) {
   return wrap;
 }
 
-// Plain spoken text for TTS — only the selected mascot's line(s), without the
-// "Name:" prefix (reads more naturally out loud than the on-screen label).
-function extractSpokenText(text) {
+// TTS segments for a mascot reply — only the selected mascot's line(s),
+// without the "Name:" prefix, each line spoken in that mascot's own voice
+// (Bobo squeaky-fast, Fizz lower-calmer) so the two are audibly different.
+function buildSpokenSegments(text) {
   const parsed = parseMascotLines(text);
-  if (parsed.length === 0) return text;
+  if (parsed.length === 0) return [{ text, ...KIDS_VOICE_OPTIONS }];
   const preference = getMascotPreference();
   const visible = preference === "both" ? parsed : parsed.filter((p) => p.name === preference);
-  return visible.map((p) => p.line).join(" ");
+  return visible.map((p) => ({ text: p.line, ...MASCOT_VOICES[p.name] }));
 }
 
 function appendSystemNotice(text) {
@@ -435,7 +451,7 @@ async function handleSend() {
     } else {
       appendMessageToLog("assistant", result.reply, session.profile);
       if (session.profile.features.mascots) {
-        speak(extractSpokenText(result.reply), KIDS_VOICE_OPTIONS);
+        speakLines(buildSpokenSegments(result.reply));
       } else {
         speak(result.reply);
       }

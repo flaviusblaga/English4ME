@@ -106,7 +106,9 @@ async function handleProfilePicked(profileId) {
     profile,
   };
 
-  if (profile.features.lessons) {
+  // Mascot tiers land on the lesson menu; chat-first tiers (Advanced/Expert)
+  // land in conversation, with exercises reachable from the chat header.
+  if (profile.features.lessons && !profile.features.chatFirst) {
     openLessons();
   } else {
     openChat(null);
@@ -121,6 +123,14 @@ function handleLogout() {
   showScreen("login");
 }
 
+// Back to the level-picker without signing out — picking a level reloads
+// that profile's Drive state fresh, so nothing needs tearing down here.
+function goToLevelPicker() {
+  document.body.className = "";
+  renderProfilePicker();
+  showScreen("profile-picker");
+}
+
 window.addEventListener("DOMContentLoaded", () => {
   initAuth();
   el("login-btn").addEventListener("click", handleLogin);
@@ -130,6 +140,8 @@ window.addEventListener("DOMContentLoaded", () => {
     showScreen("parent-view");
   });
   el("reading-btn").addEventListener("click", openReading);
+  el("home-btn").addEventListener("click", goToLevelPicker);
+  el("lesson-home-btn").addEventListener("click", goToLevelPicker);
   el("parent-view-back-btn").addEventListener("click", () => {
     showScreen("chat");
   });

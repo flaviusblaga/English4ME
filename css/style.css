@@ -571,6 +571,11 @@ body.mascot-theme .mascot-avatar--tiny {
   font-size: 1.6rem;
 }
 
+/* Grammar stems are full sentences — the giant word-size font doesn't fit. */
+.lesson-question-stem--grammar-mcq {
+  font-size: 1.3rem;
+}
+
 .lesson-options-grid[hidden] {
   display: none;
 }

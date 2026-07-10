@@ -20,6 +20,10 @@ export const BADGES = [
   { id: "sentence-master", label: "Sentence Master", emoji: "🎓", check: (s) => s.lessonsIntermediate && Object.values(s.lessonsIntermediate.completed).some((l) => l.bestScore >= 22) },
   { id: "reading-first", label: "First Story Read!", emoji: "📖", check: (s) => s.reading && Object.keys(s.reading.completed).length >= 1 },
   { id: "reading-all", label: "Bookworm", emoji: "🐛", check: (s) => s.reading && Object.keys(s.reading.completed).length >= 6 },
+  { id: "grammar-first", label: "Grammar Challenger", emoji: "📙", check: (s) => s.lessonsAdvanced && Object.keys(s.lessonsAdvanced.completed).length >= 1 },
+  { id: "grammar-all", label: "Grammar Champion", emoji: "🏅", check: (s) => s.lessonsAdvanced && Object.keys(s.lessonsAdvanced.completed).length >= 6 },
+  { id: "expert-first", label: "Expert in Training", emoji: "🎯", check: (s) => s.lessonsExpert && Object.keys(s.lessonsExpert.completed).length >= 1 },
+  { id: "expert-all", label: "Word Master", emoji: "👑", check: (s) => s.lessonsExpert && Object.keys(s.lessonsExpert.completed).length >= 4 },
 ];
 
 function todayLocalDateString() {
