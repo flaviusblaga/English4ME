@@ -48,6 +48,13 @@ function applyFeatureDefaults(state, features) {
     };
   }
 
+  if (features && features.reading && !state.reading) {
+    state.reading = {
+      lastPassageId: null,
+      completed: {}, // passageId -> { bestScore, attempts, lastCompletedAt }
+    };
+  }
+
   return state;
 }
 

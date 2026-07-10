@@ -25,6 +25,20 @@ export const PROFILES = [
     description: "Already know the basics — time to build full sentences with Bobo & Fizz.",
     features: { scenarios: false, documents: false, gamification: true, parentVisible: true, lessons: true, mascots: true, lessonsIntermediate: true },
   },
+  {
+    id: "kids-advanced",
+    displayName: "Socatei — Advanced",
+    level: "advanced",
+    description: "Can already hold a conversation — free-form English practice on real topics, with natural corrections.",
+    features: { scenarios: false, documents: false, gamification: true, parentVisible: true, lessons: false, mascots: false },
+  },
+  {
+    id: "kids-expert",
+    displayName: "Socatei — Expert",
+    level: "expert",
+    description: "Conversation, reading, and writing practice for a confident young English speaker.",
+    features: { scenarios: false, documents: false, gamification: true, parentVisible: true, lessons: false, mascots: false, reading: true },
+  },
 ];
 
 export function getProfile(profileId) {

@@ -51,6 +51,7 @@
         </select>
         <button id="tts-mute-btn" class="btn btn-small" aria-pressed="false">🔊 Voice on</button>
         <button id="back-to-lessons-btn" class="btn btn-small" hidden>← Back to lessons</button>
+        <button id="reading-btn" class="btn btn-small" hidden>📖 Reading</button>
         <button id="view-child-progress-btn" class="btn btn-small" hidden>👀 View child's progress</button>
         <button id="debug-data-btn" class="btn btn-small">Show saved data</button>
         <button id="logout-btn" class="btn btn-small">Sign out</button>
@@ -179,6 +180,38 @@
       <div class="lesson-complete-actions">
         <button id="lesson-chat-about-it-btn" class="btn btn-primary">💬 Chat about it with Bobo &amp; Fizz</button>
         <button id="lesson-back-to-menu-btn" class="btn btn-small">← Back to lessons</button>
+      </div>
+    </div>
+  </main>
+
+  <main id="screen-reading" class="screen" hidden>
+    <header class="chat-header">
+      <strong>📖 Reading practice</strong>
+      <button id="reading-back-btn" class="btn btn-small">← Back to chat</button>
+    </header>
+
+    <div id="reading-menu-view" class="reading-body">
+      <p class="hint">Read a short story, then answer the questions. Take your time — you can look back at the story anytime.</p>
+      <div id="reading-menu-grid" class="lesson-menu-grid"></div>
+    </div>
+
+    <div id="reading-passage-view" class="reading-body" hidden>
+      <div class="lesson-progress-bar">
+        <span id="reading-progress-label"></span>
+        <button id="reading-exit-btn" class="btn btn-small">← Back to stories</button>
+      </div>
+      <h2 id="reading-passage-title" class="reading-passage-title"></h2>
+      <p id="reading-passage-text" class="reading-passage-text"></p>
+      <p id="reading-question-text" class="reading-question-text"></p>
+      <div id="reading-options-grid" class="lesson-options-grid lesson-options-grid--sentences"></div>
+      <p id="reading-feedback" class="reading-feedback"></p>
+      <button id="reading-next-btn" class="btn btn-primary" hidden>Next question →</button>
+    </div>
+
+    <div id="reading-complete-view" class="reading-body" hidden>
+      <p id="reading-complete-score" class="lesson-score"></p>
+      <div class="lesson-complete-actions">
+        <button id="reading-back-to-menu-btn" class="btn btn-primary">← Back to stories</button>
       </div>
     </div>
   </main>

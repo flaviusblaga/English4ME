@@ -18,6 +18,8 @@ export const BADGES = [
   { id: "sentence-first", label: "First Sentence Lesson!", emoji: "📗", check: (s) => s.lessonsIntermediate && Object.keys(s.lessonsIntermediate.completed).length >= 1 },
   { id: "sentence-all-starter", label: "Sentence Explorer", emoji: "🧭", check: (s) => s.lessonsIntermediate && Object.keys(s.lessonsIntermediate.completed).length >= 8 },
   { id: "sentence-master", label: "Sentence Master", emoji: "🎓", check: (s) => s.lessonsIntermediate && Object.values(s.lessonsIntermediate.completed).some((l) => l.bestScore >= 22) },
+  { id: "reading-first", label: "First Story Read!", emoji: "📖", check: (s) => s.reading && Object.keys(s.reading.completed).length >= 1 },
+  { id: "reading-all", label: "Bookworm", emoji: "🐛", check: (s) => s.reading && Object.keys(s.reading.completed).length >= 6 },
 ];
 
 function todayLocalDateString() {

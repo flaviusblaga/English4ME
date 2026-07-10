@@ -708,6 +708,50 @@ body.mascot-theme .mascot-avatar--tiny {
   display: none;
 }
 
+/* Reading practice screen (Expert tier — no mascot theme, grown-up look) */
+.reading-body {
+  padding: 1rem;
+  max-width: 640px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.reading-passage-title {
+  margin: 0.5rem 0;
+  font-size: 1.3rem;
+}
+
+.reading-passage-text {
+  background: #fff;
+  border: 1px solid #e4e0d6;
+  border-radius: 10px;
+  padding: 1rem;
+  line-height: 1.7;
+  font-size: 1rem;
+}
+
+.reading-question-text {
+  font-weight: 700;
+  font-size: 1.05rem;
+  margin: 1rem 0 0.75rem;
+}
+
+.reading-feedback {
+  min-height: 1.4rem;
+  margin: 0.75rem 0;
+  font-size: 0.9rem;
+  color: #555;
+}
+
+#reading-next-btn {
+  display: block;
+  margin: 0.5rem auto 1rem;
+}
+
+#reading-next-btn[hidden] {
+  display: none;
+}
+
 /* Parent view screen */
 .parent-view-body {
   padding: 1rem;

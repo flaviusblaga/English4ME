@@ -2,6 +2,7 @@ import { initAuth, signIn, signOut, getAccessToken } from "./auth.js";
 import { getOrCreateState } from "./drive.js";
 import { initChat } from "./chat.js";
 import { initLessons } from "./lessons.js";
+import { initReading } from "./reading.js";
 import { PROFILES, getProfile } from "./profile.js";
 import { getRememberedProfileId, rememberProfileId } from "./profile-picker.js";
 import { initParentView } from "./parent-view.js";
@@ -18,6 +19,7 @@ function showScreen(name) {
   el("screen-profile-picker").hidden = name !== "profile-picker";
   el("screen-chat").hidden = name !== "chat";
   el("screen-lesson").hidden = name !== "lesson";
+  el("screen-reading").hidden = name !== "reading";
   el("screen-parent-view").hidden = name !== "parent-view";
 }
 
@@ -29,6 +31,11 @@ function openChat(lessonWordList) {
 function openLessons() {
   initLessons({ ...currentSession, onJustChat: openChat, onChatAboutIt: openChat });
   showScreen("lesson");
+}
+
+function openReading() {
+  initReading({ ...currentSession, onBack: () => openChat(null) });
+  showScreen("reading");
 }
 
 async function handleLogin() {
@@ -88,6 +95,7 @@ async function handleProfilePicked(profileId) {
   el("current-user-name").textContent = currentUser.name;
   el("current-profile-name").textContent = profile.displayName;
   el("view-child-progress-btn").hidden = !profile.features.canViewChildren;
+  el("reading-btn").hidden = !profile.features.reading;
 
   currentSession = {
     accessToken,
@@ -121,6 +129,7 @@ window.addEventListener("DOMContentLoaded", () => {
   el("view-child-progress-btn").addEventListener("click", () => {
     showScreen("parent-view");
   });
+  el("reading-btn").addEventListener("click", openReading);
   el("parent-view-back-btn").addEventListener("click", () => {
     showScreen("chat");
   });
