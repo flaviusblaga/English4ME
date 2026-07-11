@@ -7,6 +7,7 @@ export const LESSONS = [
   {
     id: "animals",
     label: "Animals",
+    emoji: "🐶",
     words: [
       { en: "dog", ro: "câine", emoji: "🐶", example: "I have a dog. My dog is brown." },
       { en: "cat", ro: "pisică", emoji: "🐱", example: "The cat is sleeping on the chair." },
@@ -21,6 +22,7 @@ export const LESSONS = [
   {
     id: "family",
     label: "Family",
+    emoji: "👨‍👩‍👧",
     words: [
       { en: "mother", ro: "mamă", emoji: "👩", example: "My mother makes breakfast every day." },
       { en: "father", ro: "tată", emoji: "👨", example: "My father drives me to school." },
@@ -35,6 +37,7 @@ export const LESSONS = [
   {
     id: "colors",
     label: "Colors",
+    emoji: "🎨",
     words: [
       { en: "red", ro: "roșu", emoji: "🟥", example: "The apple is red." },
       { en: "blue", ro: "albastru", emoji: "🟦", example: "The sky is blue today." },
@@ -49,6 +52,7 @@ export const LESSONS = [
   {
     id: "food",
     label: "Food",
+    emoji: "🍎",
     words: [
       { en: "apple", ro: "măr", emoji: "🍎", example: "I eat an apple every day." },
       { en: "banana", ro: "banană", emoji: "🍌", example: "The banana is yellow." },
@@ -63,6 +67,7 @@ export const LESSONS = [
   {
     id: "school",
     label: "School",
+    emoji: "🎒",
     words: [
       { en: "book", ro: "carte", emoji: "📖", example: "I am reading a book." },
       { en: "pencil", ro: "creion", emoji: "✏️", example: "I write with my pencil." },
@@ -77,6 +82,7 @@ export const LESSONS = [
   {
     id: "body",
     label: "Body",
+    emoji: "🖐️",
     words: [
       { en: "head", ro: "cap", emoji: "🗣️", example: "Touch your head." },
       { en: "hand", ro: "mână", emoji: "✋", example: "Wash your hands, please." },
@@ -91,6 +97,7 @@ export const LESSONS = [
   {
     id: "weather",
     label: "Weather",
+    emoji: "☀️",
     words: [
       { en: "sun", ro: "soare", emoji: "☀️", example: "The sun is very bright today." },
       { en: "rain", ro: "ploaie", emoji: "🌧️", example: "I like to jump in the rain." },
@@ -105,6 +112,7 @@ export const LESSONS = [
   {
     id: "numbers",
     label: "Numbers",
+    emoji: "🔢",
     isNumbers: true, // picture-match uses keycap number emoji, not thematic emoji
     words: [
       { en: "one", ro: "unu", emoji: "1️⃣", example: "I have one dog." },
@@ -132,6 +140,7 @@ export const SENTENCE_LESSONS = [
   {
     id: "animals",
     label: "Animals",
+    emoji: "🦁",
     sentences: [
       { en: "The dog runs in the park.", ro: "Câinele aleargă în parc.", emoji: "🐕",
         blankWord: "runs", blankSentence: "The dog ____ in the park.",
@@ -162,6 +171,7 @@ export const SENTENCE_LESSONS = [
   {
     id: "family",
     label: "Family",
+    emoji: "🏡",
     sentences: [
       { en: "My mother cooks dinner every day.", ro: "Mama mea gătește cina în fiecare zi.", emoji: "👩",
         blankWord: "cooks", blankSentence: "My mother ____ dinner every day.",
@@ -192,6 +202,7 @@ export const SENTENCE_LESSONS = [
   {
     id: "daily-routines",
     label: "Daily Routines",
+    emoji: "⏰",
     sentences: [
       { en: "I wake up at seven.", ro: "Mă trezesc la șapte.", emoji: "⏰",
         blankWord: "wake", blankSentence: "I ____ up at seven.",
@@ -222,6 +233,7 @@ export const SENTENCE_LESSONS = [
   {
     id: "school",
     label: "School",
+    emoji: "✏️",
     sentences: [
       { en: "I read a book in class.", ro: "Citesc o carte în clasă.", emoji: "📖",
         blankWord: "read", blankSentence: "I ____ a book in class.",
@@ -252,6 +264,7 @@ export const SENTENCE_LESSONS = [
   {
     id: "food",
     label: "Food",
+    emoji: "🍕",
     sentences: [
       { en: "I eat an apple every morning.", ro: "Mănânc un măr în fiecare dimineață.", emoji: "🍎",
         blankWord: "eat", blankSentence: "I ____ an apple every morning.",
@@ -282,6 +295,7 @@ export const SENTENCE_LESSONS = [
   {
     id: "weather",
     label: "Weather",
+    emoji: "🌈",
     sentences: [
       { en: "The sun shines in the summer.", ro: "Soarele strălucește vara.", emoji: "☀️",
         blankWord: "shines", blankSentence: "The sun ____ in the summer.",
@@ -312,6 +326,7 @@ export const SENTENCE_LESSONS = [
   {
     id: "prepositions",
     label: "Prepositions",
+    emoji: "📦",
     sentences: [
       { en: "The cat is under the table.", ro: "Pisica este sub masă.", emoji: "🐱",
         blankWord: "under", blankSentence: "The cat is ____ the table.",
@@ -342,6 +357,7 @@ export const SENTENCE_LESSONS = [
   {
     id: "questions",
     label: "Questions",
+    emoji: "❓",
     sentences: [
       { en: "Where is the dog?", ro: "Unde este câinele?", emoji: "🐕",
         blankWord: "Where", blankSentence: "____ is the dog?",

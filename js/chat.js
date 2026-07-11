@@ -122,7 +122,7 @@ export function initChat({ accessToken, userEmail, displayName, fileId, state, p
   el("back-to-lessons-btn").hidden = !profile.features.lessons;
   // Chat-first tiers frame the same button as the way INTO exercises rather
   // than the way back to a lesson menu they started from.
-  el("back-to-lessons-btn").textContent = profile.features.chatFirst ? "🎓 Exercises" : "← Back to lessons";
+  el("back-to-lessons-btn").textContent = profile.features.chatFirst ? "🎓 Exercises" : "📚 Lessons";
   el("back-to-lessons-btn").onclick = () => {
     if (onBackToLessons) onBackToLessons();
   };
@@ -167,10 +167,12 @@ export function initChat({ accessToken, userEmail, displayName, fileId, state, p
 
   if (profile.features.gamification) {
     el("gamification-bar").hidden = false;
+    el("gamification-badges-btn").hidden = false;
     renderGamificationBar();
     renderBadgesPanel();
   } else {
     el("gamification-bar").hidden = true;
+    el("gamification-badges-btn").hidden = true;
     el("gamification-badges-panel").hidden = true;
   }
 }

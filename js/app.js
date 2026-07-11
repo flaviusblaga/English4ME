@@ -62,16 +62,24 @@ function renderProfilePicker() {
   for (const profile of PROFILES) {
     const card = document.createElement("button");
     card.type = "button";
-    card.className = "profile-card";
+    card.className = `profile-card profile-card--${profile.level}`;
     if (profile.id === remembered) card.classList.add("profile-card--remembered");
 
+    const icon = document.createElement("span");
+    icon.className = "profile-card-icon";
+    icon.textContent = profile.emoji || "📘";
+
+    const textCol = document.createElement("div");
+    textCol.className = "profile-card-text";
     const title = document.createElement("strong");
     title.textContent = profile.displayName;
     const desc = document.createElement("span");
     desc.textContent = profile.description;
+    textCol.appendChild(title);
+    textCol.appendChild(desc);
 
-    card.appendChild(title);
-    card.appendChild(desc);
+    card.appendChild(icon);
+    card.appendChild(textCol);
     card.addEventListener("click", () => handleProfilePicked(profile.id));
     list.appendChild(card);
   }
@@ -94,6 +102,7 @@ async function handleProfilePicked(profileId) {
 
   el("current-user-name").textContent = currentUser.name;
   el("current-profile-name").textContent = profile.displayName;
+  el("header-avatar").textContent = (currentUser.name[0] || "?").toUpperCase();
   el("view-child-progress-btn").hidden = !profile.features.canViewChildren;
   el("reading-btn").hidden = !profile.features.reading;
 
@@ -131,6 +140,16 @@ function goToLevelPicker() {
   showScreen("profile-picker");
 }
 
+// Same toggle pattern as the badges panel — the gear button shows/hides a
+// small row of rarely-used controls (voice, debug, sign out).
+function wireSettingsToggle(btnId, panelId) {
+  el(btnId).addEventListener("click", () => {
+    const panel = el(panelId);
+    panel.hidden = !panel.hidden;
+    el(btnId).setAttribute("aria-pressed", String(!panel.hidden));
+  });
+}
+
 window.addEventListener("DOMContentLoaded", () => {
   initAuth();
   el("login-btn").addEventListener("click", handleLogin);
@@ -142,6 +161,8 @@ window.addEventListener("DOMContentLoaded", () => {
   el("reading-btn").addEventListener("click", openReading);
   el("home-btn").addEventListener("click", goToLevelPicker);
   el("lesson-home-btn").addEventListener("click", goToLevelPicker);
+  wireSettingsToggle("settings-btn", "settings-panel");
+  wireSettingsToggle("lesson-settings-btn", "lesson-settings-panel");
   el("parent-view-back-btn").addEventListener("click", () => {
     showScreen("chat");
   });

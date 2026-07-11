@@ -179,8 +179,9 @@ export function initLessons({ accessToken, userEmail, displayName, fileId, state
 
   el("lesson-user-name").textContent = displayName;
   el("lesson-profile-tag").textContent = profile.displayName;
+  el("lesson-header-avatar").textContent = (displayName[0] || "?").toUpperCase();
   el("lesson-just-chat-btn").textContent = profile.features.mascots
-    ? "💬 Just chat with Bobo & Fizz"
+    ? "💬 Chat with Bobo & Fizz"
     : "💬 Back to chat";
   el("lesson-just-chat-btn").onclick = () => {
     if (onJustChatCallback) onJustChatCallback(null);
@@ -245,15 +246,44 @@ function showMenu() {
     const card = document.createElement("button");
     card.type = "button";
     card.className = "lesson-card";
+
+    const icon = document.createElement("span");
+    icon.className = "lesson-card-icon";
+    icon.textContent = lesson.emoji || "📘";
+    card.appendChild(icon);
+
     const title = document.createElement("strong");
     title.textContent = lesson.label;
-    const sub = document.createElement("span");
-    sub.textContent = record ? `Best: ${record.bestScore}/${maxScore}` : "Not started yet";
     card.appendChild(title);
-    card.appendChild(sub);
+
+    if (record) {
+      card.classList.add("lesson-card--done");
+      const stars = document.createElement("span");
+      stars.className = "lesson-card-stars";
+      stars.textContent = "⭐".repeat(starsForScore(record.bestScore, maxScore)) || "—";
+      card.appendChild(stars);
+      const sub = document.createElement("span");
+      sub.textContent = `Best: ${record.bestScore}/${maxScore}`;
+      card.appendChild(sub);
+    } else {
+      const sub = document.createElement("span");
+      sub.textContent = "Not started yet";
+      card.appendChild(sub);
+    }
+
     card.addEventListener("click", () => startLesson(lesson.id));
     grid.appendChild(card);
   }
+}
+
+// Shared thresholds for the menu cards and the complete screen:
+// 3 stars >= 90%, 2 >= 70%, 1 >= 50%, 0 below.
+function starsForScore(score, max) {
+  const ratio = score / max;
+  if (ratio >= 0.9) return 3;
+  if (ratio >= 0.7) return 2;
+  if (ratio >= 0.5) return 1;
+  return 0;
 }
 
 function startLesson(lessonId) {
@@ -275,7 +305,8 @@ function startLesson(lessonId) {
 function renderQuestion() {
   const question = currentQueue[currentIndex];
   const tier = currentTierConfig();
-  el("lesson-progress-label").textContent = `${currentLesson.label} — ${currentIndex + 1} / ${currentQueue.length}`;
+  el("lesson-progress-label").textContent = `${currentIndex + 1} / ${currentQueue.length}`;
+  el("lesson-progress-fill").style.width = `${((currentIndex + 1) / currentQueue.length) * 100}%`;
 
   const usesMascots = session.profile.features.mascots;
   const asker = usesMascots ? activeMascotForAsking(currentIndex) : null;
@@ -563,6 +594,16 @@ function showComplete(score, total, newlyUnlocked) {
     completeAvatar.hidden = true;
     el("lesson-complete-line").textContent = getLessonCompleteLine(score, total);
   }
+
+  const starRow = el("lesson-complete-stars");
+  starRow.hidden = false;
+  const earned = starsForScore(score, total);
+  [...starRow.children].forEach((star) => star.classList.remove("star--filled"));
+  void starRow.offsetWidth; // force reflow so the pop animation replays on repeat completions
+  [...starRow.children].forEach((star, idx) => {
+    if (idx < earned) star.classList.add("star--filled");
+  });
+
   el("lesson-complete-score").textContent = `You got ${score} out of ${total}! 🎉`;
 
   if (newlyUnlocked.length > 0) {

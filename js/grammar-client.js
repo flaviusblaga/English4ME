@@ -8,6 +8,7 @@ export const ADVANCED_LESSONS = [
   {
     id: "past-tenses",
     label: "Past Tenses",
+    emoji: "⏳",
     questions: [
       { q: "While I ____ TV, the phone rang.", options: ["watched", "was watching", "am watching", "watch"], correct: 1,
         explain: "An action in progress (was watching) is interrupted by a short action (rang)." },
@@ -30,6 +31,7 @@ export const ADVANCED_LESSONS = [
   {
     id: "present-perfect",
     label: "Present Perfect",
+    emoji: "✅",
     questions: [
       { q: "I have lived here ____ 2019.", options: ["for", "since", "from", "during"], correct: 1,
         explain: "\"Since\" marks the starting point; \"for\" would need a duration (for five years)." },
@@ -52,6 +54,7 @@ export const ADVANCED_LESSONS = [
   {
     id: "comparatives",
     label: "Comparing Things",
+    emoji: "⚖️",
     questions: [
       { q: "This book is ____ than the movie.", options: ["more better", "better", "more good", "gooder"], correct: 1,
         explain: "\"Better\" is already the comparative of good — never \"more better\"." },
@@ -74,6 +77,7 @@ export const ADVANCED_LESSONS = [
   {
     id: "future-forms",
     label: "Talking About the Future",
+    emoji: "🔮",
     questions: [
       { q: "Look at those clouds! It ____ rain.", options: ["will", "is going to", "would", "does"], correct: 1,
         explain: "A prediction based on what you can see now takes \"going to\"." },
@@ -96,6 +100,7 @@ export const ADVANCED_LESSONS = [
   {
     id: "phrasal-verbs",
     label: "Phrasal Verbs",
+    emoji: "🧩",
     questions: [
       { q: "Please turn ____ the music — the baby is sleeping.", options: ["down", "up", "in", "over"], correct: 0,
         explain: "Turn down = make quieter; turn up = make louder." },
@@ -118,6 +123,7 @@ export const ADVANCED_LESSONS = [
   {
     id: "conditionals",
     label: "If Sentences",
+    emoji: "🔀",
     questions: [
       { q: "If it rains tomorrow, we ____ at home.", options: ["stay", "will stay", "stayed", "would stayed"], correct: 1,
         explain: "First conditional: if + present simple, will + verb." },
@@ -143,6 +149,7 @@ export const EXPERT_LESSONS = [
   {
     id: "idioms",
     label: "Idioms",
+    emoji: "🎭",
     questions: [
       { q: "The math test was a piece of cake. What does this mean?", options: ["It was very easy", "It was about fractions", "It was very long", "It was a reward"], correct: 0,
         explain: "A piece of cake = something very easy to do." },
@@ -165,6 +172,7 @@ export const EXPERT_LESSONS = [
   {
     id: "confusables",
     label: "Tricky Word Pairs",
+    emoji: "🤔",
     questions: [
       { q: "Can you ____ me your bike until tomorrow?", options: ["borrow", "lend", "loan me", "rent me"], correct: 1,
         explain: "You lend TO someone; you borrow FROM someone." },
@@ -187,6 +195,7 @@ export const EXPERT_LESSONS = [
   {
     id: "phrasal-verbs-advanced",
     label: "Advanced Phrasal Verbs",
+    emoji: "🚀",
     questions: [
       { q: "The meeting was put ____ until next week.", options: ["away", "off", "down", "out"], correct: 1,
         explain: "Put off = postpone, delay to a later time." },
@@ -209,6 +218,7 @@ export const EXPERT_LESSONS = [
   {
     id: "paraphrase",
     label: "Say It Another Way",
+    emoji: "🔁",
     questions: [
       { q: "\"I've never seen such a good film.\" means the same as...", options: ["I don't like films.", "It's the best film I've ever seen.", "I never watch good films.", "I saw a good film once."], correct: 1,
         explain: "\"Never seen such a good X\" = \"the best X I've ever seen\"." },

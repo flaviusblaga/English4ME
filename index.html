@@ -27,37 +27,48 @@
   </main>
 
   <main id="screen-chat" class="screen" hidden>
-    <header class="chat-header">
-      <div>
-        <strong id="current-user-name"></strong>
-        <span id="current-profile-name" class="profile-tag"></span>
-      </div>
-      <div id="scenario-select-wrap" class="chat-header-center" hidden>
-        <label for="scenario-select" class="scenario-label">Practice:</label>
-        <select id="scenario-select">
-          <option value="">Free conversation</option>
-        </select>
-      </div>
-      <div class="chat-header-right">
-        <div id="gamification-bar" class="gamification-bar" hidden>
-          <span id="gamification-points" class="gamification-points">⭐ 0</span>
-          <span id="gamification-streak" class="gamification-streak">🔥 0</span>
-          <button id="gamification-badges-btn" class="btn btn-small">🏅 Badges</button>
+    <header class="app-header">
+      <div class="app-header-top">
+        <div class="app-identity">
+          <span id="header-avatar" class="identity-avatar"></span>
+          <div>
+            <strong id="current-user-name"></strong>
+            <span id="current-profile-name" class="profile-tag"></span>
+          </div>
         </div>
-        <span id="budget-indicator" class="budget-indicator"></span>
-        <select id="voice-gender-select" class="voice-gender-select" title="Interlocutor voice">
-          <option value="female">👩 Female voice</option>
-          <option value="male">👨 Male voice</option>
-        </select>
-        <button id="tts-mute-btn" class="btn btn-small" aria-pressed="false">🔊 Voice on</button>
-        <button id="back-to-lessons-btn" class="btn btn-small" hidden>← Back to lessons</button>
+        <div class="app-header-status">
+          <div id="gamification-bar" class="gamification-bar" hidden>
+            <span id="gamification-points" class="gamification-points">⭐ 0</span>
+            <span id="gamification-streak" class="gamification-streak">🔥 0</span>
+          </div>
+          <span id="budget-indicator" class="budget-indicator"></span>
+          <button id="settings-btn" class="btn btn-small btn-icon" aria-label="Settings" aria-pressed="false">⚙️</button>
+        </div>
+      </div>
+      <div class="app-header-actions">
+        <div id="scenario-select-wrap" class="chat-header-center" hidden>
+          <label for="scenario-select" class="scenario-label">Practice:</label>
+          <select id="scenario-select">
+            <option value="">Free conversation</option>
+          </select>
+        </div>
+        <button id="gamification-badges-btn" class="btn btn-small" hidden>🏅 Badges</button>
+        <button id="back-to-lessons-btn" class="btn btn-small" hidden>📚 Exercises</button>
         <button id="reading-btn" class="btn btn-small" hidden>📖 Reading</button>
         <button id="view-child-progress-btn" class="btn btn-small" hidden>👀 View child's progress</button>
-        <button id="debug-data-btn" class="btn btn-small">Show saved data</button>
         <button id="home-btn" class="btn btn-small">🏠 Levels</button>
-        <button id="logout-btn" class="btn btn-small">Sign out</button>
       </div>
     </header>
+
+    <div id="settings-panel" class="settings-panel" hidden>
+      <select id="voice-gender-select" class="voice-gender-select" title="Interlocutor voice">
+        <option value="female">👩 Female voice</option>
+        <option value="male">👨 Male voice</option>
+      </select>
+      <button id="tts-mute-btn" class="btn btn-small" aria-pressed="false">🔊 Voice on</button>
+      <button id="debug-data-btn" class="btn btn-small">Show saved data</button>
+      <button id="logout-btn" class="btn btn-small">Sign out</button>
+    </div>
 
     <div id="gamification-badges-panel" class="gamification-badges-panel" hidden></div>
 
@@ -101,30 +112,41 @@
     <div id="chat-log" class="chat-log"></div>
 
     <footer class="chat-input-row">
-      <button id="mic-btn" class="btn btn-small" hidden>🎤</button>
+      <button id="mic-btn" class="btn btn-small btn-icon" hidden aria-label="Speak">🎤</button>
       <textarea id="chat-input" rows="2" placeholder="Type your message in English..."></textarea>
-      <button id="chat-send" class="btn btn-primary">Send</button>
+      <button id="chat-send" class="btn btn-primary btn-send" aria-label="Send">➤</button>
     </footer>
 
     <pre id="debug-data-output" class="debug-output" hidden></pre>
   </main>
 
   <main id="screen-lesson" class="screen" hidden>
-    <header class="chat-header">
-      <div>
-        <strong id="lesson-user-name"></strong>
-        <span id="lesson-profile-tag" class="profile-tag"></span>
-      </div>
-      <div class="chat-header-right">
-        <div id="lesson-gamification-bar" class="gamification-bar">
-          <span id="lesson-gamification-points" class="gamification-points">⭐ 0</span>
-          <span id="lesson-gamification-streak" class="gamification-streak">🔥 0</span>
+    <header class="app-header">
+      <div class="app-header-top">
+        <div class="app-identity">
+          <span id="lesson-header-avatar" class="identity-avatar"></span>
+          <div>
+            <strong id="lesson-user-name"></strong>
+            <span id="lesson-profile-tag" class="profile-tag"></span>
+          </div>
         </div>
-        <button id="lesson-just-chat-btn" class="btn btn-small">💬 Just chat with Bobo &amp; Fizz</button>
+        <div class="app-header-status">
+          <div id="lesson-gamification-bar" class="gamification-bar">
+            <span id="lesson-gamification-points" class="gamification-points">⭐ 0</span>
+            <span id="lesson-gamification-streak" class="gamification-streak">🔥 0</span>
+          </div>
+          <button id="lesson-settings-btn" class="btn btn-small btn-icon" aria-label="Settings" aria-pressed="false">⚙️</button>
+        </div>
+      </div>
+      <div class="app-header-actions">
+        <button id="lesson-just-chat-btn" class="btn btn-small">💬 Chat</button>
         <button id="lesson-home-btn" class="btn btn-small">🏠 Levels</button>
-        <button id="lesson-logout-btn" class="btn btn-small">Sign out</button>
       </div>
     </header>
+
+    <div id="lesson-settings-panel" class="settings-panel" hidden>
+      <button id="lesson-logout-btn" class="btn btn-small">Sign out</button>
+    </div>
 
     <div id="lesson-mascot-select-bar" class="mascot-select-bar">
       <span class="mascot-select-label">My teacher today:</span>
@@ -151,8 +173,9 @@
 
     <div id="lesson-exercise-view" hidden>
       <div class="lesson-progress-bar">
-        <span id="lesson-progress-label"></span>
-        <button id="lesson-exit-btn" class="btn btn-small">← Back to lessons</button>
+        <button id="lesson-exit-btn" class="btn btn-small btn-icon" aria-label="Exit lesson">✕</button>
+        <div class="progress-track"><div id="lesson-progress-fill" class="progress-fill"></div></div>
+        <span id="lesson-progress-label" class="progress-label"></span>
       </div>
       <div class="lesson-mascot-prompt">
         <img id="lesson-prompt-avatar" class="mascot-avatar" alt="" />
@@ -169,15 +192,18 @@
         <img id="lesson-reaction-avatar" class="mascot-avatar" alt="" hidden />
         <p id="lesson-reaction-text" class="mascot-text"></p>
       </div>
-      <button id="lesson-replay-btn" class="btn btn-small" hidden>🔊 Hear it again</button>
-      <button id="lesson-next-btn" class="btn btn-primary" hidden>Next →</button>
+      <div class="lesson-action-bar">
+        <button id="lesson-replay-btn" class="btn btn-small" hidden>🔊 Hear it again</button>
+        <button id="lesson-next-btn" class="btn btn-primary" hidden>Next →</button>
+      </div>
     </div>
 
     <div id="lesson-complete-view" hidden>
       <div class="lesson-mascot-intro">
-        <img id="lesson-complete-avatar" class="mascot-avatar" alt="Fizz" />
+        <img id="lesson-complete-avatar" class="mascot-avatar mascot-avatar--big" alt="Fizz" />
         <p id="lesson-complete-line" class="mascot-text"></p>
       </div>
+      <div id="lesson-complete-stars" class="star-row" hidden><span class="star">⭐</span><span class="star">⭐</span><span class="star">⭐</span></div>
       <p id="lesson-complete-score" class="lesson-score"></p>
       <div class="lesson-complete-actions">
         <button id="lesson-chat-about-it-btn" class="btn btn-primary">💬 Chat about it with Bobo &amp; Fizz</button>
@@ -199,8 +225,9 @@
 
     <div id="reading-passage-view" class="reading-body" hidden>
       <div class="lesson-progress-bar">
-        <span id="reading-progress-label"></span>
-        <button id="reading-exit-btn" class="btn btn-small">← Back to stories</button>
+        <button id="reading-exit-btn" class="btn btn-small btn-icon" aria-label="Back to stories">✕</button>
+        <div class="progress-track"><div id="reading-progress-fill" class="progress-fill"></div></div>
+        <span id="reading-progress-label" class="progress-label"></span>
       </div>
       <h2 id="reading-passage-title" class="reading-passage-title"></h2>
       <p id="reading-passage-text" class="reading-passage-text"></p>
@@ -229,7 +256,10 @@
         <label for="parent-view-email-input">Child's email:</label>
         <input id="parent-view-email-input" type="email" placeholder="child@gmail.com" />
         <select id="parent-view-profile-select">
-          <option value="kids-primar">Socatei — Bobo &amp; Fizz</option>
+          <option value="kids-primar">🌱 Beginner</option>
+          <option value="kids-intermediate">🌿 Intermediate</option>
+          <option value="kids-advanced">🌳 Advanced</option>
+          <option value="kids-expert">🏆 Expert</option>
         </select>
         <button id="parent-view-load-btn" class="btn btn-primary">Load</button>
       </div>

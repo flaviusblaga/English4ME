@@ -45,10 +45,15 @@ function showMenu() {
     const card = document.createElement("button");
     card.type = "button";
     card.className = "lesson-card";
+    if (record) card.classList.add("lesson-card--done");
+    const icon = document.createElement("span");
+    icon.className = "lesson-card-icon";
+    icon.textContent = passage.emoji || "📖";
     const title = document.createElement("strong");
     title.textContent = passage.title;
     const sub = document.createElement("span");
     sub.textContent = record ? `Best: ${record.bestScore}/${passage.questions.length}` : "Not read yet";
+    card.appendChild(icon);
     card.appendChild(title);
     card.appendChild(sub);
     card.addEventListener("click", () => startPassage(passage.id));
@@ -75,7 +80,8 @@ function startPassage(passageId) {
 
 function renderQuestion() {
   const question = currentPassage.questions[currentQuestionIndex];
-  el("reading-progress-label").textContent = `Question ${currentQuestionIndex + 1} of ${currentPassage.questions.length}`;
+  el("reading-progress-label").textContent = `${currentQuestionIndex + 1} / ${currentPassage.questions.length}`;
+  el("reading-progress-fill").style.width = `${((currentQuestionIndex + 1) / currentPassage.questions.length) * 100}%`;
   el("reading-question-text").textContent = question.q;
 
   const optionsGrid = el("reading-options-grid");

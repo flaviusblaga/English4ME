@@ -7,6 +7,7 @@ export const READING_PASSAGES = [
   {
     id: "the-lighthouse-keeper",
     title: "The Lighthouse Keeper's Cat",
+    emoji: "🐱",
     text: "For forty years, Mr. Halloran kept the lighthouse on Storm Point, and for thirty-nine of them, he did it alone. Then, one October morning, a thin grey cat appeared at his door, soaked from the night's rain. He named her Compass, because she always sat facing north. Visitors found it strange that such a solitary man talked constantly to a cat, but Mr. Halloran didn't mind. On foggy nights, when the great lamp turned slowly above them, Compass would climb to the gallery and watch the beam sweep across the water. The fishermen in the village below joked that Storm Point now had two keepers, and honestly, they weren't entirely wrong.",
     questions: [
       { q: "How long did Mr. Halloran work at the lighthouse completely alone?",
@@ -22,6 +23,7 @@ export const READING_PASSAGES = [
   {
     id: "the-science-fair",
     title: "The Science Fair Surprise",
+    emoji: "🔬",
     text: "Maya had worked on her volcano model for three weeks, but the night before the science fair, disaster struck: her little brother knocked it off the table, and the whole thing cracked in half. Instead of panicking, Maya stared at the broken model and had an idea. She spent the evening turning the crack into a feature, painting glowing lava inside the split and adding a label that read 'Cross-section of an active volcano.' The next day, the judges spent longer at her table than at anyone else's. 'Most models only show the outside,' one judge said, impressed. Maya won second place, and she never told anyone except her brother how the cross-section was really invented.",
     questions: [
       { q: "How long had Maya worked on her project?",
@@ -37,6 +39,7 @@ export const READING_PASSAGES = [
   {
     id: "the-midnight-train",
     title: "The Midnight Train",
+    emoji: "🚂",
     text: "The station at Greyfield was supposed to be closed at midnight, which is exactly why Tom and his grandfather were there. Every year, on the last night of August, they came to watch the freight train pass through — a tradition that started before Tom could walk. His grandfather claimed the train carried everything from pianos to circus equipment, and Tom had long suspected he was inventing half of it. But last year, through a gap in one wagon's door, Tom had glimpsed something that looked remarkably like a carousel horse. Tonight, as the distant rumble grew louder, his grandfather smiled and said, 'Wonder what impossible thing rides through tonight.' Tom didn't answer. He was already watching the tracks.",
     questions: [
       { q: "When did Tom and his grandfather visit the station?",
@@ -52,6 +55,7 @@ export const READING_PASSAGES = [
   {
     id: "the-recipe-book",
     title: "Grandma's Recipe Book",
+    emoji: "🍰",
     text: "When the family finally sorted through Grandma Elena's kitchen, everyone wanted the famous recipe book — the one with the plum dumplings recipe that no restaurant had ever matched. But when Ana opened the worn notebook, she started laughing. The measurements made no sense: 'flour — enough,' 'sugar — until it tastes right,' 'butter — more than you think.' There were no times, no temperatures, only notes like 'knead until your arms complain.' Her uncle wanted to throw it away, but Ana kept it. It took her two years of failed batches to understand what Grandma meant, and the day her dumplings finally tasted right, she added her own note to the margin: 'patience — all of it.'",
     questions: [
       { q: "Why did everyone want the recipe book?",
@@ -67,6 +71,7 @@ export const READING_PASSAGES = [
   {
     id: "the-robot-gardener",
     title: "The Robot Gardener",
+    emoji: "🤖",
     text: "The city of Brightwater installed its first robot gardener in Central Park last spring, and the results surprised everyone — including its programmers. The robot, nicknamed Sprout by local children, was designed simply to water plants and remove weeds. But its learning software began noticing patterns nobody had programmed: it learned that the roses near the fountain needed less water on windy days, and that a certain oak attracted birds that helpfully ate harmful insects. By autumn, Sprout was leaving certain 'weeds' alone entirely — wildflowers that fed the park's bees. Some gardeners were skeptical at first, worried a machine would make the park feel artificial. Instead, Central Park had its greenest year in decades.",
     questions: [
       { q: "What was Sprout originally designed to do?",
@@ -82,6 +87,7 @@ export const READING_PASSAGES = [
   {
     id: "the-forgotten-language",
     title: "The Forgotten Language",
+    emoji: "📜",
     text: "Professor Ionescu spent her career studying languages that no one speaks anymore, but her favorite discovery happened by accident. While recording an elderly shepherd in the mountains for a project about folk songs, she noticed he counted his sheep using words she had never heard — not Romanian, not Hungarian, not anything in her books. The shepherd shrugged: 'My grandfather counted this way, and his grandfather before him. It's just how sheep are counted.' It turned out to be a counting system centuries old, surviving in exactly one valley, used by exactly eleven families, and only ever for sheep. The professor published her findings, but her favorite part wasn't the fame. It was that the shepherd, after all the interviews, still refused to count anything else that way.",
     questions: [
       { q: "What was Professor Ionescu recording when she made her discovery?",
