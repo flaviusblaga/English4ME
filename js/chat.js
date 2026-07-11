@@ -133,6 +133,9 @@ export function initChat({ accessToken, userEmail, displayName, fileId, state, p
   el("mascot-select-bar").hidden = !profile.features.mascots;
   if (profile.features.mascots) updateMascotSelectUi();
   el("voice-gender-select").hidden = !isSpeechSynthesisSupported() || profile.features.mascots;
+  // Kids don't need the technical debug button cluttering their header —
+  // the parent still has it on their own (adult) profile.
+  el("debug-data-btn").hidden = profile.features.mascots;
 
   if (profile.features.scenarios) {
     el("scenario-select-wrap").hidden = false;

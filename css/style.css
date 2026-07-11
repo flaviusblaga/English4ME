@@ -5,7 +5,9 @@
 body {
   margin: 0;
   font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
-  background: #f4f1ea;
+  /* Page backdrop — the app itself is a centered ~900px canvas (see .screen);
+     this slightly darker tone frames it on wide viewports. */
+  background: #e9e4d8;
   color: #222;
 }
 
@@ -13,10 +15,26 @@ body {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  /* The app canvas: never stretch edge-to-edge on wide screens. */
+  max-width: 900px;
+  margin: 0 auto;
+  width: 100%;
+  background: #f4f1ea;
 }
 
 .screen[hidden] {
   display: none;
+}
+
+/* On wide viewports, float the canvas as a rounded card. */
+@media (min-width: 940px) {
+  .screen {
+    min-height: calc(100vh - 40px);
+    margin: 20px auto;
+    border-radius: 18px;
+    overflow: hidden;
+    box-shadow: 0 6px 32px rgba(0, 0, 0, 0.1);
+  }
 }
 
 /* Login screen */
@@ -51,6 +69,26 @@ body {
   padding: 0.6rem 1.2rem;
   font-size: 0.95rem;
   cursor: pointer;
+}
+
+/* Press feedback — every pressable element scales down slightly on press so
+   the UI visibly responds to the touch (matters most for kids on tablets). */
+.btn,
+.lesson-option-btn,
+.lesson-card,
+.word-chip,
+.profile-card,
+.mascot-select-btn {
+  transition: transform 160ms cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.btn:active,
+.lesson-option-btn:not(:disabled):active,
+.lesson-card:active,
+.word-chip:not(:disabled):active,
+.profile-card:active,
+.mascot-select-btn:active {
+  transform: scale(0.97);
 }
 
 .btn-primary {
@@ -372,6 +410,11 @@ body.mascot-theme {
   --kid-yellow: #ffd93d;
   --kid-pink: #ff8fc7;
   --kid-blue: #4dabf7;
+  /* Backdrop around the app canvas (kids version). */
+  background: #cfe3f9;
+}
+
+body.mascot-theme .screen {
   background: #eef6ff;
 }
 
@@ -432,17 +475,27 @@ body.mascot-theme #chat-send {
   min-width: 70px;
 }
 
-body.mascot-theme .mascot-avatar {
+/* Base avatar sizing is deliberately UNSCOPED — a mascot image must never
+   render at its natural size (1024px+) no matter which profile/theme is
+   active. The theme class only adds decoration on top. */
+.mascot-avatar {
   width: 92px;
   height: auto;
   flex-shrink: 0;
   object-fit: contain;
   border-radius: 14px;
   background: #fff;
+}
+
+.mascot-avatar[hidden] {
+  display: none;
+}
+
+body.mascot-theme .mascot-avatar {
   border: 3px solid var(--kid-yellow);
 }
 
-body.mascot-theme .mascot-avatar--emoji-fallback {
+.mascot-avatar--emoji-fallback {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -452,7 +505,11 @@ body.mascot-theme .mascot-avatar--emoji-fallback {
   border-radius: 14px;
 }
 
-body.mascot-theme .mascot-avatar--tiny {
+.mascot-avatar--emoji-fallback[hidden] {
+  display: none;
+}
+
+.mascot-avatar--tiny {
   width: 44px;
   border-radius: 8px;
 }
@@ -503,6 +560,12 @@ body.mascot-theme .mascot-avatar--tiny {
   align-items: flex-start;
   gap: 0.75rem;
   padding: 1rem;
+}
+
+.lesson-mascot-intro[hidden],
+.lesson-mascot-prompt[hidden],
+.lesson-mascot-reaction[hidden] {
+  display: none;
 }
 
 .lesson-menu-grid {
@@ -825,4 +888,43 @@ body.mascot-theme .mascot-avatar--tiny {
 
 .parent-view-line--user {
   background: #e6f0ff;
+}
+
+/* Mobile — comfortable touch targets for small hands. */
+@media (max-width: 600px) {
+  .lesson-option-btn {
+    min-height: 56px;
+    font-size: 1.25rem;
+  }
+
+  .lesson-options-grid--sentences .lesson-option-btn {
+    min-height: 48px;
+  }
+
+  .word-chip {
+    min-height: 46px;
+    font-size: 1.15rem;
+  }
+
+  .lesson-card {
+    min-height: 72px;
+  }
+
+  .lesson-question-stem {
+    font-size: 1.8rem;
+  }
+
+  .lesson-question-stem--grammar-mcq {
+    font-size: 1.15rem;
+  }
+
+  .mascot-avatar {
+    width: 64px;
+  }
+
+  .mascot-avatar--emoji-fallback {
+    width: 64px;
+    height: 64px;
+    font-size: 2.2rem;
+  }
 }
