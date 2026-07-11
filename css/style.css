@@ -1113,6 +1113,84 @@ body.mascot-theme .chat-bubble--assistant {
   max-width: 360px;
 }
 
+/* Bilingual line inside the reaction speech bubble */
+.mascot-text p {
+  margin: 0;
+}
+
+.mascot-text p + p {
+  margin-top: 0.35rem;
+}
+
+.lesson-translation {
+  font-size: var(--fs-sm);
+  font-weight: 700;
+  color: var(--kid-purple-dark, var(--text-muted));
+  background: var(--surface);
+  border-radius: var(--r-sm);
+  padding: 0.35rem 0.6rem;
+}
+
+/* End-of-lesson recap */
+.lesson-summary {
+  width: 100%;
+  max-width: 480px;
+  background: var(--surface-raised);
+  border: 2px solid var(--line);
+  border-radius: var(--r-lg);
+  padding: var(--sp-4);
+  text-align: left;
+}
+
+.lesson-summary-heading {
+  margin: 0 0 var(--sp-3);
+  font-size: var(--fs-md);
+  font-weight: 800;
+  text-align: center;
+}
+
+.lesson-summary-group {
+  margin-bottom: var(--sp-3);
+  border-radius: var(--r-md);
+  padding: var(--sp-3);
+}
+
+.lesson-summary-group--knew {
+  background: var(--success-soft);
+}
+
+.lesson-summary-group--practice {
+  background: var(--danger-soft);
+}
+
+.lesson-summary-title {
+  margin: 0 0 var(--sp-2);
+  font-weight: 800;
+  font-size: var(--fs-sm);
+}
+
+.lesson-summary-group--knew .lesson-summary-title {
+  color: var(--success-text);
+}
+
+.lesson-summary-group--practice .lesson-summary-title {
+  color: var(--danger-text);
+}
+
+.lesson-summary-row {
+  margin: 0 0 0.3rem;
+  font-size: var(--fs-sm);
+  line-height: 1.5;
+}
+
+.lesson-summary-cheer {
+  margin: 0;
+  font-weight: 700;
+  font-size: var(--fs-sm);
+  text-align: center;
+  color: var(--text-muted);
+}
+
 /* ---------- 12. Reading ---------- */
 .reading-body {
   padding: var(--sp-4);

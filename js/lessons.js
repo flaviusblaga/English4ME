@@ -118,6 +118,14 @@ function getSpokenAnswer(question) {
   return question.options.find((o) => o.isCorrect).value;
 }
 
+// Romanian meaning of the tested item — the word/sentence banks already
+// carry `ro` for every entry; grammar questions have none (returns null).
+function getItemTranslation(question) {
+  if (question.word) return question.word.ro;
+  if (question.sentence) return question.sentence.ro;
+  return null;
+}
+
 function questionTypeLabel(type) {
   switch (type) {
     case "picture": return "Picture match";
@@ -322,7 +330,8 @@ function renderQuestion() {
 
   // Reset per-question interactive state shared by every type.
   el("lesson-reaction-avatar").hidden = true;
-  el("lesson-reaction-text").textContent = "";
+  el("lesson-reaction-line").textContent = "";
+  el("lesson-translation-line").hidden = true;
   el("lesson-replay-btn").hidden = true;
   el("lesson-next-btn").hidden = true;
   promptAvatar.style.cursor = "default";
@@ -490,7 +499,15 @@ function finalizeAnswer(question, wasCorrect) {
     reactionAvatar.hidden = false;
     setMascotAvatar(reactionAvatar, reactor);
     const reactionLine = getRandomLine(wasCorrect ? CORRECT_REACTION_LINES : INCORRECT_REACTION_LINES);
-    el("lesson-reaction-text").textContent = `${reactor}: ${reactionLine}`;
+    el("lesson-reaction-line").textContent = `${reactor}: ${reactionLine}`;
+
+    // Bilingual reinforcement for the mascot tiers — every answer shows the
+    // English item with its Romanian meaning, right in the speech bubble.
+    const translation = getItemTranslation(question);
+    if (translation) {
+      el("lesson-translation-line").textContent = `🇬🇧 ${getItemLabel(question)}  =  🇷🇴 ${translation}`;
+      el("lesson-translation-line").hidden = false;
+    }
 
     // Always speak the actual correct answer out loud here (not just the
     // flavor line) — this is the one moment every question guarantees the
@@ -504,7 +521,7 @@ function finalizeAnswer(question, wasCorrect) {
     reactionAvatar.hidden = true;
     const verdict = wasCorrect ? "Correct!" : "Not quite.";
     const explanation = question.mcq && question.mcq.explain ? ` ${question.mcq.explain}` : "";
-    el("lesson-reaction-text").textContent = `${verdict}${explanation}`;
+    el("lesson-reaction-line").textContent = `${verdict}${explanation}`;
     replayVoice = {}; // default voice, normal pitch — no cartoon voice for teens
     speak(spokenAnswer, replayVoice);
   }
@@ -611,6 +628,8 @@ function showComplete(score, total, newlyUnlocked) {
     el("lesson-complete-score").textContent += ` New badge: ${badgeNames}!`;
   }
 
+  renderLessonSummary();
+
   el("lesson-chat-about-it-btn").textContent = session.profile.features.mascots
     ? "💬 Chat about it with Bobo & Fizz"
     : "💬 Chat about what you practiced";
@@ -625,4 +644,91 @@ function showComplete(score, total, newlyUnlocked) {
       onChatAboutItCallback({ label: currentLesson.label, words });
     }
   };
+}
+
+// End-of-lesson recap: aggregates the finished run per ITEM (a word/sentence
+// appears in 2-3 different question types), splitting into "knew it" (every
+// question about it answered correctly) and "practice again" (missed at
+// least once). Kids tiers show the Romanian meaning per item; grammar tiers
+// show the correct answer, plus the explanation on missed ones.
+function renderLessonSummary() {
+  const usesMascots = session.profile.features.mascots;
+  const byItem = new Map();
+  for (const q of currentQueue) {
+    const label = getItemLabel(q);
+    let entry = byItem.get(label);
+    if (!entry) {
+      entry = {
+        label,
+        translation: getItemTranslation(q),
+        answer: getSpokenAnswer(q),
+        explain: q.mcq && q.mcq.explain ? q.mcq.explain : null,
+        anyWrong: false,
+      };
+      byItem.set(label, entry);
+    }
+    if (!q.wasCorrect) entry.anyWrong = true;
+  }
+
+  const knew = [...byItem.values()].filter((e) => !e.anyWrong);
+  const practice = [...byItem.values()].filter((e) => e.anyWrong);
+
+  const summary = el("lesson-summary");
+  summary.innerHTML = "";
+
+  const heading = document.createElement("h3");
+  heading.className = "lesson-summary-heading";
+  heading.textContent = usesMascots ? "📋 Lesson recap · Ce ai învățat azi" : "📋 Lesson recap";
+  summary.appendChild(heading);
+
+  function addGroup(titleText, cssClass, entries, showExplain) {
+    if (entries.length === 0) return;
+    const group = document.createElement("div");
+    group.className = `lesson-summary-group ${cssClass}`;
+    const title = document.createElement("p");
+    title.className = "lesson-summary-title";
+    title.textContent = titleText;
+    group.appendChild(title);
+    for (const entry of entries) {
+      const row = document.createElement("p");
+      row.className = "lesson-summary-row";
+      if (entry.translation) {
+        row.textContent = `${entry.label}  —  ${entry.translation}`;
+      } else if (showExplain && entry.explain) {
+        row.textContent = `${entry.answer} — ${entry.explain}`;
+      } else {
+        row.textContent = entry.answer;
+      }
+      group.appendChild(row);
+    }
+    summary.appendChild(group);
+  }
+
+  addGroup(
+    usesMascots ? "✅ You knew these! · Le-ai știut!" : "✅ You got these right",
+    "lesson-summary-group--knew",
+    knew,
+    false
+  );
+  addGroup(
+    usesMascots ? "🔁 Practice these again · Mai exersează-le" : "🔁 Worth another look",
+    "lesson-summary-group--practice",
+    practice,
+    true
+  );
+
+  const cheer = document.createElement("p");
+  cheer.className = "lesson-summary-cheer";
+  if (practice.length === 0) {
+    cheer.textContent = usesMascots
+      ? "🎉 Perfect run — every single one! Amazing! · Totul corect — bravo!"
+      : "🎉 Perfect run — every single one!";
+  } else {
+    cheer.textContent = usesMascots
+      ? `💪 You finished the whole lesson — great job! Next time those ${practice.length} will be yours too! · Ai terminat toată lecția — data viitoare le prinzi și pe celelalte!`
+      : `💪 Solid work finishing the lesson — those ${practice.length} will stick next time.`;
+  }
+  summary.appendChild(cheer);
+
+  summary.hidden = false;
 }
