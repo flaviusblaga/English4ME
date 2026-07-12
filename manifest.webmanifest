@@ -1,0 +1,32 @@
+{
+  "name": "Engleza Familie — Socatei",
+  "short_name": "Socatei",
+  "description": "Invata engleza cu Bobo & Fizz — lectii, exercitii si recompense pentru toata familia.",
+  "lang": "ro",
+  "start_url": ".",
+  "scope": ".",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#fdf7ec",
+  "theme_color": "#58cc02",
+  "icons": [
+    {
+      "src": "assets/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "assets/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "assets/icons/icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}

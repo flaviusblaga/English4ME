@@ -2,9 +2,20 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Engleza Familie — Business English</title>
-  <link rel="icon" href="favicon.ico" type="image/x-icon" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Engleza Familie — Socatei</title>
+
+  <!-- Installable-app (PWA) wiring -->
+  <link rel="manifest" href="manifest.webmanifest" />
+  <meta name="theme-color" content="#58cc02" />
+  <link rel="icon" href="assets/icons/favicon.ico" sizes="16x16 32x32 48x48" />
+  <link rel="icon" href="assets/icons/favicon-32.png" type="image/png" sizes="32x32" />
+  <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="Socatei" />
+
   <link rel="stylesheet" href="css/style.css" />
   <script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
@@ -13,9 +24,11 @@
   <main id="screen-login" class="screen">
     <div class="card">
       <h1>Engleza Familie</h1>
-      <p class="subtitle">Business English — Conversational practice</p>
+      <p class="subtitle">Invata engleza cu Bobo &amp; Fizz</p>
       <button id="login-btn" class="btn btn-primary">Sign in with Google</button>
       <p id="login-error" class="error" hidden></p>
+      <button id="install-app-btn" class="btn btn-small" hidden>📲 Instaleaza pe telefon</button>
+      <p id="ios-install-hint" class="hint" hidden>Pe iPhone: apasa Share ⬆️ (in Safari), apoi „Add to Home Screen".</p>
     </div>
   </main>
 

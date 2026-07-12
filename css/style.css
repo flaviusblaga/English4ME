@@ -401,6 +401,11 @@ body.mascot-theme .identity-avatar {
   width: 100%;
 }
 
+#install-app-btn {
+  width: 100%;
+  margin-top: var(--sp-3);
+}
+
 /* Profile picker — the "home" */
 .card-wide {
   background: transparent;

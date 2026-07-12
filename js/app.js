@@ -6,6 +6,7 @@ import { initReading } from "./reading.js";
 import { PROFILES, getProfile } from "./profile.js";
 import { getRememberedProfileId, rememberProfileId } from "./profile-picker.js";
 import { initParentView } from "./parent-view.js";
+import { initPwa } from "./pwa.js";
 
 let currentUser = null; // { email, name } — set after sign-in, used once a profile is picked
 let currentSession = null; // { accessToken, userEmail, displayName, fileId, state, profile } — reused across lesson<->chat navigation
@@ -167,5 +168,6 @@ window.addEventListener("DOMContentLoaded", () => {
     showScreen("chat");
   });
   initParentView();
+  initPwa();
   showScreen("login");
 });
