@@ -137,10 +137,12 @@ let currentUtterance = null;
 const FEMALE_NAME_HINTS = [
   "zira", "hazel", "susan", "catherine", "samantha", "victoria", "karen",
   "moira", "tessa", "fiona", "kate", "serena", "allison", "ava", "female",
+  "aria", "jenny", "michelle", "emma", "ana", "clara", "sonia", "libby",
 ];
 const MALE_NAME_HINTS = [
   "david", "mark", "george", "ryan", "alex", "daniel", "fred", "oliver",
   "james", "thomas", "male",
+  "guy", "andrew", "brian", "christopher", "eric", "steffan", "tony",
 ];
 
 function classifyVoiceGender(voice) {
@@ -172,6 +174,13 @@ function pickBestVoice(gender) {
   const genderMatches = langCandidates.filter((v) => classifyVoiceGender(v) === gender);
   const candidates = genderMatches.length ? genderMatches : langCandidates;
 
+  // Edge (and some Windows builds of Chrome) expose "Microsoft ... Online
+  // (Natural)" neural voices — dramatically less robotic than the local SAPI
+  // ones, especially with the pitched-up mascot voices. Always take one of
+  // those first when available.
+  const naturalVoice = candidates.find((v) => /natural/i.test(v.name));
+  if (naturalVoice) return naturalVoice;
+
   const preferredNames =
     gender === "male"
       ? ["Google UK English Male", "Microsoft David - English (United States)"]
@@ -193,7 +202,10 @@ function pickBestVoice(gender) {
 // replies don't queue up and read out of order if the user sends fast.
 // Async so it can wait for the voice list — chat.js calls this without
 // awaiting it, which is fine, speaking happens in the background either way.
-export async function speak(text, { pitch = 1.0, rate = 1.0 } = {}) {
+// `onstart`/`onend` (both optional) let the caller animate a mascot avatar
+// exactly while its line is being spoken; `onend` also fires on error and
+// cancel so a "talking" CSS class never gets stuck on.
+export async function speak(text, { pitch = 1.0, rate = 1.0, onstart, onend } = {}) {
   if (!isSpeechSynthesisSupported() || isTtsMuted() || !text) return;
 
   await ensureVoicesLoaded();
@@ -206,11 +218,14 @@ export async function speak(text, { pitch = 1.0, rate = 1.0 } = {}) {
   currentUtterance.rate = rate;
   const voice = pickBestVoice(getVoiceGenderPreference());
   if (voice) currentUtterance.voice = voice;
+  if (onstart) currentUtterance.onstart = () => onstart();
   currentUtterance.onend = () => {
     currentUtterance = null;
+    if (onend) onend();
   };
   currentUtterance.onerror = () => {
     currentUtterance = null;
+    if (onend) onend();
   };
 
   // Calling speak() immediately after cancel() can silently no-op in Chrome
@@ -246,6 +261,11 @@ export async function speakLines(segments) {
       utterance.pitch = segment.pitch != null ? segment.pitch : 1.0;
       utterance.rate = segment.rate != null ? segment.rate : 1.0;
       if (voice) utterance.voice = voice;
+      if (segment.onstart) utterance.onstart = () => segment.onstart();
+      if (segment.onend) {
+        utterance.onend = () => segment.onend();
+        utterance.onerror = () => segment.onend();
+      }
       return utterance;
     });
 

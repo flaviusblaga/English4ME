@@ -1,6 +1,9 @@
 import { CONFIG } from "./config.js";
 
-const SCOPES = "https://www.googleapis.com/auth/drive.appdata openid email profile";
+// drive.file (added for the lesson-recap export) only grants access to files
+// THIS app creates in the visible Drive — it cannot read the user's other
+// files. Existing users are re-prompted for consent once at next sign-in.
+const SCOPES = "https://www.googleapis.com/auth/drive.appdata https://www.googleapis.com/auth/drive.file openid email profile";
 
 let tokenClient = null;
 let accessToken = null;

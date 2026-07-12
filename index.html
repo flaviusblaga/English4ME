@@ -165,9 +165,13 @@
 
     <div id="lesson-menu-view">
       <div class="lesson-mascot-intro">
-        <img id="lesson-menu-avatar" class="mascot-avatar" alt="Bobo" />
+        <span class="mascot-figure">
+          <img id="lesson-menu-avatar" class="mascot-avatar" alt="Bobo" />
+          <span class="mascot-avatar-name"></span>
+        </span>
         <p id="lesson-menu-intro-line" class="mascot-text"></p>
       </div>
+      <div id="lesson-rewards-card" class="rewards-card" hidden></div>
       <div id="lesson-menu-grid" class="lesson-menu-grid"></div>
     </div>
 
@@ -178,7 +182,10 @@
         <span id="lesson-progress-label" class="progress-label"></span>
       </div>
       <div class="lesson-mascot-prompt">
-        <img id="lesson-prompt-avatar" class="mascot-avatar" alt="" />
+        <span class="mascot-figure">
+          <img id="lesson-prompt-avatar" class="mascot-avatar" alt="" />
+          <span class="mascot-avatar-name"></span>
+        </span>
         <p id="lesson-prompt-text" class="mascot-text"></p>
       </div>
       <div id="lesson-question-stem" class="lesson-question-stem"></div>
@@ -189,7 +196,10 @@
         <button id="lesson-unscramble-check-btn" class="btn btn-primary">Check</button>
       </div>
       <div class="lesson-mascot-reaction">
-        <img id="lesson-reaction-avatar" class="mascot-avatar" alt="" hidden />
+        <span class="mascot-figure">
+          <img id="lesson-reaction-avatar" class="mascot-avatar" alt="" hidden />
+          <span class="mascot-avatar-name"></span>
+        </span>
         <div id="lesson-reaction-text" class="mascot-text">
           <p id="lesson-reaction-line"></p>
           <p id="lesson-translation-line" class="lesson-translation" hidden></p>
@@ -203,14 +213,19 @@
 
     <div id="lesson-complete-view" hidden>
       <div class="lesson-mascot-intro">
-        <img id="lesson-complete-avatar" class="mascot-avatar mascot-avatar--big" alt="Fizz" />
+        <span class="mascot-figure">
+          <img id="lesson-complete-avatar" class="mascot-avatar mascot-avatar--big" alt="Fizz" />
+          <span class="mascot-avatar-name"></span>
+        </span>
         <p id="lesson-complete-line" class="mascot-text"></p>
       </div>
       <div id="lesson-complete-stars" class="star-row" hidden><span class="star">⭐</span><span class="star">⭐</span><span class="star">⭐</span></div>
       <p id="lesson-complete-score" class="lesson-score"></p>
+      <div id="lesson-complete-rewards" class="rewards-callout" hidden></div>
       <div id="lesson-summary" class="lesson-summary" hidden></div>
       <div class="lesson-complete-actions">
         <button id="lesson-chat-about-it-btn" class="btn btn-primary">💬 Chat about it with Bobo &amp; Fizz</button>
+        <button id="lesson-save-recap-btn" class="btn btn-small">💾 Save recap to Drive · Salvează pe Drive</button>
         <button id="lesson-back-to-menu-btn" class="btn btn-small">← Back to lessons</button>
       </div>
     </div>
@@ -277,6 +292,7 @@
           <span id="parent-view-streak">🔥 0</span>
           <span id="parent-view-turns"></span>
         </div>
+        <div id="parent-view-rewards" class="rewards-card" hidden></div>
         <div id="parent-view-badges" class="gamification-badges-panel"></div>
         <p id="parent-view-caps-note" class="hint" hidden></p>
         <div id="parent-view-days" class="parent-view-days"></div>

@@ -8,6 +8,7 @@ import { syncProgress } from "./worker-client.js";
 import { updateGamificationAfterLesson } from "./gamification.js";
 import { recordTurnForParentSync, todayLocalDateString } from "./chat.js";
 import { READING_PASSAGES, getPassage } from "./reading-client.js";
+import { gamificationWithRewards } from "./rewards.js";
 
 let session = null; // { accessToken, userEmail, displayName, fileId, state, profile }
 let onBackCallback = null;
@@ -161,7 +162,7 @@ function finishPassage() {
       userEmail: session.userEmail,
       profileId: session.profile.id,
       displayName: session.displayName,
-      gamification: session.state.gamification || null,
+      gamification: gamificationWithRewards(session.state, session.profile),
       progress: session.state.progress,
       date: session.state.parentSync.todayDate || todayLocalDateString(),
       turns: session.state.parentSync.todayTurns,

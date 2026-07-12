@@ -527,6 +527,96 @@ body.mascot-theme .mascot-avatar--emoji-fallback {
   border-width: 2px;
 }
 
+/* Per-character face crops. The artwork is full-body: Bobo's face sits near
+   the TOP of his image, but Fizz's face is mid-image — the whole top half is
+   his curled tail, which is exactly what the old generic "top center" crop
+   was showing. object-view-box (Chromium) zooms the circle onto the head;
+   object-position keeps a sane framing on browsers without it. Selected by
+   src so every mascot <img> in the app (lessons, chat, picker) is covered. */
+img.mascot-avatar[src*="bobo"] {
+  object-position: 50% 20%;
+  object-view-box: inset(5% 24% 62% 30%);
+}
+
+img.mascot-avatar[src*="fizz"] {
+  object-position: 50% 45%;
+  object-view-box: inset(34% 46% 28% 8%);
+}
+
+/* Avatar + visible name caption, stacked. */
+.mascot-figure {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  flex-shrink: 0;
+}
+
+.mascot-avatar-name {
+  font-size: 0.72rem;
+  font-weight: 800;
+  color: var(--text-muted);
+}
+
+body.mascot-theme .mascot-avatar-name {
+  color: var(--kid-purple-dark);
+}
+
+/* No orphan caption when the avatar itself is hidden (e.g. before the first
+   reaction, or on the grown-up tiers) or empty. */
+.mascot-figure img[hidden] + .mascot-avatar-name,
+.mascot-avatar-name:empty {
+  display: none;
+}
+
+/* ---------- Mascot life: idle bob, talking wiggle, reactions ---------- */
+@keyframes mascot-idle {
+  0%, 100% { transform: translateY(0) rotate(-1deg); }
+  50% { transform: translateY(-4px) rotate(1.5deg); }
+}
+
+body.mascot-theme .mascot-avatar {
+  animation: mascot-idle 3.2s ease-in-out infinite;
+}
+
+@keyframes mascot-talk {
+  0%, 100% { transform: translateY(0) rotate(-2.5deg) scale(1); }
+  25% { transform: translateY(-3px) rotate(2deg) scale(1.06); }
+  50% { transform: translateY(-1px) rotate(-1.5deg) scale(1.03); }
+  75% { transform: translateY(-4px) rotate(2.5deg) scale(1.07); }
+}
+
+/* The body.mascot-theme variants outrank the idle rule above (which would
+   otherwise win on specificity and freeze the one-shot/talking animations). */
+.mascot-avatar.mascot-talking,
+body.mascot-theme .mascot-avatar.mascot-talking {
+  animation: mascot-talk 0.55s ease-in-out infinite;
+}
+
+@keyframes mascot-celebrate {
+  0% { transform: translateY(0) scale(1); }
+  30% { transform: translateY(-16px) scale(1.15) rotate(7deg); }
+  55% { transform: translateY(0) scale(0.95); }
+  75% { transform: translateY(-7px) scale(1.07) rotate(-4deg); }
+  100% { transform: translateY(0) scale(1); }
+}
+
+.mascot-avatar.mascot-celebrate,
+body.mascot-theme .mascot-avatar.mascot-celebrate {
+  animation: mascot-celebrate 0.75s ease;
+}
+
+@keyframes mascot-sad {
+  0%, 100% { transform: rotate(0); }
+  25% { transform: rotate(-8deg); }
+  75% { transform: rotate(8deg); }
+}
+
+.mascot-avatar.mascot-sad,
+body.mascot-theme .mascot-avatar.mascot-sad {
+  animation: mascot-sad 0.6s ease;
+}
+
 .mascot-line {
   display: flex;
   align-items: flex-start;
@@ -1370,12 +1460,89 @@ body.mascot-theme .chat-bubble--assistant {
   }
 }
 
+/* ---------- 14b. Confetti + rewards ---------- */
+.confetti-piece {
+  position: fixed;
+  top: -14px;
+  width: 10px;
+  height: 14px;
+  border-radius: 3px;
+  z-index: 999;
+  pointer-events: none;
+  animation: confetti-fall linear forwards;
+}
+
+@keyframes confetti-fall {
+  0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+  100% { transform: translateY(105vh) rotate(680deg); opacity: 0.85; }
+}
+
+.rewards-card {
+  background: var(--surface-raised);
+  border: 2px solid var(--line);
+  border-radius: var(--r-lg);
+  padding: var(--sp-3) var(--sp-4);
+  margin: var(--sp-3) 0;
+  box-shadow: var(--shadow-sm);
+}
+
+/* Aligns with the lesson grid's horizontal padding. */
+#lesson-rewards-card {
+  margin: 0 var(--sp-4) var(--sp-3);
+}
+
+.rewards-card-heading {
+  margin: 0 0 var(--sp-2);
+  font-size: var(--fs-md);
+  font-weight: 800;
+}
+
+.rewards-progress-track {
+  margin-bottom: var(--sp-2);
+}
+
+.rewards-row {
+  margin: 0 0 0.3rem;
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  line-height: 1.5;
+}
+
+.rewards-row--bonus {
+  font-weight: 800;
+}
+
+.rewards-row--earned {
+  color: var(--success-text);
+  background: var(--success-soft);
+  border-radius: var(--r-sm);
+  padding: 0.35rem 0.6rem;
+}
+
+.rewards-callout {
+  width: 100%;
+  max-width: 480px;
+  background: var(--surface-raised);
+  border: 2px solid var(--line);
+  border-radius: var(--r-lg);
+  padding: var(--sp-3) var(--sp-4);
+  text-align: center;
+}
+
 /* ---------- 15. Reduced motion ---------- */
 @media (prefers-reduced-motion: reduce) {
   .lesson-option-btn--incorrect,
   .word-chip--wrong-order,
   .star--filled,
-  .lesson-score {
+  .lesson-score,
+  body.mascot-theme .mascot-avatar,
+  .mascot-avatar.mascot-talking,
+  body.mascot-theme .mascot-avatar.mascot-talking,
+  .mascot-avatar.mascot-celebrate,
+  body.mascot-theme .mascot-avatar.mascot-celebrate,
+  .mascot-avatar.mascot-sad,
+  body.mascot-theme .mascot-avatar.mascot-sad,
+  .confetti-piece {
     animation: none;
   }
 

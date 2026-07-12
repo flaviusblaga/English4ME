@@ -1,6 +1,7 @@
-import { saveState } from "./drive.js";
+import { saveState, saveRecapToDrive } from "./drive.js";
 import { syncProgress } from "./worker-client.js";
 import { updateGamificationAfterLesson, BADGES } from "./gamification.js";
+import { computeRewards, gamificationWithRewards, SCREEN_TIME_PER_LESSON_MIN } from "./rewards.js";
 import {
   recordTurnForParentSync,
   todayLocalDateString,
@@ -142,12 +143,29 @@ function setMascotAvatar(imgEl, name) {
   const avatar = MASCOT_AVATARS[name];
   imgEl.src = avatar.img;
   imgEl.alt = name;
+  // data-mascot drives the per-character face crop in CSS (Bobo's face is at
+  // the top of his artwork, Fizz's is mid-image below his huge curled tail).
+  imgEl.dataset.mascot = name;
+  // Visible name caption under the portrait, when the avatar sits in a
+  // .mascot-figure wrapper (all four lesson-screen avatars do).
+  const caption = imgEl.parentElement && imgEl.parentElement.querySelector(".mascot-avatar-name");
+  if (caption) caption.textContent = name;
   imgEl.onerror = function () {
     const fallback = document.createElement("span");
     fallback.className = "mascot-avatar mascot-avatar--emoji-fallback";
     fallback.textContent = avatar.emoji;
     this.replaceWith(fallback);
   };
+}
+
+// Speaks a line in a mascot's voice while animating that mascot's portrait —
+// the avatar gets a "talking" wiggle for exactly as long as the TTS runs.
+function speakAsMascot(text, voiceOpts, avatarEl) {
+  speak(text, {
+    ...voiceOpts,
+    onstart: () => avatarEl && avatarEl.classList.add("mascot-talking"),
+    onend: () => avatarEl && avatarEl.classList.remove("mascot-talking"),
+  });
 }
 
 // Which mascot leads (asks the current question): a single-mascot preference
@@ -232,7 +250,10 @@ function showMenu() {
   el("lesson-exercise-view").hidden = true;
   el("lesson-complete-view").hidden = true;
 
-  const menuIntroRow = el("lesson-menu-avatar").parentElement;
+  // .closest, not .parentElement — the avatar now sits inside a
+  // .mascot-figure wrapper (for the name caption), so its parent is no
+  // longer the intro row itself.
+  const menuIntroRow = el("lesson-menu-avatar").closest(".lesson-mascot-intro");
   if (session.profile.features.mascots) {
     menuIntroRow.hidden = false;
     // Not tied to a question index here (there isn't one yet) — pick randomly
@@ -243,6 +264,8 @@ function showMenu() {
   } else {
     menuIntroRow.hidden = true;
   }
+
+  renderRewardsCard();
 
   const tier = currentTierConfig();
   const bucket = currentStateBucket();
@@ -282,6 +305,55 @@ function showMenu() {
     card.addEventListener("click", () => startLesson(lesson.id));
     grid.appendChild(card);
   }
+}
+
+// The reward ladder agreed with the parents, always visible above the lesson
+// grid so the child sees exactly what finishing the module is worth: screen
+// time per lesson, and the level's money bonus at 100%.
+function renderRewardsCard() {
+  const card = el("lesson-rewards-card");
+  const rewards = computeRewards(session.state, session.profile.contentTier);
+  if (!rewards) {
+    card.hidden = true;
+    return;
+  }
+
+  card.innerHTML = "";
+
+  const heading = document.createElement("p");
+  heading.className = "rewards-card-heading";
+  heading.textContent = "🏆 My rewards · Recompensele mele";
+  card.appendChild(heading);
+
+  const track = document.createElement("div");
+  track.className = "progress-track rewards-progress-track";
+  const fill = document.createElement("div");
+  fill.className = "progress-fill";
+  fill.style.width = `${Math.min(100, (rewards.lessonsCompleted / rewards.totalLessons) * 100)}%`;
+  track.appendChild(fill);
+  card.appendChild(track);
+
+  const progressLine = document.createElement("p");
+  progressLine.className = "rewards-row";
+  progressLine.textContent = `📚 ${rewards.lessonsCompleted} / ${rewards.totalLessons} lessons done · lecții terminate`;
+  card.appendChild(progressLine);
+
+  const screenTimeLine = document.createElement("p");
+  screenTimeLine.className = "rewards-row";
+  screenTimeLine.textContent = `⏱ +${SCREEN_TIME_PER_LESSON_MIN} min screen time per lesson · Timp câștigat: ${rewards.screenTimeMin} min`;
+  card.appendChild(screenTimeLine);
+
+  const bonusLine = document.createElement("p");
+  bonusLine.className = "rewards-row rewards-row--bonus";
+  if (rewards.bonusEarned) {
+    bonusLine.classList.add("rewards-row--earned");
+    bonusLine.textContent = `🎁 BONUS UNLOCKED: ${rewards.bonusLei} lei! · Bonus deblocat — spune-le părinților!`;
+  } else {
+    bonusLine.textContent = `🎁 Finish all ${rewards.totalLessons} → ${rewards.bonusLei} lei bonus · Termină tot modulul pentru bonus!`;
+  }
+  card.appendChild(bonusLine);
+
+  card.hidden = false;
 }
 
 // Shared thresholds for the menu cards and the complete screen:
@@ -381,10 +453,10 @@ function renderQuestion() {
     // Spoken in the asking mascot's own voice, so who you see is who you hear.
     const askerVoice = MASCOT_VOICES[asker] || KIDS_VOICE_OPTIONS;
     promptAvatar.style.cursor = "pointer";
-    promptAvatar.onclick = () => speak(spokenTarget, askerVoice);
+    promptAvatar.onclick = () => speakAsMascot(spokenTarget, askerVoice, promptAvatar);
     stem.style.cursor = "pointer";
-    stem.onclick = () => speak(spokenTarget, askerVoice);
-    speak(spokenTarget, askerVoice);
+    stem.onclick = () => speakAsMascot(spokenTarget, askerVoice, promptAvatar);
+    speakAsMascot(spokenTarget, askerVoice, promptAvatar);
   } else {
     stem.style.cursor = "default";
     stem.onclick = null;
@@ -498,6 +570,12 @@ function finalizeAnswer(question, wasCorrect) {
     const reactor = activeMascotForReaction(wasCorrect);
     reactionAvatar.hidden = false;
     setMascotAvatar(reactionAvatar, reactor);
+    // One-shot emotional reaction on the portrait: a happy jump for a correct
+    // answer, a sympathetic head-wobble for a miss. Class removed + reflow so
+    // the animation replays on every answer, not just the first.
+    reactionAvatar.classList.remove("mascot-celebrate", "mascot-sad");
+    void reactionAvatar.offsetWidth;
+    reactionAvatar.classList.add(wasCorrect ? "mascot-celebrate" : "mascot-sad");
     const reactionLine = getRandomLine(wasCorrect ? CORRECT_REACTION_LINES : INCORRECT_REACTION_LINES);
     el("lesson-reaction-line").textContent = `${reactor}: ${reactionLine}`;
 
@@ -514,7 +592,7 @@ function finalizeAnswer(question, wasCorrect) {
     // child hears it pronounced, whether they got it right or not. Spoken in
     // the reacting mascot's own voice (Bobo vs Fizz sound different).
     replayVoice = MASCOT_VOICES[reactor] || KIDS_VOICE_OPTIONS;
-    speak(`${reactionLine} ${spokenAnswer}.`, replayVoice);
+    speakAsMascot(`${reactionLine} ${spokenAnswer}.`, replayVoice, reactionAvatar);
   } else {
     // Grown-up tiers: no mascots, and the WHY matters more than cheering —
     // show the authored explanation when the question has one.
@@ -529,7 +607,8 @@ function finalizeAnswer(question, wasCorrect) {
   // Interactive replay — tap to hear the answer again as many times as wanted.
   const replayBtn = el("lesson-replay-btn");
   replayBtn.hidden = false;
-  replayBtn.onclick = () => speak(spokenAnswer, replayVoice);
+  replayBtn.onclick = () =>
+    usesMascots ? speakAsMascot(spokenAnswer, replayVoice, reactionAvatar) : speak(spokenAnswer, replayVoice);
 
   const isLast = currentIndex === currentQueue.length - 1;
   const nextBtn = el("lesson-next-btn");
@@ -555,6 +634,10 @@ function finishLesson() {
   const tier = currentTierConfig();
   const bucket = currentStateBucket();
 
+  // Snapshot before recording the completion, so a first-time completion of
+  // the final lesson is detectable as "the bonus was JUST earned".
+  const rewardsBefore = computeRewards(session.state, session.profile.contentTier);
+
   const existing = bucket.completed[currentLesson.id];
   const masteredSet = new Set(existing ? existing[tier.masteryField] : []);
   // An item counts once it's been answered correctly at least once, in this
@@ -574,11 +657,32 @@ function finishLesson() {
   const newlyUnlocked = updateGamificationAfterLesson(session.state);
   renderGamificationBar();
 
+  const rewards = computeRewards(session.state, session.profile.contentTier);
+  const isFirstCompletion = !existing;
+  const bonusJustEarned = !!(rewards && rewards.bonusEarned && rewardsBefore && !rewardsBefore.bonusEarned);
+
   recordTurnForParentSync(session.state, {
     role: "assistant",
     text: `[Lesson: ${currentLesson.label}] Finished with ${score}/${total} correct. 🎉`,
     ts: new Date().toISOString(),
   });
+
+  // The parent transcript is where rewards get "cashed in" — log them as
+  // explicit lines the parent can act on.
+  if (rewards && isFirstCompletion) {
+    recordTurnForParentSync(session.state, {
+      role: "assistant",
+      text: `[Reward] First completion of "${currentLesson.label}" — earned +${SCREEN_TIME_PER_LESSON_MIN} min screen time (total earned: ${rewards.screenTimeMin} min).`,
+      ts: new Date().toISOString(),
+    });
+  }
+  if (bonusJustEarned) {
+    recordTurnForParentSync(session.state, {
+      role: "assistant",
+      text: `[Reward] 🎁 MODULE COMPLETE — all ${rewards.totalLessons} lessons of the ${rewards.tier} level done. The agreed bonus is ${rewards.bonusLei} lei!`,
+      ts: new Date().toISOString(),
+    });
+  }
 
   saveState(session.accessToken, session.fileId, session.state);
 
@@ -587,17 +691,17 @@ function finishLesson() {
       userEmail: session.userEmail,
       profileId: session.profile.id,
       displayName: session.displayName,
-      gamification: session.state.gamification || null,
+      gamification: gamificationWithRewards(session.state, session.profile),
       progress: session.state.progress,
       date: session.state.parentSync.todayDate || todayLocalDateString(),
       turns: session.state.parentSync.todayTurns,
     }).catch((err) => console.warn("Parent-progress sync failed (non-fatal):", err));
   }
 
-  showComplete(score, total, newlyUnlocked);
+  showComplete(score, total, newlyUnlocked, { rewards, isFirstCompletion, bonusJustEarned });
 }
 
-function showComplete(score, total, newlyUnlocked) {
+function showComplete(score, total, newlyUnlocked, rewardInfo = {}) {
   el("lesson-exercise-view").hidden = true;
   el("lesson-complete-view").hidden = false;
 
@@ -628,7 +732,11 @@ function showComplete(score, total, newlyUnlocked) {
     el("lesson-complete-score").textContent += ` New badge: ${badgeNames}!`;
   }
 
+  renderCompleteRewards(rewardInfo);
   renderLessonSummary();
+  wireSaveRecapButton(score, total);
+
+  if (session.profile.features.mascots) launchConfetti();
 
   el("lesson-chat-about-it-btn").textContent = session.profile.features.mascots
     ? "💬 Chat about it with Bobo & Fizz"
@@ -646,13 +754,63 @@ function showComplete(score, total, newlyUnlocked) {
   };
 }
 
-// End-of-lesson recap: aggregates the finished run per ITEM (a word/sentence
-// appears in 2-3 different question types), splitting into "knew it" (every
-// question about it answered correctly) and "practice again" (missed at
-// least once). Kids tiers show the Romanian meaning per item; grammar tiers
-// show the correct answer, plus the explanation on missed ones.
-function renderLessonSummary() {
-  const usesMascots = session.profile.features.mascots;
+// Reward callout on the complete screen: the screen time just earned, the
+// running totals, and — the big one — the module bonus the moment the last
+// lesson of the tier is first completed.
+function renderCompleteRewards({ rewards, isFirstCompletion, bonusJustEarned }) {
+  const box = el("lesson-complete-rewards");
+  if (!rewards) {
+    box.hidden = true;
+    return;
+  }
+
+  box.innerHTML = "";
+
+  const timeLine = document.createElement("p");
+  timeLine.className = "rewards-row";
+  timeLine.textContent = isFirstCompletion
+    ? `⏱ +${SCREEN_TIME_PER_LESSON_MIN} min screen time earned! · Ai câștigat +${SCREEN_TIME_PER_LESSON_MIN} min de tehnologie! (total: ${rewards.screenTimeMin} min)`
+    : `⏱ Lesson already counted — screen time earned so far: ${rewards.screenTimeMin} min · Timp câștigat până acum: ${rewards.screenTimeMin} min`;
+  box.appendChild(timeLine);
+
+  if (bonusJustEarned) {
+    const bonusLine = document.createElement("p");
+    bonusLine.className = "rewards-row rewards-row--bonus rewards-row--earned";
+    bonusLine.textContent = `🎁 MODULE COMPLETE! Bonus unlocked: ${rewards.bonusLei} lei! · Ai terminat tot modulul — spune-le părinților!`;
+    box.appendChild(bonusLine);
+  } else {
+    const towardLine = document.createElement("p");
+    towardLine.className = "rewards-row";
+    towardLine.textContent = `📚 ${rewards.lessonsCompleted} / ${rewards.totalLessons} lessons toward the ${rewards.bonusLei} lei bonus · lecții spre bonus`;
+    box.appendChild(towardLine);
+  }
+
+  box.hidden = false;
+}
+
+// Celebration confetti when a lesson finishes on the mascot tiers — pure
+// DOM + CSS, no library. Skipped entirely for users who prefer reduced
+// motion.
+function launchConfetti() {
+  if (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  const colors = ["#58cc02", "#1cb0f6", "#ffc800", "#ff4b4b", "#ce82ff", "#ff9600"];
+  for (let i = 0; i < 40; i++) {
+    const piece = document.createElement("div");
+    piece.className = "confetti-piece";
+    piece.style.left = `${Math.random() * 100}vw`;
+    piece.style.background = colors[i % colors.length];
+    piece.style.animationDuration = `${2 + Math.random() * 1.6}s`;
+    piece.style.animationDelay = `${Math.random() * 0.5}s`;
+    document.body.appendChild(piece);
+    piece.addEventListener("animationend", () => piece.remove());
+  }
+}
+
+// Aggregates the finished run per ITEM (a word/sentence appears in 2-3
+// different question types): "knew" = every question about it answered
+// correctly, "practice" = missed at least once. Shared by the on-screen
+// recap and the Drive export.
+function summarizeRun() {
   const byItem = new Map();
   for (const q of currentQueue) {
     const label = getItemLabel(q);
@@ -669,9 +827,76 @@ function renderLessonSummary() {
     }
     if (!q.wasCorrect) entry.anyWrong = true;
   }
+  return {
+    knew: [...byItem.values()].filter((e) => !e.anyWrong),
+    practice: [...byItem.values()].filter((e) => e.anyWrong),
+  };
+}
 
-  const knew = [...byItem.values()].filter((e) => !e.anyWrong);
-  const practice = [...byItem.values()].filter((e) => e.anyWrong);
+// Plain-text version of the recap, exported to the user's visible Google
+// Drive as a Google Doc via the 💾 button on the complete screen.
+function buildRecapText(score, total) {
+  const { knew, practice } = summarizeRun();
+  const lines = [];
+  lines.push(`Lesson recap · Rezumatul lecției`);
+  lines.push(`Student: ${session.displayName}`);
+  lines.push(`Lesson · Lecția: ${currentLesson.label} (${session.profile.displayName})`);
+  lines.push(`Date · Data: ${todayLocalDateString()}`);
+  lines.push(`Score · Scor: ${score} / ${total} (${"⭐".repeat(starsForScore(score, total)) || "—"})`);
+  lines.push("");
+  if (knew.length) {
+    lines.push(`✅ Knew these · Le-a știut:`);
+    for (const e of knew) {
+      lines.push(e.translation ? `  • ${e.label} — ${e.translation}` : `  • ${e.answer}`);
+    }
+    lines.push("");
+  }
+  if (practice.length) {
+    lines.push(`🔁 Practice again · De mai exersat:`);
+    for (const e of practice) {
+      if (e.translation) lines.push(`  • ${e.label} — ${e.translation}`);
+      else if (e.explain) lines.push(`  • ${e.answer} — ${e.explain}`);
+      else lines.push(`  • ${e.answer}`);
+    }
+    lines.push("");
+  }
+  lines.push(
+    practice.length === 0
+      ? "🎉 Perfect run — every single one! · Totul corect!"
+      : `💪 Finished the whole lesson — ${practice.length} item(s) to catch next time. · A terminat toată lecția!`
+  );
+  return lines.join("\n");
+}
+
+function wireSaveRecapButton(score, total) {
+  const btn = el("lesson-save-recap-btn");
+  btn.disabled = false;
+  btn.textContent = "💾 Save recap to Drive · Salvează pe Drive";
+  btn.onclick = async () => {
+    btn.disabled = true;
+    btn.textContent = "💾 Saving… · Se salvează…";
+    const title = `Engleza Familie — ${session.displayName} — ${currentLesson.label} — ${todayLocalDateString()}`;
+    try {
+      await saveRecapToDrive(session.accessToken, title, buildRecapText(score, total));
+      btn.textContent = "✅ Saved to Drive! · Salvat!";
+    } catch (err) {
+      btn.disabled = false;
+      btn.textContent = "💾 Try again · Încearcă din nou";
+      const scopeHint =
+        err.status === 403
+          ? " Sign out and sign in again to allow the new Drive permission. · Ieși din cont și loghează-te din nou ca să aprobi noua permisiune Drive."
+          : "";
+      el("lesson-complete-score").textContent += ` ⚠️ Couldn't save to Drive.${scopeHint}`;
+    }
+  };
+}
+
+// End-of-lesson recap on screen. Kids tiers show the Romanian meaning per
+// item; grammar tiers show the correct answer, plus the explanation on
+// missed ones.
+function renderLessonSummary() {
+  const usesMascots = session.profile.features.mascots;
+  const { knew, practice } = summarizeRun();
 
   const summary = el("lesson-summary");
   summary.innerHTML = "";

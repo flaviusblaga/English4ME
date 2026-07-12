@@ -187,3 +187,35 @@ export async function saveState(accessToken, fileId, data) {
   data.lastUpdatedAt = new Date().toISOString();
   await saveFileContent(accessToken, fileId, data);
 }
+
+// Unlike the state files above (hidden in appDataFolder), this creates a
+// file the user can actually SEE in My Drive: a Google Doc built from the
+// lesson-recap text. Needs the drive.file scope — accounts that consented
+// before that scope was added get a 403 here until they sign in again.
+export async function saveRecapToDrive(accessToken, title, textContent) {
+  const metadata = { name: title, mimeType: "application/vnd.google-apps.document" };
+  const boundary = "engleza-familie-recap-boundary";
+  const body =
+    `--${boundary}\r\n` +
+    `Content-Type: application/json; charset=UTF-8\r\n\r\n` +
+    `${JSON.stringify(metadata)}\r\n` +
+    `--${boundary}\r\n` +
+    `Content-Type: text/plain; charset=UTF-8\r\n\r\n` +
+    `${textContent}\r\n` +
+    `--${boundary}--`;
+
+  const response = await fetch(`${DRIVE_UPLOAD_URL}?uploadType=multipart&fields=id,webViewLink`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+      "Content-Type": `multipart/related; boundary=${boundary}`,
+    },
+    body,
+  });
+  if (!response.ok) {
+    const err = new Error(`Drive recap save failed: ${response.status}`);
+    err.status = response.status;
+    throw err;
+  }
+  return response.json();
+}

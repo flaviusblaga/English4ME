@@ -55,6 +55,8 @@ function renderRecord(record) {
   el("parent-view-streak").textContent = `🔥 ${record.gamification ? record.gamification.currentStreak : 0}`;
   el("parent-view-turns").textContent = `Total exchanges so far: ${record.progress ? record.progress.totalTurns : 0}`;
 
+  renderRewards(record.gamification && record.gamification.rewards);
+
   const badgesPanel = el("parent-view-badges");
   badgesPanel.innerHTML = "";
   const unlocked = new Set(record.gamification ? record.gamification.badges : []);
@@ -79,6 +81,48 @@ function renderRecord(record) {
   for (const day of sortedDays) {
     daysWrap.appendChild(renderDay(day));
   }
+}
+
+// The child's real-world reward status (agreed ladder: screen time per
+// completed lesson + a per-level money bonus for finishing the module) —
+// synced from the child's device inside the gamification payload, so this
+// shows without any Worker change. Older synced records predate the field
+// and simply hide the card.
+function renderRewards(rewards) {
+  const card = el("parent-view-rewards");
+  if (!rewards) {
+    card.hidden = true;
+    return;
+  }
+
+  card.innerHTML = "";
+
+  const heading = document.createElement("p");
+  heading.className = "rewards-card-heading";
+  heading.textContent = "🏆 Recompense de onorat";
+  card.appendChild(heading);
+
+  const progressLine = document.createElement("p");
+  progressLine.className = "rewards-row";
+  progressLine.textContent = `📚 ${rewards.lessonsCompleted} / ${rewards.totalLessons} lecții terminate la nivelul ${rewards.tier}`;
+  card.appendChild(progressLine);
+
+  const screenTimeLine = document.createElement("p");
+  screenTimeLine.className = "rewards-row";
+  screenTimeLine.textContent = `⏱ Timp de tehnologie câștigat: ${rewards.screenTimeMin} min (20 min / lecție)`;
+  card.appendChild(screenTimeLine);
+
+  const bonusLine = document.createElement("p");
+  bonusLine.className = "rewards-row rewards-row--bonus";
+  if (rewards.bonusEarned) {
+    bonusLine.classList.add("rewards-row--earned");
+    bonusLine.textContent = `🎁 BONUS DE PLĂTIT: ${rewards.bonusLei} lei — modulul e terminat integral!`;
+  } else {
+    bonusLine.textContent = `🎁 Bonus la modul complet: ${rewards.bonusLei} lei (mai are ${rewards.totalLessons - rewards.lessonsCompleted} lecții)`;
+  }
+  card.appendChild(bonusLine);
+
+  card.hidden = false;
 }
 
 function renderDay(day) {

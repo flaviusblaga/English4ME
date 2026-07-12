@@ -3,6 +3,7 @@ import { saveState } from "./drive.js";
 import { SCENARIOS } from "./scenarios-client.js";
 import { initDocumentsUi, refreshDocumentsSummary } from "./documents-ui.js";
 import { BADGES, updateGamificationAfterTurn } from "./gamification.js";
+import { gamificationWithRewards } from "./rewards.js";
 import {
   isSpeechRecognitionSupported,
   isSpeechSynthesisSupported,
@@ -53,8 +54,11 @@ export const KIDS_VOICE_OPTIONS = { pitch: 1.35, rate: 1.05 };
 // Web Speech API has no true character voices, so pitch/rate contrast on the
 // same base voice is how the two stay audibly distinct. Exported for
 // js/lessons.js so exercises use the same two voices.
+// Bobo capped at 1.45 — pitches beyond ~1.5 make Windows' local SAPI voices
+// stutter and sound broken (reported on the family laptop), and 1.45 vs 1.15
+// keeps the two audibly distinct.
 export const MASCOT_VOICES = {
-  Bobo: { pitch: 1.65, rate: 1.18 },
+  Bobo: { pitch: 1.45, rate: 1.1 },
   Fizz: { pitch: 1.15, rate: 0.98 },
 };
 
@@ -503,7 +507,7 @@ async function handleSend() {
         userEmail: session.userEmail,
         profileId: session.profile.id,
         displayName: session.displayName,
-        gamification: session.state.gamification || null,
+        gamification: gamificationWithRewards(session.state, session.profile),
         progress: session.state.progress,
         date: session.state.parentSync.todayDate,
         turns: session.state.parentSync.todayTurns,
