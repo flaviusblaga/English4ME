@@ -36,8 +36,8 @@ import {
 } from "./grammar-client.js";
 
 const MASCOT_AVATARS = {
-  Bobo: { emoji: "🦫", img: "assets/socatei/bobo.png" },
-  Fizz: { emoji: "🐿️", img: "assets/socatei/fizz.png" },
+  Bobo: { emoji: "🦫", img: "assets/socatei/bobo-face.png" },
+  Fizz: { emoji: "🐿️", img: "assets/socatei/fizz-face.png" },
 };
 
 // One entry per contentTier — the only place that needs to grow when a new

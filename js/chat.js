@@ -22,8 +22,8 @@ const ROLLING_WINDOW_SIZE = 10; // messages (not turns) sent to the Worker each 
 const MAX_STORED_TURNS = 20; // messages kept in Drive before older ones are dropped
 
 const MASCOT_AVATARS = {
-  Bobo: { emoji: "🦫", img: "assets/socatei/bobo.png" },
-  Fizz: { emoji: "🐿️", img: "assets/socatei/fizz.png" },
+  Bobo: { emoji: "🦫", img: "assets/socatei/bobo-face.png" },
+  Fizz: { emoji: "🐿️", img: "assets/socatei/fizz-face.png" },
 };
 
 // Which mascot(s) the child wants to see/hear talk. Claude still always

@@ -587,13 +587,23 @@ body.mascot-theme .identity-avatar {
 .login-mascots {
   display: flex;
   justify-content: center;
-  margin-bottom: 10px;
+  align-items: flex-end;
+  gap: 2px;
+  margin-bottom: 8px;
 }
 
-.login-mascots .mascot-avatar {
+/* Full die-cut stickers (character + name plaque) as the login hero. */
+.mascot-sticker-hero {
+  width: 134px;
+  height: auto;
+  filter: drop-shadow(0 6px 10px rgba(16, 74, 88, 0.26));
+}
+
+/* If a sticker PNG fails to load, the emoji fallback swaps in as a round badge. */
+.login-mascots .mascot-avatar--emoji-fallback {
   width: 88px;
   height: 88px;
-  margin: 0 -8px; /* gentle overlap of the two portraits */
+  margin: 0 -8px;
 }
 
 .login-card h1 {
@@ -730,25 +740,28 @@ body.mascot-theme .identity-avatar {
 /* ---------- 7. Mascot avatars + speech bubbles ---------- */
 /* Base sizing is UNSCOPED on purpose — a mascot image must never render at
    its natural size (1024px+) no matter which theme is active. */
-.mascot-avatar,
+/* Mascot images are now die-cut STICKERS (transparent PNG with a white outline
+   baked in) — show the whole cutout with a soft shadow that follows the
+   silhouette. No circle, no border, no white background box. */
+.mascot-avatar {
+  width: 76px;
+  height: 76px;
+  flex-shrink: 0;
+  object-fit: contain;
+  object-position: center;
+  filter: drop-shadow(0 3px 4px rgba(16, 74, 88, 0.28));
+}
+
+/* The emoji fallback (only shown if a sticker PNG fails to load) keeps the
+   old round badge look, since there's no cutout to show. */
 .mascot-avatar--emoji-fallback {
   width: 76px;
   height: 76px;
   flex-shrink: 0;
   border-radius: 50%;
   background: #fff;
-  object-fit: cover;
-  object-position: top center;
-  border: 3px solid #fff;
+  border: 3px solid var(--kid-yellow);
   box-shadow: var(--shadow-sm);
-}
-
-body.mascot-theme .mascot-avatar,
-body.mascot-theme .mascot-avatar--emoji-fallback {
-  border-color: var(--kid-yellow);
-}
-
-.mascot-avatar--emoji-fallback {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -767,21 +780,8 @@ body.mascot-theme .mascot-avatar--emoji-fallback {
   border-width: 2px;
 }
 
-/* Per-character face crops. The artwork is full-body: Bobo's face sits near
-   the TOP of his image, but Fizz's face is mid-image — the whole top half is
-   his curled tail, which is exactly what the old generic "top center" crop
-   was showing. object-view-box (Chromium) zooms the circle onto the head;
-   object-position keeps a sane framing on browsers without it. Selected by
-   src so every mascot <img> in the app (lessons, chat, picker) is covered. */
-img.mascot-avatar[src*="bobo"] {
-  object-position: 50% 20%;
-  object-view-box: inset(5% 24% 62% 30%);
-}
-
-img.mascot-avatar[src*="fizz"] {
-  object-position: 50% 45%;
-  object-view-box: inset(34% 46% 28% 8%);
-}
+/* (Per-character circle zoom removed — the mascot images are now pre-cropped
+   die-cut face stickers, shown whole via object-fit:contain above.) */
 
 /* Avatar + visible name caption, stacked. */
 .mascot-figure {
