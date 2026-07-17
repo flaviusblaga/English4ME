@@ -245,10 +245,20 @@ function renderGamificationBar() {
   el("lesson-gamification-streak").textContent = `🔥 ${g.currentStreak}`;
 }
 
+// The bottom tab bar shows on the adventure-path home, but hides during an
+// active exercise and the celebration screen so those stay focused (matches
+// the redesign mockup). The nav is a shared element parented into this screen
+// by app.js, so toggling its `hidden` here is enough.
+function setNavVisible(visible) {
+  const nav = document.getElementById("app-nav");
+  if (nav) nav.hidden = !visible;
+}
+
 function showMenu() {
   el("lesson-menu-view").hidden = false;
   el("lesson-exercise-view").hidden = true;
   el("lesson-complete-view").hidden = true;
+  setNavVisible(true);
 
   // .closest, not .parentElement — the avatar now sits inside a
   // .mascot-figure wrapper (for the name caption), so its parent is no
@@ -270,41 +280,47 @@ function showMenu() {
   const tier = currentTierConfig();
   const bucket = currentStateBucket();
   const grid = el("lesson-menu-grid");
+  grid.className = "lesson-path";
   grid.innerHTML = "";
-  for (const lesson of tier.lessonSet) {
+
+  // Adventure path: a vertical trail of circular lesson nodes. Completed ones
+  // are coloured with their star count; the first not-yet-finished lesson is
+  // marked "current" (pulsing). Every node stays tappable — no hard locking,
+  // so kids keep the freedom to replay or jump ahead.
+  let currentMarked = false;
+  tier.lessonSet.forEach((lesson, i) => {
     const record = bucket.completed[lesson.id];
     const maxScore = tier.maxScore(lesson);
-    const card = document.createElement("button");
-    card.type = "button";
-    card.className = "lesson-card";
 
-    const icon = document.createElement("span");
-    icon.className = "lesson-card-icon";
-    icon.textContent = lesson.emoji || "📘";
-    card.appendChild(icon);
-
-    const title = document.createElement("strong");
-    title.textContent = lesson.label;
-    card.appendChild(title);
-
+    const node = document.createElement("button");
+    node.type = "button";
+    node.className = "lesson-node";
+    node.style.setProperty("--node-shift", i % 2 === 0 ? "36px" : "-36px"); // zig-zag left/right
     if (record) {
-      card.classList.add("lesson-card--done");
-      const stars = document.createElement("span");
-      stars.className = "lesson-card-stars";
-      stars.textContent = "⭐".repeat(starsForScore(record.bestScore, maxScore)) || "—";
-      card.appendChild(stars);
-      const sub = document.createElement("span");
-      sub.textContent = `Best: ${record.bestScore}/${maxScore}`;
-      card.appendChild(sub);
-    } else {
-      const sub = document.createElement("span");
-      sub.textContent = "Not started yet";
-      card.appendChild(sub);
+      node.classList.add("lesson-node--done");
+    } else if (!currentMarked) {
+      node.classList.add("lesson-node--current");
+      currentMarked = true;
     }
 
-    card.addEventListener("click", () => startLesson(lesson.id));
-    grid.appendChild(card);
-  }
+    const circle = document.createElement("span");
+    circle.className = "lesson-node-circle";
+    circle.textContent = lesson.emoji || "📘";
+    node.appendChild(circle);
+
+    const label = document.createElement("span");
+    label.className = "lesson-node-label";
+    label.textContent = lesson.label;
+    node.appendChild(label);
+
+    const stars = document.createElement("span");
+    stars.className = "lesson-node-stars";
+    stars.textContent = record ? ("⭐".repeat(starsForScore(record.bestScore, maxScore)) || "·") : "";
+    node.appendChild(stars);
+
+    node.addEventListener("click", () => startLesson(lesson.id));
+    grid.appendChild(node);
+  });
 }
 
 // The reward ladder agreed with the parents, always visible above the lesson
@@ -378,6 +394,7 @@ function startLesson(lessonId) {
   el("lesson-menu-view").hidden = true;
   el("lesson-exercise-view").hidden = false;
   el("lesson-complete-view").hidden = true;
+  setNavVisible(false);
 
   renderQuestion();
 }
@@ -704,6 +721,7 @@ function finishLesson() {
 function showComplete(score, total, newlyUnlocked, rewardInfo = {}) {
   el("lesson-exercise-view").hidden = true;
   el("lesson-complete-view").hidden = false;
+  setNavVisible(false);
 
   const completeAvatar = el("lesson-complete-avatar");
   if (session.profile.features.mascots) {

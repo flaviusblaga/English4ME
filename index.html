@@ -16,25 +16,35 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="default" />
   <meta name="apple-mobile-web-app-title" content="Socatei" />
 
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@400;600;700;800&display=swap" />
   <link rel="stylesheet" href="css/style.css" />
   <script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
 <body>
 
   <main id="screen-login" class="screen">
-    <div class="card">
-      <h1>Engleza Familie</h1>
-      <p class="subtitle">Invata engleza cu Bobo &amp; Fizz</p>
-      <button id="login-btn" class="btn btn-primary">Sign in with Google</button>
+    <div class="login-card">
+      <div class="login-mascots">
+        <img class="mascot-avatar mascot-avatar--big" src="assets/socatei/bobo.png" alt="Bobo"
+             onerror="this.replaceWith(Object.assign(document.createElement('span'),{className:'mascot-avatar mascot-avatar--big mascot-avatar--emoji-fallback',textContent:'🦫'}))" />
+        <img class="mascot-avatar mascot-avatar--big" src="assets/socatei/fizz.png" alt="Fizz"
+             onerror="this.replaceWith(Object.assign(document.createElement('span'),{className:'mascot-avatar mascot-avatar--big mascot-avatar--emoji-fallback',textContent:'🐿️'}))" />
+      </div>
+      <h1>Bobo &amp; Fizz English</h1>
+      <p class="subtitle">Învață engleza jucându-te, cu prietenii tăi Bobo &amp; Fizz! 🎉</p>
+      <button id="login-btn" class="btn btn-google">🔵 Sign in with Google</button>
       <p id="login-error" class="error" hidden></p>
-      <button id="install-app-btn" class="btn btn-small" hidden>📲 Instaleaza pe telefon</button>
-      <p id="ios-install-hint" class="hint" hidden>Pe iPhone: apasa Share ⬆️ (in Safari), apoi „Add to Home Screen".</p>
+      <button id="install-app-btn" class="btn btn-small" hidden>📲 Instalează pe telefon</button>
+      <p id="ios-install-hint" class="hint" hidden>Pe iPhone: apasă Share ⬆️ (în Safari), apoi „Add to Home Screen".</p>
     </div>
   </main>
 
   <main id="screen-profile-picker" class="screen" hidden>
     <div class="card card-wide">
-      <h1>Who's practicing today?</h1>
+      <h1>Cine învață azi? 👋</h1>
+      <p class="profile-picker-sub">Alege profilul tău</p>
       <div id="profile-picker-list" class="profile-picker-list"></div>
     </div>
   </main>
@@ -299,11 +309,20 @@
       <p id="parent-view-status" class="hint" hidden></p>
 
       <div id="parent-view-results" hidden>
-        <div class="parent-view-summary">
-          <span id="parent-view-name"></span>
-          <span id="parent-view-points">⭐ 0</span>
-          <span id="parent-view-streak">🔥 0</span>
-          <span id="parent-view-turns"></span>
+        <h2 id="parent-view-name" class="parent-view-title"></h2>
+        <div class="parent-stat-row">
+          <div class="parent-stat">
+            <div id="parent-view-points" class="parent-stat-num parent-stat-num--purple">0</div>
+            <div class="parent-stat-label">Puncte</div>
+          </div>
+          <div class="parent-stat">
+            <div id="parent-view-streak" class="parent-stat-num parent-stat-num--coral">0</div>
+            <div class="parent-stat-label">Streak</div>
+          </div>
+          <div class="parent-stat">
+            <div id="parent-view-turns" class="parent-stat-num parent-stat-num--teal">0</div>
+            <div class="parent-stat-label">Mesaje</div>
+          </div>
         </div>
         <div id="parent-view-rewards" class="rewards-card" hidden></div>
         <div id="parent-view-badges" class="gamification-badges-panel"></div>
@@ -312,6 +331,22 @@
       </div>
     </div>
   </main>
+
+  <!-- Persistent bottom navigation — moved into the active app screen by app.js. -->
+  <nav id="app-nav" class="app-nav" hidden>
+    <button id="nav-home" type="button" class="app-nav-btn">
+      <span class="app-nav-icon">🏠</span><span class="app-nav-label">Acasă</span>
+    </button>
+    <button id="nav-chat" type="button" class="app-nav-btn">
+      <span class="app-nav-icon">💬</span><span class="app-nav-label">Chat</span>
+    </button>
+    <button id="nav-reading" type="button" class="app-nav-btn">
+      <span class="app-nav-icon">📖</span><span class="app-nav-label">Lectură</span>
+    </button>
+    <button id="nav-parent" type="button" class="app-nav-btn">
+      <span class="app-nav-icon">👀</span><span class="app-nav-label">Părinte</span>
+    </button>
+  </nav>
 
   <script type="module" src="js/app.js"></script>
 </body>

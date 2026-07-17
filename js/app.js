@@ -22,6 +22,42 @@ function showScreen(name) {
   el("screen-lesson").hidden = name !== "lesson";
   el("screen-reading").hidden = name !== "reading";
   el("screen-parent-view").hidden = name !== "parent-view";
+  updateAppNav(name);
+}
+
+// The bottom tab bar is a single shared element (index.html) that we relocate
+// into whichever app screen is showing, so it visually belongs to that screen
+// (sticky at the bottom of the phone column). Which tabs appear depends on the
+// active profile's features; login/profile-picker show no nav at all.
+const NAV_TAB_BY_SCREEN = {
+  chat: "nav-chat",
+  lesson: "nav-home",
+  reading: "nav-reading",
+  "parent-view": "nav-parent",
+};
+
+function updateAppNav(screenName) {
+  const nav = el("app-nav");
+  const activeTab = NAV_TAB_BY_SCREEN[screenName];
+  if (!currentSession || !activeTab) {
+    nav.hidden = true;
+    return;
+  }
+
+  const f = currentSession.profile.features;
+  // Home = lessons/exercises (learners only). Chat = always. Reading = Expert.
+  // Parent = the adult profile that can view children.
+  el("nav-home").hidden = !(f.lessons || f.chatFirst);
+  el("nav-chat").hidden = false;
+  el("nav-reading").hidden = !f.reading;
+  el("nav-parent").hidden = !f.canViewChildren;
+
+  for (const id of ["nav-home", "nav-chat", "nav-reading", "nav-parent"]) {
+    el(id).classList.toggle("app-nav-btn--active", id === activeTab);
+  }
+
+  el(`screen-${screenName}`).appendChild(nav); // relocate into the active screen
+  nav.hidden = false;
 }
 
 function openChat(lessonWordList) {
@@ -162,6 +198,12 @@ window.addEventListener("DOMContentLoaded", () => {
   el("reading-btn").addEventListener("click", openReading);
   el("home-btn").addEventListener("click", goToLevelPicker);
   el("lesson-home-btn").addEventListener("click", goToLevelPicker);
+
+  // Bottom tab bar
+  el("nav-home").addEventListener("click", openLessons);
+  el("nav-chat").addEventListener("click", () => openChat(null));
+  el("nav-reading").addEventListener("click", openReading);
+  el("nav-parent").addEventListener("click", () => showScreen("parent-view"));
   wireSettingsToggle("settings-btn", "settings-panel");
   wireSettingsToggle("lesson-settings-btn", "lesson-settings-panel");
   el("parent-view-back-btn").addEventListener("click", () => {

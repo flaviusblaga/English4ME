@@ -50,10 +50,10 @@ async function handleLoad() {
 }
 
 function renderRecord(record) {
-  el("parent-view-name").textContent = record.displayName || record.userEmail;
-  el("parent-view-points").textContent = `⭐ ${record.gamification ? record.gamification.points : 0}`;
-  el("parent-view-streak").textContent = `🔥 ${record.gamification ? record.gamification.currentStreak : 0}`;
-  el("parent-view-turns").textContent = `Total exchanges so far: ${record.progress ? record.progress.totalTurns : 0}`;
+  el("parent-view-name").textContent = `👀 Progresul lui ${record.displayName || record.userEmail}`;
+  el("parent-view-points").textContent = record.gamification ? record.gamification.points : 0;
+  el("parent-view-streak").textContent = record.gamification ? record.gamification.currentStreak : 0;
+  el("parent-view-turns").textContent = record.progress ? record.progress.totalTurns : 0;
 
   renderRewards(record.gamification && record.gamification.rewards);
 
