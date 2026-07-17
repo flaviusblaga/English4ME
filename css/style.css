@@ -112,7 +112,6 @@ h1, h2, h3, h4 {
     min-height: calc(100dvh - 40px);
     margin: 20px auto;
     border-radius: 28px;
-    overflow: hidden;
     box-shadow: var(--shadow-lg);
   }
 }
@@ -205,18 +204,48 @@ body.mascot-theme .btn-primary {
 }
 
 /* ---------- Bottom tab bar (persistent app navigation) ---------- */
+/* Fixed to the viewport bottom, constrained to the phone column and centred —
+   so it is ALWAYS visible regardless of how tall the scrolling content is, and
+   is not clipped by any `overflow:hidden` ancestor (which breaks sticky). */
 .app-nav {
-  margin-top: auto;               /* short content → pinned to the bottom */
-  position: sticky;
+  position: fixed;
+  left: 0;
+  right: 0;
   bottom: 0;
-  z-index: 40;
+  margin-inline: auto;
+  max-width: 460px;
+  z-index: 50;
   display: flex;
   align-items: stretch;
   gap: 2px;
   background: var(--surface-raised);
   border-top: 1px solid var(--line);
-  box-shadow: 0 -4px 20px rgba(43, 38, 80, 0.06);
+  box-shadow: 0 -4px 20px rgba(43, 38, 80, 0.08);
   padding: 8px 8px calc(10px + env(safe-area-inset-bottom, 0px));
+}
+
+/* Clearance so scrolling content never hides behind the fixed bottom nav. */
+#lesson-menu-view,
+.reading-body,
+.parent-view-body {
+  padding-bottom: 84px;
+}
+
+/* Chat is a fixed-height app shell: the log scrolls INSIDE while the header,
+   the input row, and the bottom nav all stay put. A fixed height (not the
+   base min-height, which would grow and push the input row off-screen) is what
+   makes the flex:1 log scroll internally. padding-bottom clears the fixed nav. */
+#screen-chat {
+  height: 100vh;
+  height: 100dvh;
+  padding-bottom: 84px;
+}
+
+@media (min-width: 500px) {
+  #screen-chat {
+    height: calc(100vh - 40px);
+    height: calc(100dvh - 40px);
+  }
 }
 
 .app-nav-btn {
@@ -927,11 +956,16 @@ body.mascot-theme .mascot-name {
 /* ---------- 8. Chat ---------- */
 .chat-log {
   flex: 1;
+  min-height: 0;          /* let the log shrink so it scrolls INSIDE the flex column */
   overflow-y: auto;
   padding: var(--sp-4);
   display: flex;
   flex-direction: column;
   gap: var(--sp-2);
+}
+
+.chat-input-row {
+  flex-shrink: 0;         /* keep the input row a fixed size above the nav */
 }
 
 .chat-bubble {
