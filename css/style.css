@@ -19,33 +19,34 @@
   /* type */
   --fs-xs: 0.75rem; --fs-sm: 0.875rem; --fs-base: 1rem; --fs-md: 1.15rem;
   --fs-lg: 1.35rem; --fs-xl: 1.75rem; --fs-2xl: 2.2rem;
-  /* soft purple-tinted shadows (from the mockup) */
-  --shadow-sm: 0 2px 8px rgba(43, 38, 80, 0.08);
-  --shadow-md: 0 8px 20px rgba(43, 38, 80, 0.12);
-  --shadow-lg: 0 20px 48px rgba(43, 38, 80, 0.18);
+  /* soft teal-tinted shadows */
+  --shadow-sm: 0 2px 8px rgba(16, 74, 88, 0.08);
+  --shadow-md: 0 8px 20px rgba(16, 74, 88, 0.12);
+  --shadow-lg: 0 20px 48px rgba(16, 74, 88, 0.16);
   /* motion */
   --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
 
-  /* colour system */
-  --backdrop: #e9e4fb;        /* behind the phone column */
-  --surface: #f4f1ff;         /* screen canvas (light purple) */
+  /* colour system — Bobo (blue tongue) + Fizz (green tongue): the app's two
+     signature colours. Blue leads the actions, green marks every win. */
+  --backdrop: #cfe9ee;        /* behind the phone column */
+  --surface: #edf8fb;         /* screen canvas (light aqua) */
   --surface-raised: #ffffff;  /* cards */
-  --surface-tint: #faf9ff;    /* subtly-off-white panels (parent) */
-  --line: #ebe6f9;
-  --line-strong: #d9d1f2;
-  --text: #2b2650;
-  --text-muted: #8b84b0;
-  --text-faint: #b7afd6;      /* inactive nav / chevrons */
+  --surface-tint: #f4fdff;    /* subtly-off-white panels (parent) */
+  --line: #d5edf3;
+  --line-strong: #b9e0e9;
+  --text: #123c46;
+  --text-muted: #5d8894;
+  --text-faint: #a1c6cf;      /* inactive nav / chevrons */
 
-  --primary: #7c4dff;
-  --primary-dark: #5b32d6;
-  --primary-soft: #ede6ff;
-  --primary-tint: #f3efff;
-  --accent: #7c4dff;
+  --primary: #0587bd;         /* Bobo blue — deep enough for legible white button text */
+  --primary-dark: #05699a;
+  --primary-soft: #d4f0fb;
+  --primary-tint: #eafaff;
+  --accent: #0587bd;
 
-  --success: #2fd9a6;
-  --success-soft: #dbfbef;
-  --success-text: #12874f;
+  --success: #1fbf88;         /* Fizz green */
+  --success-soft: #d2f6e7;
+  --success-text: #0f854f;
   --danger: #ff6b6b;
   --danger-soft: #ffe3e3;
   --danger-text: #c23b3b;
@@ -56,16 +57,18 @@
   --chip-hot-bg: #ffe3e3;     /* 🔥 streak */
   --chip-hot-text: #c23b3b;
 
-  /* playful accents — profile-card tints, confetti, lesson nodes */
-  --kid-purple: #7c4dff; --kid-purple-dark: #5b32d6;
+  /* playful accents — profile-card tints, confetti, lesson nodes.
+     --kid-purple is kept as a var NAME but now carries Bobo blue, so every
+     "primary/current" accent that referenced it turns blue, not purple. */
+  --kid-purple: #12a5d4; --kid-purple-dark: #0b7ea8;
   --kid-coral: #ff6b6b;  --kid-coral-dark: #e94f4f;
-  --kid-teal: #2fd9a6;   --kid-teal-dark: #22b98b;
+  --kid-teal: #1fbf88;   --kid-teal-dark: #16a473;
   --kid-yellow: #ffcb3d; --kid-yellow-dark: #e6b000;
   --kid-pink: #ff8fc7;   --kid-pink-dark: #f06ba8;
   --kid-blue: #2fc1e8;   --kid-blue-dark: #1fa8cc;
 
   /* tint backgrounds for the round icon tiles */
-  --tile-coral: #ffe3e3; --tile-blue: #dff6fc; --tile-green: #dbfbef; --tile-yellow: #fff3d1;
+  --tile-coral: #ffe3e3; --tile-blue: #dff6fc; --tile-green: #d2f6e7; --tile-yellow: #fff3d1;
 }
 
 /* Kept as a hook so JS that toggles body.mascot-theme still works; the visual
@@ -135,12 +138,12 @@ h1, h2, h3, h4 {
 .btn-primary {
   background: var(--primary);
   color: #fff;
-  box-shadow: 0 6px 16px rgba(124, 77, 255, 0.34);
+  box-shadow: 0 6px 16px rgba(18, 165, 212, 0.34);
 }
 
 .btn-primary:not(:disabled):active {
   transform: translateY(1px) scale(0.98);
-  box-shadow: 0 3px 10px rgba(124, 77, 255, 0.30);
+  box-shadow: 0 3px 10px rgba(18, 165, 212, 0.30);
 }
 
 .btn-primary:disabled {
@@ -220,7 +223,7 @@ body.mascot-theme .btn-primary {
   gap: 2px;
   background: var(--surface-raised);
   border-top: 1px solid var(--line);
-  box-shadow: 0 -4px 20px rgba(43, 38, 80, 0.08);
+  box-shadow: 0 -4px 20px rgba(16, 74, 88, 0.08);
   padding: 8px 8px calc(10px + env(safe-area-inset-bottom, 0px));
 }
 
@@ -345,13 +348,13 @@ body.mascot-theme .btn-primary {
   background: var(--primary);
   color: #fff;
   outline-color: var(--primary-soft);
-  box-shadow: 0 0 0 6px rgba(124, 77, 255, 0.18), var(--shadow-md);
+  box-shadow: 0 0 0 6px rgba(18, 165, 212, 0.18), var(--shadow-md);
   animation: node-pulse 1.8s var(--ease-out) infinite;
 }
 
 @keyframes node-pulse {
-  0%, 100% { box-shadow: 0 0 0 6px rgba(124, 77, 255, 0.18), var(--shadow-md); }
-  50%      { box-shadow: 0 0 0 13px rgba(124, 77, 255, 0.07), var(--shadow-md); }
+  0%, 100% { box-shadow: 0 0 0 6px rgba(18, 165, 212, 0.18), var(--shadow-md); }
+  50%      { box-shadow: 0 0 0 13px rgba(18, 165, 212, 0.07), var(--shadow-md); }
 }
 
 .lesson-node-label {
