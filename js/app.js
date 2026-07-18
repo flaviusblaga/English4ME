@@ -1,4 +1,4 @@
-import { initAuth, signIn, signOut, getAccessToken } from "./auth.js";
+import { initAuth, signIn, signOut, getAccessToken, whenGoogleReady, wasSignedIn } from "./auth.js";
 import { getOrCreateState } from "./drive.js";
 import { initChat } from "./chat.js";
 import { initLessons } from "./lessons.js";
@@ -187,8 +187,27 @@ function wireSettingsToggle(btnId, panelId) {
   });
 }
 
-window.addEventListener("DOMContentLoaded", () => {
-  initAuth();
+// Silently restore a previous session so a page refresh never forces a manual
+// re-login. The access token lives only in memory and dies on reload; here we
+// ask Google for a fresh one WITHOUT any popup (prompt:'' succeeds silently as
+// long as the Google session is still active and consent was granted before).
+// Only an explicit "Sign out" clears the flag, so refresh keeps you in.
+async function restoreOrShowLogin() {
+  if (!wasSignedIn()) {
+    showScreen("login");
+    return;
+  }
+  try {
+    currentUser = await signIn(); // silent for a returning user (prompt:'')
+    renderProfilePicker();
+    showScreen("profile-picker");
+  } catch {
+    // Session expired or consent revoked — fall back to the normal login.
+    showScreen("login");
+  }
+}
+
+window.addEventListener("DOMContentLoaded", async () => {
   el("login-btn").addEventListener("click", handleLogin);
   el("logout-btn").addEventListener("click", handleLogout);
   el("lesson-logout-btn").addEventListener("click", handleLogout);
@@ -211,5 +230,18 @@ window.addEventListener("DOMContentLoaded", () => {
   });
   initParentView();
   initPwa();
-  showScreen("login");
+
+  // Auth needs the async-loaded Google script; wait for it, then init and try
+  // a silent restore. Guard the button until the token client exists.
+  el("login-btn").disabled = true;
+  try {
+    await whenGoogleReady();
+    initAuth();
+    el("login-btn").disabled = false;
+    await restoreOrShowLogin();
+  } catch (err) {
+    console.error("Auth init failed:", err);
+    el("login-btn").disabled = false;
+    showScreen("login");
+  }
 });
