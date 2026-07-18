@@ -750,6 +750,23 @@ body.mascot-theme .identity-avatar {
 .profile-card--adult .profile-card-icon { background: var(--tile-yellow); }
 .profile-card--kid .profile-card-icon { background: var(--tile-blue); }
 
+/* "Recomandat" badge on the level picker (highlights the test's suggestion,
+   without locking the others). */
+.level-recommended-badge {
+  display: inline-block;
+  margin-left: 6px;
+  font-family: var(--font-body);
+  font-size: 0.7rem;
+  font-weight: 800;
+  color: var(--primary-dark);
+  background: var(--primary-soft);
+  padding: 1px 7px;
+  border-radius: var(--r-pill);
+  vertical-align: middle;
+}
+
+#level-picker-back-btn { margin-bottom: var(--sp-3); }
+
 /* ---------- Placement test ---------- */
 #screen-placement { padding: 0; }
 #placement-quiz-view { padding: var(--sp-4) var(--sp-4) var(--sp-6); }

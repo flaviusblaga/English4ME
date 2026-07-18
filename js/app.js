@@ -11,6 +11,7 @@ import { initPlacement } from "./placement.js";
 
 let currentUser = null; // { email, name } — set after sign-in, used once a profile is picked
 let currentSession = null; // { accessToken, userEmail, displayName, fileId, state, profile } — reused across lesson<->chat navigation
+let currentMember = null; // which family member is active — lets "Levels" return to this kid's level picker
 
 function el(id) {
   return document.getElementById(id);
@@ -19,6 +20,7 @@ function el(id) {
 function showScreen(name) {
   el("screen-login").hidden = name !== "login";
   el("screen-profile-picker").hidden = name !== "profile-picker";
+  el("screen-level-picker").hidden = name !== "level-picker";
   el("screen-placement").hidden = name !== "placement";
   el("screen-chat").hidden = name !== "chat";
   el("screen-lesson").hidden = name !== "lesson";
@@ -144,11 +146,13 @@ function renderProfilePicker() {
   }
 }
 
-// A member tap: adults go straight to their Business profile; a kid goes to the
-// placement test the first time (then remembers the result), otherwise straight
-// into the level the test assigned.
+// A member tap: adults go straight to their Business profile; a kid takes the
+// placement test the first time (which only RECOMMENDS a level), then always
+// lands on the level picker where EVERY level is open — the recommendation is
+// just highlighted, never a lock.
 function handleMemberPicked(memberId) {
   const member = getMember(memberId);
+  currentMember = member;
   rememberProfileId(memberId);
 
   if (member.kind === "adult") {
@@ -158,14 +162,60 @@ function handleMemberPicked(memberId) {
 
   const placedProfileId = getMemberPlacement(member.id);
   if (placedProfileId) {
-    loadSession(getProfile(placedProfileId), member.name);
+    showLevelPicker(member, placedProfileId);
   } else {
     initPlacement({
       member,
-      onDone: (profileId) => loadSession(getProfile(profileId), member.name),
+      onDone: (recommendedProfileId) => showLevelPicker(member, recommendedProfileId),
     });
     showScreen("placement");
   }
+}
+
+// The four kid levels, always all selectable. The test result only decides
+// which one wears the "Recomandat" badge.
+const KID_LEVELS = ["kids-primar", "kids-intermediate", "kids-advanced", "kids-expert"];
+const LEVEL_LABEL = { "kids-primar": "Beginner", "kids-intermediate": "Intermediate", "kids-advanced": "Advanced", "kids-expert": "Expert" };
+
+function showLevelPicker(member, recommendedProfileId) {
+  currentMember = member;
+  el("level-picker-title").textContent = `Alege nivelul, ${member.name}! 🎯`;
+
+  const list = el("level-picker-list");
+  list.innerHTML = "";
+  for (const levelId of KID_LEVELS) {
+    const profile = getProfile(levelId);
+    const card = document.createElement("button");
+    card.type = "button";
+    card.className = `profile-card profile-card--${profile.level}`;
+    if (levelId === recommendedProfileId) card.classList.add("profile-card--remembered");
+
+    const icon = document.createElement("span");
+    icon.className = "profile-card-icon";
+    icon.textContent = profile.emoji || "📘";
+
+    const textCol = document.createElement("div");
+    textCol.className = "profile-card-text";
+    const title = document.createElement("strong");
+    title.textContent = LEVEL_LABEL[levelId];
+    if (levelId === recommendedProfileId) {
+      const badge = document.createElement("span");
+      badge.className = "level-recommended-badge";
+      badge.textContent = " ⭐ Recomandat";
+      title.appendChild(badge);
+    }
+    const desc = document.createElement("span");
+    desc.textContent = profile.description;
+    textCol.appendChild(title);
+    textCol.appendChild(desc);
+
+    card.appendChild(icon);
+    card.appendChild(textCol);
+    card.addEventListener("click", () => loadSession(profile, member.name));
+    list.appendChild(card);
+  }
+
+  showScreen("level-picker");
 }
 
 // Opens a profile for the current Google account, showing `displayName` (the
@@ -211,16 +261,29 @@ function handleLogout() {
   signOut();
   currentUser = null;
   currentSession = null;
+  currentMember = null;
   document.body.className = "";
   showScreen("login");
 }
 
-// Back to the level-picker without signing out — picking a level reloads
-// that profile's Drive state fresh, so nothing needs tearing down here.
-function goToLevelPicker() {
+// "Alt membru" — back to the family picker (switch who's practicing).
+function goToMemberPicker() {
   document.body.className = "";
+  currentMember = null;
   renderProfilePicker();
   showScreen("profile-picker");
+}
+
+// The header "Levels"/home button. For a kid it returns to their level picker
+// so they can freely switch level; for an adult (no levels) it goes back to the
+// family picker.
+function goHome() {
+  document.body.className = "";
+  if (currentMember && currentMember.kind === "kid") {
+    showLevelPicker(currentMember, getMemberPlacement(currentMember.id));
+  } else {
+    goToMemberPicker();
+  }
 }
 
 // Same toggle pattern as the badges panel — the gear button shows/hides a
@@ -261,8 +324,9 @@ window.addEventListener("DOMContentLoaded", async () => {
     showScreen("parent-view");
   });
   el("reading-btn").addEventListener("click", openReading);
-  el("home-btn").addEventListener("click", goToLevelPicker);
-  el("lesson-home-btn").addEventListener("click", goToLevelPicker);
+  el("home-btn").addEventListener("click", goHome);
+  el("lesson-home-btn").addEventListener("click", goHome);
+  el("level-picker-back-btn").addEventListener("click", goToMemberPicker);
 
   // Bottom tab bar
   el("nav-home").addEventListener("click", openLessons);
