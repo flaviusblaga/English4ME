@@ -7,8 +7,9 @@ import { saveState } from "./drive.js";
 import { syncProgress } from "./worker-client.js";
 import { updateGamificationAfterLesson } from "./gamification.js";
 import { recordTurnForParentSync, todayLocalDateString } from "./chat.js";
-import { READING_PASSAGES, getPassage } from "./reading-client.js";
+import { getReadingSet, getPassage } from "./reading-client.js";
 import { gamificationWithRewards } from "./rewards.js";
+import { speak } from "./voice.js";
 
 let session = null; // { accessToken, userEmail, displayName, fileId, state, profile }
 let onBackCallback = null;
@@ -41,7 +42,7 @@ function showMenu() {
 
   const grid = el("reading-menu-grid");
   grid.innerHTML = "";
-  for (const passage of READING_PASSAGES) {
+  for (const passage of getReadingSet(session.profile.contentTier)) {
     const record = session.state.reading.completed[passage.id];
     const card = document.createElement("button");
     card.type = "button";
@@ -75,6 +76,10 @@ function startPassage(passageId) {
 
   el("reading-passage-title").textContent = currentPassage.title;
   el("reading-passage-text").textContent = currentPassage.text;
+
+  // Active listening: tap to hear the whole passage read aloud, as often as
+  // wanted. Read at a slightly slower rate so learners can follow along.
+  el("reading-listen-btn").onclick = () => speak(currentPassage.text, { rate: 0.9 });
 
   renderQuestion();
 }

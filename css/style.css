@@ -1574,10 +1574,21 @@ body.mascot-theme .chat-bubble--assistant {
   display: block;
 }
 
+.reading-passage-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-3);
+}
+
 .reading-passage-title {
   margin: var(--sp-2) 0;
   font-size: var(--fs-lg);
   font-weight: 800;
+}
+
+#reading-listen-btn {
+  flex-shrink: 0;
 }
 
 .reading-passage-text {

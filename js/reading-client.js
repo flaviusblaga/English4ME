@@ -3,6 +3,105 @@
 // and sentence banks). Each passage is 80-150 words with 4 multiple-choice
 // comprehension questions; `correct` is the index into `options`.
 
+// Beginner reading — very short, simple present-tense texts (30-45 words) with
+// 3 easy comprehension questions each. Meant to be read AND listened to (the
+// reading screen speaks the text aloud).
+export const BEGINNER_READING = [
+  {
+    id: "b-my-dog",
+    title: "My Dog",
+    emoji: "🐶",
+    text: "I have a dog. His name is Max. Max is brown and small. He likes to run and play. Every day, we play in the park. Max is my best friend.",
+    questions: [
+      { q: "What is the dog's name?", options: ["Max", "Tom", "Rex", "Sam"], correct: 0 },
+      { q: "What color is Max?", options: ["Black", "White", "Brown", "Grey"], correct: 2 },
+      { q: "Where do they play?", options: ["At school", "In the park", "At home", "In the car"], correct: 1 },
+    ],
+  },
+  {
+    id: "b-red-apple",
+    title: "The Red Apple",
+    emoji: "🍎",
+    text: "Ana has a red apple. The apple is big and sweet. She eats it after lunch. Apples are good for you. Ana likes apples very much.",
+    questions: [
+      { q: "What color is the apple?", options: ["Green", "Red", "Yellow", "Blue"], correct: 1 },
+      { q: "How does the apple taste?", options: ["Sour", "Salty", "Sweet", "Bitter"], correct: 2 },
+      { q: "When does Ana eat the apple?", options: ["After lunch", "Before school", "At night", "In the car"], correct: 0 },
+    ],
+  },
+  {
+    id: "b-sunny-day",
+    title: "A Sunny Day",
+    emoji: "☀️",
+    text: "Today the sun is out. The sky is blue. Tom and his sister go to the beach. They play in the sand and swim in the sea. It is a happy day.",
+    questions: [
+      { q: "How is the sky today?", options: ["Grey", "Blue", "Green", "Dark"], correct: 1 },
+      { q: "Where do Tom and his sister go?", options: ["To school", "To the shop", "To the beach", "To the park"], correct: 2 },
+      { q: "What do they do in the sea?", options: ["Sleep", "Swim", "Read", "Eat"], correct: 1 },
+    ],
+  },
+  {
+    id: "b-my-cat",
+    title: "My Cat",
+    emoji: "🐱",
+    text: "Lily has a small cat. The cat is white and soft. It sleeps all day on the bed. At night, the cat plays with a ball. Lily loves her cat.",
+    questions: [
+      { q: "What color is the cat?", options: ["Black", "Brown", "White", "Orange"], correct: 2 },
+      { q: "Where does the cat sleep?", options: ["On the bed", "On the chair", "In the box", "On the floor"], correct: 0 },
+      { q: "When does the cat play?", options: ["In the morning", "At night", "After lunch", "At school"], correct: 1 },
+    ],
+  },
+];
+
+// Intermediate reading — short stories (55-75 words) with a little more plot and
+// 3 comprehension questions each.
+export const INTERMEDIATE_READING = [
+  {
+    id: "i-lost-ball",
+    title: "The Lost Ball",
+    emoji: "⚽",
+    text: "Sam and Dan were playing football in the garden. Sam kicked the ball too hard, and it flew over the fence into Mrs. Green's yard. The boys were afraid to ask for it. But Mrs. Green was kind. She smiled, gave the ball back, and even brought them cold lemonade. After that, the boys always said hello to her.",
+    questions: [
+      { q: "Where did the ball go?", options: ["Into the river", "Over the fence into Mrs. Green's yard", "Onto the roof", "Under the car"], correct: 1 },
+      { q: "How did the boys feel at first?", options: ["Happy", "Angry", "Afraid to ask", "Bored"], correct: 2 },
+      { q: "What did Mrs. Green do?", options: ["She kept the ball", "She was angry", "She gave the ball back and brought lemonade", "She called their parents"], correct: 2 },
+    ],
+  },
+  {
+    id: "i-new-girl",
+    title: "The New Girl",
+    emoji: "🏫",
+    text: "On Monday, a new girl came to Maria's class. Her name was Elena, and she was very quiet. At lunch, she sat alone. Maria walked over and asked her to join them. Elena smiled for the first time that day. Soon they were laughing together, and Elena wasn't quiet anymore.",
+    questions: [
+      { q: "What was the new girl's name?", options: ["Maria", "Elena", "Ana", "Lily"], correct: 1 },
+      { q: "Where did Elena sit at lunch?", options: ["With Maria", "Alone", "With the teacher", "Outside"], correct: 1 },
+      { q: "What did Maria do?", options: ["She laughed at Elena", "She ignored her", "She asked Elena to join them", "She told the teacher"], correct: 2 },
+    ],
+  },
+  {
+    id: "i-rainy-trip",
+    title: "The Rainy Trip",
+    emoji: "🌧️",
+    text: "The family planned a picnic in the mountains. But when they arrived, it started to rain. Instead of going home, Dad found a small cabin. They played games, told stories, and drank hot tea while the rain fell outside. Everyone agreed it was the best picnic ever, even without the sun.",
+    questions: [
+      { q: "What did the family plan?", options: ["A picnic in the mountains", "A day at the beach", "A trip to the city", "A visit to grandma"], correct: 0 },
+      { q: "What happened when they arrived?", options: ["It got very hot", "It started to rain", "They got lost", "The car broke down"], correct: 1 },
+      { q: "What did they do in the cabin?", options: ["They slept all day", "They went home", "They played games and told stories", "They watched TV"], correct: 2 },
+    ],
+  },
+  {
+    id: "i-brave-turtle",
+    title: "The Brave Little Turtle",
+    emoji: "🐢",
+    text: "All the animals laughed at Tilly the turtle because she was so slow. One hot day, a small bird fell from its nest near the river. The fast animals ran away, scared of the water. But slow Tilly walked into the river, put the bird on her shell, and carried it safely to the shore. Nobody laughed after that.",
+    questions: [
+      { q: "Why did the animals laugh at Tilly?", options: ["She was slow", "She was loud", "She was small", "She was afraid"], correct: 0 },
+      { q: "What fell near the river?", options: ["A leaf", "A small bird", "A nest of eggs", "A fish"], correct: 1 },
+      { q: "How did Tilly save the bird?", options: ["She called for help", "She flew to it", "She carried it on her shell", "She pushed it with a stick"], correct: 2 },
+    ],
+  },
+];
+
 export const READING_PASSAGES = [
   {
     id: "the-lighthouse-keeper",
@@ -102,6 +201,22 @@ export const READING_PASSAGES = [
   },
 ];
 
+// Which passage set each content tier reads. Beginner and Intermediate get
+// their own gentle sets; Advanced falls back to the Intermediate stories;
+// Expert keeps the original hard passages.
+export const READING_SETS = {
+  beginner: BEGINNER_READING,
+  intermediate: INTERMEDIATE_READING,
+  advanced: INTERMEDIATE_READING,
+  expert: READING_PASSAGES,
+};
+
+export function getReadingSet(contentTier) {
+  return READING_SETS[contentTier] || READING_PASSAGES;
+}
+
+const ALL_PASSAGES = [...BEGINNER_READING, ...INTERMEDIATE_READING, ...READING_PASSAGES];
+
 export function getPassage(passageId) {
-  return READING_PASSAGES.find((p) => p.id === passageId) || null;
+  return ALL_PASSAGES.find((p) => p.id === passageId) || null;
 }
