@@ -51,6 +51,150 @@ export const BEGINNER_READING = [
       { q: "When does the cat play?", options: ["In the morning", "At night", "After lunch", "At school"], correct: 1 },
     ],
   },
+  {
+    id: "b-big-tree", title: "The Big Tree", emoji: "🌳",
+    text: "In our garden there is a big tree. It is very old and very tall. In summer, the tree has many green leaves. Birds make their nests in the tree. My brother and I like to sit under it when the sun is hot. It is our favorite place to play.",
+    questions: [
+      { q: "Where is the tree?", options: ["In the park", "In our garden", "At school", "In the forest"], correct: 1 },
+      { q: "When does the tree have green leaves?", options: ["In winter", "In summer", "At night", "Never"], correct: 1 },
+      { q: "What do the birds do in the tree?", options: ["Sleep on the grass", "Make their nests", "Eat the leaves", "Fly away"], correct: 1 },
+    ],
+  },
+  {
+    id: "b-school-bag", title: "My School Bag", emoji: "🎒",
+    text: "This is my school bag. It is blue and green. Inside, I have my books, my pencils, and my lunch. My bag is a little heavy, but I like it. Every morning, I put it on my back and walk to school with my friend.",
+    questions: [
+      { q: "What colors is the bag?", options: ["Red and yellow", "Blue and green", "Black and white", "Pink"], correct: 1 },
+      { q: "What is inside the bag?", options: ["Toys and games", "Books, pencils, and lunch", "A cat", "Shoes"], correct: 1 },
+      { q: "How does the child go to school?", options: ["By car", "By bus", "Walks with a friend", "By train"], correct: 2 },
+    ],
+  },
+  {
+    id: "b-rainy-day", title: "The Rainy Day", emoji: "🌧️",
+    text: "Today it is raining. The sky is grey and the streets are wet. I cannot play outside, so I stay at home. I read a book and drink warm tea. My cat sleeps next to me. I like rainy days because they are quiet and cozy.",
+    questions: [
+      { q: "How is the sky today?", options: ["Blue", "Grey", "Yellow", "Pink"], correct: 1 },
+      { q: "Why does the child stay home?", options: ["It is too hot", "It is raining", "It is night", "School is closed"], correct: 1 },
+      { q: "What does the child do at home?", options: ["Play football", "Read and drink tea", "Sleep all day", "Cook dinner"], correct: 1 },
+    ],
+  },
+  {
+    id: "b-my-family", title: "My Family", emoji: "👨‍👩‍👧‍👦",
+    text: "I have a big family. My mother is a nurse and my father is a teacher. I have one sister and one brother. We also have a dog named Rex. On Sundays, we eat lunch together and play games. I love my family very much.",
+    questions: [
+      { q: "What is the mother's job?", options: ["Teacher", "Nurse", "Doctor", "Cook"], correct: 1 },
+      { q: "How many brothers and sisters does the child have?", options: ["One sister and one brother", "Two sisters", "Only a brother", "None"], correct: 0 },
+      { q: "What do they do on Sundays?", options: ["Go to school", "Eat lunch and play games", "Watch TV all day", "Go to work"], correct: 1 },
+    ],
+  },
+  {
+    id: "b-little-bird", title: "The Little Bird", emoji: "🐦",
+    text: "A little bird lives in the tree near my window. Every morning, it sings a happy song. The bird is small and brown. I put some bread on the window for it. The bird is not afraid of me now. It is my little friend.",
+    questions: [
+      { q: "Where does the bird live?", options: ["On the roof", "In the tree near the window", "In a cage", "Under the bed"], correct: 1 },
+      { q: "What does the bird do every morning?", options: ["Sleeps", "Sings a song", "Flies away", "Eats the tree"], correct: 1 },
+      { q: "What does the child give the bird?", options: ["Water", "Some bread", "A toy", "Nothing"], correct: 1 },
+    ],
+  },
+  {
+    id: "b-at-the-farm", title: "At the Farm", emoji: "🐄",
+    text: "My grandfather has a farm. There are cows, sheep, and chickens. Every morning, the rooster wakes everyone up. The cows give us fresh milk. I like to feed the chickens and collect the eggs. The farm is dirty but so much fun!",
+    questions: [
+      { q: "Who has a farm?", options: ["My uncle", "My grandfather", "My teacher", "My friend"], correct: 1 },
+      { q: "What wakes everyone up?", options: ["A bell", "The rooster", "The dog", "An alarm"], correct: 1 },
+      { q: "What does the child like to do?", options: ["Ride the cows", "Feed the chickens and collect eggs", "Sleep all day", "Milk the sheep"], correct: 1 },
+    ],
+  },
+  {
+    id: "b-my-birthday", title: "My Birthday", emoji: "🎂",
+    text: "Today is my birthday. I am eight years old now. My mother made a big chocolate cake. My friends came to my house with presents. We played games, ate cake, and sang songs. It was the best day of the whole year!",
+    questions: [
+      { q: "How old is the child now?", options: ["Seven", "Eight", "Nine", "Ten"], correct: 1 },
+      { q: "What kind of cake did the mother make?", options: ["Vanilla", "Chocolate", "Fruit", "Cheese"], correct: 1 },
+      { q: "What did the friends bring?", options: ["Nothing", "Presents", "Only food", "Balloons"], correct: 1 },
+    ],
+  },
+  {
+    id: "b-snowman", title: "The Snowman", emoji: "⛄",
+    text: "It snowed all night. In the morning, the garden was white. My sister and I made a big snowman. We gave him a hat, a carrot nose, and two black eyes. Then we went inside and drank hot chocolate. Winter is so much fun!",
+    questions: [
+      { q: "When did it snow?", options: ["All morning", "All night", "For one hour", "Last week"], correct: 1 },
+      { q: "What did they use for the snowman's nose?", options: ["A stone", "A carrot", "A stick", "A button"], correct: 1 },
+      { q: "What did they drink?", options: ["Cold water", "Hot chocolate", "Tea", "Milk"], correct: 1 },
+    ],
+  },
+  {
+    id: "b-best-friend", title: "My Best Friend", emoji: "🧑‍🤝‍🧑",
+    text: "My best friend is Maria. She lives next to my house. We go to the same school and sit together in class. After school, we play in the park or draw pictures. Maria is funny and kind. I am happy she is my friend.",
+    questions: [
+      { q: "Where does Maria live?", options: ["Far away", "Next to my house", "In another city", "At school"], correct: 1 },
+      { q: "Where do they sit at school?", options: ["Far apart", "Together", "With the teacher", "Alone"], correct: 1 },
+      { q: "What do they do after school?", options: ["Sleep", "Play in the park or draw", "Nothing", "Watch TV"], correct: 1 },
+    ],
+  },
+  {
+    id: "b-picnic", title: "The Picnic", emoji: "🧺",
+    text: "On Saturday, my family went to the park for a picnic. We took sandwiches, fruit, and juice. We sat on a big blanket under a tree. After lunch, we played ball and flew a kite. Then it started to rain, so we ran home laughing.",
+    questions: [
+      { q: "When did they go to the park?", options: ["On Sunday", "On Saturday", "On Monday", "At night"], correct: 1 },
+      { q: "What did they sit on?", options: ["A bench", "A big blanket", "The wet grass", "A chair"], correct: 1 },
+      { q: "Why did they run home?", options: ["They were tired", "It started to rain", "It was late", "They were hungry"], correct: 1 },
+    ],
+  },
+  {
+    id: "b-my-room", title: "My Room", emoji: "🛏️",
+    text: "This is my room. It is small but I love it. My bed is next to the window. I have a desk for my homework and many books on the shelf. My toys are in a big box. At night, I can see the stars from my bed.",
+    questions: [
+      { q: "Where is the bed?", options: ["Next to the door", "Next to the window", "In the corner", "Under the desk"], correct: 1 },
+      { q: "Where are the toys?", options: ["On the shelf", "In a big box", "Under the bed", "On the desk"], correct: 1 },
+      { q: "What can the child see at night?", options: ["The moon", "The stars", "The garden", "Cars"], correct: 1 },
+    ],
+  },
+  {
+    id: "b-zoo-trip", title: "The Zoo Trip", emoji: "🦁",
+    text: "Yesterday my class went to the zoo. We saw lions, monkeys, and a big elephant. The monkeys were very funny and made us laugh. My favorite animal was the tall giraffe. We ate our lunch near the birds. It was a wonderful day.",
+    questions: [
+      { q: "Where did the class go?", options: ["To the park", "To the zoo", "To the museum", "To the beach"], correct: 1 },
+      { q: "Which animals were funny?", options: ["The lions", "The monkeys", "The birds", "The fish"], correct: 1 },
+      { q: "What was the child's favorite animal?", options: ["The lion", "The giraffe", "The elephant", "The monkey"], correct: 1 },
+    ],
+  },
+  {
+    id: "b-ice-cream", title: "The Ice Cream", emoji: "🍦",
+    text: "It was a very hot day. My father took me to the shop to buy ice cream. I chose strawberry and he chose chocolate. The ice cream was cold and sweet. We ate it in the park under a tree. I want ice cream again tomorrow!",
+    questions: [
+      { q: "How was the day?", options: ["Cold", "Very hot", "Rainy", "Windy"], correct: 1 },
+      { q: "What flavor did the child choose?", options: ["Chocolate", "Strawberry", "Vanilla", "Lemon"], correct: 1 },
+      { q: "Where did they eat the ice cream?", options: ["At home", "In the park", "In the shop", "In the car"], correct: 1 },
+    ],
+  },
+  {
+    id: "b-my-grandma", title: "My Grandma", emoji: "👵",
+    text: "My grandma lives in a small village. Her house has a big garden with flowers and vegetables. She makes the best soup in the world. When I visit her, she tells me old stories. I love the summer holidays at grandma's house.",
+    questions: [
+      { q: "Where does grandma live?", options: ["In the city", "In a small village", "By the sea", "In the mountains"], correct: 1 },
+      { q: "What is in her garden?", options: ["Only grass", "Flowers and vegetables", "A pool", "Toys"], correct: 1 },
+      { q: "What does grandma do when the child visits?", options: ["Watches TV", "Tells old stories", "Sleeps", "Works"], correct: 1 },
+    ],
+  },
+  {
+    id: "b-football-game", title: "The Football Game", emoji: "⚽",
+    text: "Every Sunday, I play football with my friends. We play in the field near the school. I am not the fastest, but I can kick the ball far. Last week, my team won the game. We were so happy that we jumped and cheered.",
+    questions: [
+      { q: "When do they play football?", options: ["Every Saturday", "Every Sunday", "Every day", "At night"], correct: 1 },
+      { q: "Where do they play?", options: ["At home", "In the field near the school", "In the street", "At the beach"], correct: 1 },
+      { q: "What happened last week?", options: ["They lost", "The team won", "It rained", "Nobody came"], correct: 1 },
+    ],
+  },
+  {
+    id: "b-the-garden", title: "The Garden", emoji: "🌻",
+    text: "My mother loves her garden. In spring, she plants seeds. Every day, she gives the plants water. Soon, small green plants grow. In summer, we have red tomatoes and yellow sunflowers. I help my mother, and the garden makes us both happy.",
+    questions: [
+      { q: "When does the mother plant seeds?", options: ["In winter", "In spring", "In autumn", "At night"], correct: 1 },
+      { q: "What does she give the plants every day?", options: ["Milk", "Water", "Sugar", "Nothing"], correct: 1 },
+      { q: "What grows in summer?", options: ["Only grass", "Tomatoes and sunflowers", "Apples", "Roses"], correct: 1 },
+    ],
+  },
 ];
 
 // Intermediate reading — short stories (55-75 words) with a little more plot and
@@ -98,6 +242,150 @@ export const INTERMEDIATE_READING = [
       { q: "Why did the animals laugh at Tilly?", options: ["She was slow", "She was loud", "She was small", "She was afraid"], correct: 0 },
       { q: "What fell near the river?", options: ["A leaf", "A small bird", "A nest of eggs", "A fish"], correct: 1 },
       { q: "How did Tilly save the bird?", options: ["She called for help", "She flew to it", "She carried it on her shell", "She pushed it with a stick"], correct: 2 },
+    ],
+  },
+  {
+    id: "i-homework-mixup", title: "The Homework Mix-up", emoji: "📓",
+    text: "Andrei was sure he had finished his math homework, but when the teacher asked for it, his notebook was full of drawings instead. He had taken his little sister's notebook by mistake! His face turned red. Luckily, the teacher smiled and let him bring the real homework the next day. That evening, Andrei wrote his name in big letters on every notebook so it would never happen again.",
+    questions: [
+      { q: "What did Andrei find in the notebook?", options: ["His math homework", "His sister's drawings", "A letter", "Nothing"], correct: 1 },
+      { q: "How did the teacher react?", options: ["She was angry", "She smiled and gave him another day", "She called his parents", "She laughed at him"], correct: 1 },
+      { q: "What did Andrei do that evening?", options: ["Nothing", "Wrote his name on every notebook", "Hid the notebooks", "Did more drawings"], correct: 1 },
+    ],
+  },
+  {
+    id: "i-talent-show", title: "The Talent Show", emoji: "🎤",
+    text: "Elena wanted to sing at the school talent show, but she was terribly nervous. Her hands were shaking as she walked onto the stage. For a moment, she forgot the words. Then she saw her best friend smiling in the front row and giving her a thumbs up. Suddenly, Elena felt calm. She sang beautifully, and everyone clapped. After that day, she was not afraid of the stage anymore.",
+    questions: [
+      { q: "What did Elena want to do?", options: ["Dance", "Sing", "Play the guitar", "Tell jokes"], correct: 1 },
+      { q: "What happened at first on stage?", options: ["She sang perfectly", "She forgot the words", "She fell down", "She ran away"], correct: 1 },
+      { q: "What helped Elena feel calm?", options: ["A glass of water", "Her friend smiling and giving a thumbs up", "The teacher", "The music"], correct: 1 },
+    ],
+  },
+  {
+    id: "i-grandpas-watch", title: "Grandpa's Old Watch", emoji: "⌚",
+    text: "Grandpa gave Marco an old silver watch for his tenth birthday. It did not work, and some of the numbers were hard to read. Marco's cousin laughed and said it was junk. But grandpa explained that the watch had belonged to Marco's great-grandfather, who wore it every day for fifty years. Suddenly the watch felt like treasure. Marco now keeps it in a special box and shows it to everyone who visits.",
+    questions: [
+      { q: "What did grandpa give Marco?", options: ["A new phone", "An old silver watch", "Money", "A book"], correct: 1 },
+      { q: "Why did the cousin laugh?", options: ["The watch was too big", "He thought it was junk", "It was pink", "It was loud"], correct: 1 },
+      { q: "Why is the watch special?", options: ["It is made of gold", "It belonged to his great-grandfather", "It is very expensive", "It plays music"], correct: 1 },
+    ],
+  },
+  {
+    id: "i-stray-dog", title: "The Stray Dog", emoji: "🐕",
+    text: "On her way home from school, Ana found a thin, dirty dog shivering in the rain. It had no collar and looked very hungry. Ana shared her sandwich with it, and the dog followed her all the way home. Her parents were not sure at first, but the dog was so gentle that they agreed to keep it. They named him Lucky, because that rainy day changed his life.",
+    questions: [
+      { q: "Where did Ana find the dog?", options: ["At the park", "Shivering in the rain", "In a shop", "At school"], correct: 1 },
+      { q: "What did Ana do first?", options: ["Called the police", "Shared her sandwich", "Ran away", "Ignored it"], correct: 1 },
+      { q: "Why did they name the dog Lucky?", options: ["He won a prize", "The rainy day changed his life", "He was fast", "He was golden"], correct: 1 },
+    ],
+  },
+  {
+    id: "i-camping-trip", title: "The Camping Trip", emoji: "🏕️",
+    text: "The Popescu family went camping in the forest for the weekend. They put up their tent near a small river. At night, they sat around a fire, roasted marshmallows, and told scary stories. Suddenly, they heard a noise in the bushes. Everyone froze. But it was only a curious little hedgehog looking for food. They laughed at how scared they had been, and slept well that night.",
+    questions: [
+      { q: "Where did the family camp?", options: ["By the sea", "In the forest near a river", "In the mountains", "In a field"], correct: 1 },
+      { q: "What did they do at night?", options: ["Watched TV", "Sat around a fire and told stories", "Went home", "Went swimming"], correct: 1 },
+      { q: "What made the noise in the bushes?", options: ["A bear", "A little hedgehog", "A wolf", "The wind"], correct: 1 },
+    ],
+  },
+  {
+    id: "i-broken-window", title: "The Broken Window", emoji: "🪟",
+    text: "Tom and his friends were playing football in the street when Tom kicked the ball too hard. It smashed straight through Mr. Ilie's window. The other boys ran away, but Tom stayed. He knocked on the door and said sorry. Mr. Ilie was surprised by his honesty. Instead of shouting, he asked Tom to help fix the window on Saturday. Tom learned that telling the truth was the right choice.",
+    questions: [
+      { q: "What did Tom break?", options: ["A door", "A window", "A car", "A lamp"], correct: 1 },
+      { q: "What did the other boys do?", options: ["Helped Tom", "Ran away", "Called for help", "Laughed"], correct: 1 },
+      { q: "What did Mr. Ilie ask Tom to do?", options: ["Pay a lot of money", "Help fix the window", "Leave forever", "Buy a new ball"], correct: 1 },
+    ],
+  },
+  {
+    id: "i-school-play", title: "The School Play", emoji: "🎭",
+    text: "Maria's class was putting on a play about a magic forest. Maria wanted the main part, but she was given the role of a small tree instead. At first she was disappointed. But she decided to be the best tree ever, moving her branches and making the audience laugh. After the show, many people said the funny tree was their favorite part. Maria realized that even a small role can shine.",
+    questions: [
+      { q: "What was the play about?", options: ["A castle", "A magic forest", "The sea", "A city"], correct: 1 },
+      { q: "What role did Maria get?", options: ["The main part", "A small tree", "A witch", "A bird"], correct: 1 },
+      { q: "What did Maria learn?", options: ["To give up", "Even a small role can shine", "Plays are boring", "To be sad"], correct: 1 },
+    ],
+  },
+  {
+    id: "i-lost-wallet", title: "The Lost Wallet", emoji: "👛",
+    text: "While walking to the shop, David found a brown wallet on the pavement. Inside there was money and a photo of a smiling family. David could have kept it, but he knew that was wrong. He took it to the police station. Two days later, an old man came to David's house to thank him. He was so grateful that he gave David a small reward and a big smile.",
+    questions: [
+      { q: "What did David find?", options: ["A phone", "A brown wallet", "A key", "A bag"], correct: 1 },
+      { q: "What did David do with it?", options: ["Kept the money", "Took it to the police station", "Threw it away", "Hid it"], correct: 1 },
+      { q: "What happened two days later?", options: ["Nothing", "An old man came to thank him", "He lost it", "The police fined him"], correct: 1 },
+    ],
+  },
+  {
+    id: "i-new-bicycle", title: "The New Bicycle", emoji: "🚲",
+    text: "For months, Radu saved every coin he received to buy a shiny red bicycle. Finally, he had enough. But on the day he went to the shop, he saw his neighbor crying because she could not afford medicine for her son. Radu thought hard, then gave her some of his money. He did not get the fanciest bicycle, but the smile on his neighbor's face felt better than any new toy.",
+    questions: [
+      { q: "What was Radu saving for?", options: ["A phone", "A red bicycle", "A game", "Shoes"], correct: 1 },
+      { q: "Why was the neighbor crying?", options: ["She was hurt", "She could not afford medicine for her son", "She lost a pet", "She was lonely"], correct: 1 },
+      { q: "What did Radu do?", options: ["Ignored her", "Gave her some of his money", "Bought the bicycle anyway", "Went home"], correct: 1 },
+    ],
+  },
+  {
+    id: "i-snow-day", title: "The Snow Day", emoji: "❄️",
+    text: "When Ioana woke up, the whole town was covered in thick white snow. School was closed! She and her brother spent the morning building a snow fort and having a snowball fight. Their cheeks turned red from the cold. At lunchtime, their mother called them inside for hot soup. Ioana wished that every winter day could be a snow day like that one.",
+    questions: [
+      { q: "Why was school closed?", options: ["A holiday", "Thick snow covered the town", "A storm warning", "It was Sunday"], correct: 1 },
+      { q: "What did they build?", options: ["A snowman", "A snow fort", "A house", "A wall"], correct: 1 },
+      { q: "What did their mother make?", options: ["Hot chocolate", "Hot soup", "Sandwiches", "Cake"], correct: 1 },
+    ],
+  },
+  {
+    id: "i-science-project", title: "The Science Project", emoji: "🔬",
+    text: "For the science fair, Paul decided to grow a bean plant. He put the seed in a cup of soil and placed it on the windowsill. Every day he watered it and wrote down what he saw. For a whole week, nothing happened, and he almost gave up. Then one morning, a tiny green shoot appeared. Paul was amazed that his patience had paid off, and his project won a prize.",
+    questions: [
+      { q: "What did Paul decide to grow?", options: ["A flower", "A bean plant", "A tree", "Grass"], correct: 1 },
+      { q: "Where did he put the cup?", options: ["On the floor", "On the windowsill", "In the garden", "In a dark box"], correct: 1 },
+      { q: "What happened after a week of nothing?", options: ["He threw it away", "A tiny green shoot appeared", "It died", "The cup broke"], correct: 1 },
+    ],
+  },
+  {
+    id: "i-kind-stranger", title: "The Kind Stranger", emoji: "🤝",
+    text: "Sofia was at the train station with her grandmother when they realized they had lost their tickets. Grandmother started to worry. A woman standing nearby noticed and quietly bought them two new tickets. Before Sofia could even ask her name, the woman smiled and walked away. Sofia never forgot her kindness, and she promised herself that one day she would help a stranger too.",
+    questions: [
+      { q: "What did Sofia and her grandmother lose?", options: ["Their bags", "Their tickets", "Their money", "Their phone"], correct: 1 },
+      { q: "What did the woman nearby do?", options: ["Ignored them", "Bought them two new tickets", "Called the police", "Laughed"], correct: 1 },
+      { q: "What did Sofia promise herself?", options: ["To be rich", "To help a stranger one day", "Never to travel", "To find the woman"], correct: 1 },
+    ],
+  },
+  {
+    id: "i-birthday-surprise", title: "The Birthday Surprise", emoji: "🎉",
+    text: "Luca thought everyone had forgotten his birthday. His parents said nothing at breakfast, and his friends did not mention it at school. He felt sad all day. But when he opened his front door in the afternoon, the lights turned on and everyone shouted 'Surprise!' His family and friends had planned a party in secret. It was the happiest surprise of his life, and he almost cried with joy.",
+    questions: [
+      { q: "Why did Luca feel sad?", options: ["He was sick", "He thought everyone forgot his birthday", "He lost a game", "It rained"], correct: 1 },
+      { q: "What happened when he opened the door?", options: ["Nobody was there", "Everyone shouted 'Surprise!'", "The lights broke", "He fell"], correct: 1 },
+      { q: "How did Luca feel in the end?", options: ["Angry", "Very happy", "Bored", "Tired"], correct: 1 },
+    ],
+  },
+  {
+    id: "i-big-match", title: "The Big Match", emoji: "🏆",
+    text: "Cristi's team was losing the football match by one goal, and there were only two minutes left. He was tired and wanted to stop, but his coach told him to keep believing. In the last minute, Cristi got the ball, ran past two players, and scored a perfect goal. The match ended in a tie. His teammates lifted him up, and Cristi understood why you should never give up.",
+    questions: [
+      { q: "How was Cristi's team doing near the end?", options: ["Winning easily", "Losing by one goal", "Winning by two", "Not playing"], correct: 1 },
+      { q: "What did the coach tell him?", options: ["To rest", "To keep believing", "To go home", "To stop"], correct: 1 },
+      { q: "How did the match end?", options: ["His team lost", "In a tie", "It was cancelled", "His team was disqualified"], correct: 1 },
+    ],
+  },
+  {
+    id: "i-library-book", title: "The Library Book", emoji: "📚",
+    text: "Ema borrowed a mystery book from the school library and could not stop reading it. One evening she read so late that she fell asleep with the book on her face. The next day she was tired but excited to finish it. When she returned the book, the librarian recommended two more just like it. Ema discovered that reading could be even more exciting than television.",
+    questions: [
+      { q: "What kind of book did Ema borrow?", options: ["A cookbook", "A mystery book", "A math book", "A comic"], correct: 1 },
+      { q: "What happened one evening?", options: ["She lost the book", "She fell asleep reading it", "She tore a page", "She finished it"], correct: 1 },
+      { q: "What did Ema discover?", options: ["That books are boring", "Reading can be more exciting than TV", "She hates mysteries", "Libraries are closed"], correct: 1 },
+    ],
+  },
+  {
+    id: "i-beach-day", title: "The Beach Day", emoji: "🏖️",
+    text: "The whole family drove to the seaside for the day. The children built a huge sandcastle while their father swam in the waves. At noon, a cheeky seagull swooped down and stole a sandwich right out of Mia's hand! Everyone burst out laughing. They spent the afternoon collecting shells and watching the boats. On the way home, tired and sunburnt, they all agreed it had been a perfect day.",
+    questions: [
+      { q: "Where did the family go?", options: ["To the mountains", "To the seaside", "To a lake", "To the city"], correct: 1 },
+      { q: "What did the seagull do?", options: ["Sang a song", "Stole a sandwich from Mia", "Landed on the castle", "Flew far away"], correct: 1 },
+      { q: "How did they feel on the way home?", options: ["Angry", "Tired but happy", "Bored", "Cold"], correct: 1 },
     ],
   },
 ];

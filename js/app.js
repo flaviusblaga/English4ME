@@ -3,7 +3,7 @@ import { getOrCreateState } from "./drive.js";
 import { initChat } from "./chat.js";
 import { initLessons } from "./lessons.js";
 import { initReading } from "./reading.js";
-import { getProfile, MEMBERS, getMember, getMemberPlacement } from "./profile.js";
+import { getProfile, MEMBERS, getMember, getMemberPlacement, clearMemberPlacement } from "./profile.js";
 import { getRememberedProfileId, rememberProfileId } from "./profile-picker.js";
 import { initParentView } from "./parent-view.js";
 import { initPwa } from "./pwa.js";
@@ -172,6 +172,18 @@ function handleMemberPicked(memberId) {
   }
 }
 
+// Clears the current kid's saved placement and runs the test again from the
+// start (reached via the "Reia testul" button on the level picker).
+function retakePlacement() {
+  if (!currentMember || currentMember.kind !== "kid") return;
+  clearMemberPlacement(currentMember.id);
+  initPlacement({
+    member: currentMember,
+    onDone: (recommendedProfileId) => showLevelPicker(currentMember, recommendedProfileId),
+  });
+  showScreen("placement");
+}
+
 // The four kid levels, always all selectable. The test result only decides
 // which one wears the "Recomandat" badge.
 const KID_LEVELS = ["kids-primar", "kids-intermediate", "kids-advanced", "kids-expert"];
@@ -327,6 +339,7 @@ window.addEventListener("DOMContentLoaded", async () => {
   el("home-btn").addEventListener("click", goHome);
   el("lesson-home-btn").addEventListener("click", goHome);
   el("level-picker-back-btn").addEventListener("click", goToMemberPicker);
+  el("level-picker-retake-btn").addEventListener("click", retakePlacement);
 
   // Bottom tab bar
   el("nav-home").addEventListener("click", openLessons);

@@ -767,6 +767,11 @@ body.mascot-theme .identity-avatar {
 
 #level-picker-back-btn { margin-bottom: var(--sp-3); }
 
+.level-picker-retake {
+  display: block;
+  margin: var(--sp-4) auto 0;
+}
+
 /* ---------- Placement test ---------- */
 #screen-placement { padding: 0; }
 #placement-quiz-view { padding: var(--sp-4) var(--sp-4) var(--sp-6); }
