@@ -68,8 +68,8 @@ export function getProfile(profileId) {
 export const MEMBERS = [
   { id: "flavius", name: "Flavius", emoji: "💼", kind: "adult", role: "admin", profileId: "business-conversational" },
   { id: "andrea",  name: "Andrea",  emoji: "☕", kind: "adult", role: "admin", profileId: "business-conversational" },
-  { id: "darius",  name: "Darius",  emoji: "🚀", kind: "kid" },
-  { id: "rares",   name: "Rareș",   emoji: "🦊", kind: "kid" },
+  { id: "darius",  name: "Darius",  emoji: "🦫", kind: "kid", img: "assets/socatei/bobo-face.png" },
+  { id: "rares",   name: "Rareș",   emoji: "🐿️", kind: "kid", img: "assets/socatei/fizz-face.png" },
 ];
 
 export function getMember(memberId) {

@@ -108,7 +108,20 @@ function renderProfilePicker() {
 
     const icon = document.createElement("span");
     icon.className = "profile-card-icon";
-    icon.textContent = member.emoji;
+    if (member.img) {
+      // Kids get a round portrait of their mascot (Bobo / Fizz) instead of an
+      // emoji. Fall back to the emoji badge if the image ever fails to load.
+      const img = document.createElement("img");
+      img.className = "profile-card-portrait";
+      img.src = member.img;
+      img.alt = member.name;
+      img.onerror = function () {
+        this.replaceWith(document.createTextNode(member.emoji));
+      };
+      icon.appendChild(img);
+    } else {
+      icon.textContent = member.emoji;
+    }
 
     const textCol = document.createElement("div");
     textCol.className = "profile-card-text";

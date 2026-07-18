@@ -709,6 +709,15 @@ body.mascot-theme .identity-avatar {
   display: grid;
   place-items: center;
   flex-shrink: 0;
+  overflow: hidden; /* clip the mascot portrait to the circle */
+}
+
+/* Mascot face portrait filling the round tile (Bobo for Darius, Fizz for Rareș). */
+.profile-card-portrait {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
 }
 
 .profile-card-text {
