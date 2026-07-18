@@ -56,3 +56,41 @@ export function getProfile(profileId) {
   if (!profile) throw new Error(`Unknown profileId: ${profileId}`);
   return profile;
 }
+
+// ---- Family members ----
+// The picker now shows PEOPLE, not abstract levels. Each member maps onto one
+// of the profiles above:
+//   • adults (role "admin") → the Business English profile, and can view the
+//     children's progress;
+//   • kids → their level is NOT fixed here; it's decided by the placement test
+//     the first time they enter, then remembered (see placement.js). So a kid
+//     member has no profileId until the test assigns one.
+export const MEMBERS = [
+  { id: "flavius", name: "Flavius", emoji: "💼", kind: "adult", role: "admin", profileId: "business-conversational" },
+  { id: "andrea",  name: "Andrea",  emoji: "☕", kind: "adult", role: "admin", profileId: "business-conversational" },
+  { id: "darius",  name: "Darius",  emoji: "🚀", kind: "kid" },
+  { id: "rares",   name: "Rareș",   emoji: "🦊", kind: "kid" },
+];
+
+export function getMember(memberId) {
+  const member = MEMBERS.find((m) => m.id === memberId);
+  if (!member) throw new Error(`Unknown memberId: ${memberId}`);
+  return member;
+}
+
+// A kid's placement result (which profile the test put them in) is remembered
+// per device so the test only runs once. localStorage keeps it simple and
+// avoids a Drive round-trip before we even know which level's file to open.
+const PLACEMENT_KEY_PREFIX = "engleza-familie:placement:";
+
+export function getMemberPlacement(memberId) {
+  return localStorage.getItem(PLACEMENT_KEY_PREFIX + memberId) || null;
+}
+
+export function setMemberPlacement(memberId, profileId) {
+  localStorage.setItem(PLACEMENT_KEY_PREFIX + memberId, profileId);
+}
+
+export function clearMemberPlacement(memberId) {
+  localStorage.removeItem(PLACEMENT_KEY_PREFIX + memberId);
+}

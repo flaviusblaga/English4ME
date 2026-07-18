@@ -3,10 +3,11 @@ import { getOrCreateState } from "./drive.js";
 import { initChat } from "./chat.js";
 import { initLessons } from "./lessons.js";
 import { initReading } from "./reading.js";
-import { PROFILES, getProfile } from "./profile.js";
+import { getProfile, MEMBERS, getMember, getMemberPlacement } from "./profile.js";
 import { getRememberedProfileId, rememberProfileId } from "./profile-picker.js";
 import { initParentView } from "./parent-view.js";
 import { initPwa } from "./pwa.js";
+import { initPlacement } from "./placement.js";
 
 let currentUser = null; // { email, name } — set after sign-in, used once a profile is picked
 let currentSession = null; // { accessToken, userEmail, displayName, fileId, state, profile } — reused across lesson<->chat navigation
@@ -18,6 +19,7 @@ function el(id) {
 function showScreen(name) {
   el("screen-login").hidden = name !== "login";
   el("screen-profile-picker").hidden = name !== "profile-picker";
+  el("screen-placement").hidden = name !== "placement";
   el("screen-chat").hidden = name !== "chat";
   el("screen-lesson").hidden = name !== "lesson";
   el("screen-reading").hidden = name !== "reading";
@@ -94,59 +96,90 @@ async function handleLogin() {
 function renderProfilePicker() {
   const list = el("profile-picker-list");
   list.innerHTML = "";
-  const remembered = getRememberedProfileId();
+  const remembered = getRememberedProfileId(); // now stores the last MEMBER id
 
-  for (const profile of PROFILES) {
+  const levelLabel = { "kids-primar": "Beginner", "kids-intermediate": "Intermediate", "kids-advanced": "Advanced", "kids-expert": "Expert" };
+
+  for (const member of MEMBERS) {
     const card = document.createElement("button");
     card.type = "button";
-    card.className = `profile-card profile-card--${profile.level}`;
-    if (profile.id === remembered) card.classList.add("profile-card--remembered");
+    card.className = `profile-card profile-card--${member.kind}`;
+    if (member.id === remembered) card.classList.add("profile-card--remembered");
 
     const icon = document.createElement("span");
     icon.className = "profile-card-icon";
-    icon.textContent = profile.emoji || "📘";
+    icon.textContent = member.emoji;
 
     const textCol = document.createElement("div");
     textCol.className = "profile-card-text";
     const title = document.createElement("strong");
-    title.textContent = profile.displayName;
+    title.textContent = member.name;
     const desc = document.createElement("span");
-    desc.textContent = profile.description;
+    if (member.kind === "adult") {
+      desc.textContent = "Business English · Admin";
+    } else {
+      const placed = getMemberPlacement(member.id);
+      desc.textContent = placed ? `Copil · ${levelLabel[placed] || "nivel setat"}` : "Copil · dă testul de nivel";
+    }
     textCol.appendChild(title);
     textCol.appendChild(desc);
 
     card.appendChild(icon);
     card.appendChild(textCol);
-    card.addEventListener("click", () => handleProfilePicked(profile.id));
+    card.addEventListener("click", () => handleMemberPicked(member.id));
     list.appendChild(card);
   }
 }
 
-async function handleProfilePicked(profileId) {
-  const profile = getProfile(profileId);
-  rememberProfileId(profileId);
+// A member tap: adults go straight to their Business profile; a kid goes to the
+// placement test the first time (then remembers the result), otherwise straight
+// into the level the test assigned.
+function handleMemberPicked(memberId) {
+  const member = getMember(memberId);
+  rememberProfileId(memberId);
 
+  if (member.kind === "adult") {
+    loadSession(getProfile(member.profileId), member.name);
+    return;
+  }
+
+  const placedProfileId = getMemberPlacement(member.id);
+  if (placedProfileId) {
+    loadSession(getProfile(placedProfileId), member.name);
+  } else {
+    initPlacement({
+      member,
+      onDone: (profileId) => loadSession(getProfile(profileId), member.name),
+    });
+    showScreen("placement");
+  }
+}
+
+// Opens a profile for the current Google account, showing `displayName` (the
+// member's name) in the UI. Drive state + parent-progress stay keyed by the
+// account email + profileId, so each level keeps its own saved progress.
+async function loadSession(profile, displayName) {
   const accessToken = getAccessToken();
   const { fileId, data } = await getOrCreateState(accessToken, {
     profileId: profile.id,
     userEmail: currentUser.email,
-    displayName: currentUser.name,
+    displayName,
     level: profile.level,
     features: profile.features,
   });
 
   document.body.className = `profile-${profile.id}${profile.features.mascots ? " mascot-theme" : ""}`;
 
-  el("current-user-name").textContent = currentUser.name;
+  el("current-user-name").textContent = displayName;
   el("current-profile-name").textContent = profile.displayName;
-  el("header-avatar").textContent = (currentUser.name[0] || "?").toUpperCase();
+  el("header-avatar").textContent = (displayName[0] || "?").toUpperCase();
   el("view-child-progress-btn").hidden = !profile.features.canViewChildren;
   el("reading-btn").hidden = !profile.features.reading;
 
   currentSession = {
     accessToken,
     userEmail: currentUser.email,
-    displayName: currentUser.name,
+    displayName,
     fileId,
     state: data,
     profile,

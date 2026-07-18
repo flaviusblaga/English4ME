@@ -737,6 +737,31 @@ body.mascot-theme .identity-avatar {
 .profile-card--expert .profile-card-icon { background: var(--tile-yellow); }
 .profile-card--conversational .profile-card-icon { background: var(--primary-soft); }
 
+/* Family-member picker cards: warm tile for adults, blue tile for kids. */
+.profile-card--adult .profile-card-icon { background: var(--tile-yellow); }
+.profile-card--kid .profile-card-icon { background: var(--tile-blue); }
+
+/* ---------- Placement test ---------- */
+#screen-placement { padding: 0; }
+#placement-quiz-view { padding: var(--sp-4) var(--sp-4) var(--sp-6); }
+.placement-intro { margin: var(--sp-3) 0 var(--sp-4); text-align: center; }
+#placement-stem {
+  text-align: center;
+  margin: var(--sp-2) 0 var(--sp-5);
+}
+.placement-result {
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-3);
+  padding: var(--sp-6) var(--sp-4);
+  text-align: center;
+}
+.placement-result-emoji { font-size: 4rem; }
+.placement-result .btn-primary { width: 100%; max-width: 320px; margin-top: var(--sp-2); }
+
 /* ---------- 7. Mascot avatars + speech bubbles ---------- */
 /* Base sizing is UNSCOPED on purpose — a mascot image must never render at
    its natural size (1024px+) no matter which theme is active. */
