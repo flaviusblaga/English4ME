@@ -3,7 +3,7 @@ import { getOrCreateState } from "./drive.js";
 import { initChat } from "./chat.js";
 import { initLessons } from "./lessons.js";
 import { initReading } from "./reading.js";
-import { getProfile, MEMBERS, getMember, getMemberPlacement, clearMemberPlacement } from "./profile.js";
+import { getProfile, MEMBERS, membersForEmail, getMember, getMemberPlacement, clearMemberPlacement } from "./profile.js";
 import { getRememberedProfileId, rememberProfileId } from "./profile-picker.js";
 import { initParentView } from "./parent-view.js";
 import { initPwa } from "./pwa.js";
@@ -102,7 +102,11 @@ function renderProfilePicker() {
 
   const levelLabel = { "kids-primar": "Beginner", "kids-intermediate": "Intermediate", "kids-advanced": "Advanced", "kids-expert": "Expert" };
 
-  for (const member of MEMBERS) {
+  // Admins (parents) see every member; a kid signed in with their own Google
+  // account only sees the kids' tiles — never the grown-ups' Business profile.
+  const visibleMembers = membersForEmail(currentUser ? currentUser.email : null);
+
+  for (const member of visibleMembers) {
     const card = document.createElement("button");
     card.type = "button";
     card.className = `profile-card profile-card--${member.kind}`;

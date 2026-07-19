@@ -68,9 +68,40 @@ export function getProfile(profileId) {
 export const MEMBERS = [
   { id: "flavius", name: "Flavius", emoji: "💼", kind: "adult", role: "admin", profileId: "business-conversational" },
   { id: "andrea",  name: "Andrea",  emoji: "☕", kind: "adult", role: "admin", profileId: "business-conversational" },
-  { id: "darius",  name: "Darius",  emoji: "🦫", kind: "kid", img: "assets/socatei/bobo-face.png" },
-  { id: "rares",   name: "Rareș",   emoji: "🐿️", kind: "kid", img: "assets/socatei/fizz-face.png" },
+  { id: "darius",  name: "Darius",  emoji: "🦫", kind: "kid", img: "assets/socatei/bobo-face.png",
+    emails: ["blagadariusmarcus@gmail.com", "dariusmblaga@gmail.com"] },
+  { id: "rares",   name: "Rareș",   emoji: "🐿️", kind: "kid", img: "assets/socatei/fizz-face.png",
+    emails: ["blagararesoctavian@gmail.com", "raresoblaga@gmail.com"] },
 ];
+
+// Google accounts that may see the WHOLE family in the picker (both parents and
+// both kids). Anyone else who signs in is treated as a child and only sees the
+// kids' tiles — so a child's own Google login can never reach the grown-ups'
+// Business profile. Add Andreea's Gmail here to give her admin access too.
+export const ADMIN_EMAILS = [
+  "flaviusblaga@gmail.com",
+  "andrea.bartha1@gmail.com",
+];
+
+function normEmail(e) {
+  return (e || "").trim().toLowerCase();
+}
+
+export function isAdminEmail(email) {
+  return ADMIN_EMAILS.some((a) => normEmail(a) === normEmail(email));
+}
+
+// Which member tiles the signed-in account should see:
+//  - an admin (parent) sees everyone;
+//  - a kid whose exact login email is listed on their member sees only their
+//    own tile;
+//  - anyone else is treated as a child and sees just the two kids' tiles.
+export function membersForEmail(email) {
+  if (isAdminEmail(email)) return MEMBERS;
+  const own = MEMBERS.find((m) => (m.emails || []).some((e) => normEmail(e) === normEmail(email)));
+  if (own && own.kind === "kid") return [own];
+  return MEMBERS.filter((m) => m.kind === "kid");
+}
 
 export function getMember(memberId) {
   const member = MEMBERS.find((m) => m.id === memberId);
