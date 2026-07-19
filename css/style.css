@@ -1816,6 +1816,82 @@ body.mascot-theme .chat-bubble--assistant {
   margin: 0 var(--sp-4) var(--sp-3);
 }
 
+/* ---------- Days-practised (streak) zone ---------- */
+.streak-card {
+  margin: 0 var(--sp-4) var(--sp-3);
+  background: linear-gradient(135deg, #fff4d6, #ffe0d0);
+  border: 2px solid #ffd9a8;
+  border-radius: var(--r-lg);
+  padding: var(--sp-3) var(--sp-4);
+  box-shadow: var(--shadow-sm);
+}
+
+.streak-head {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+}
+
+.streak-flame {
+  font-size: 2rem;
+  line-height: 1;
+  filter: drop-shadow(0 2px 3px rgba(196, 59, 59, 0.25));
+}
+
+.streak-count {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: var(--fs-md);
+  color: #b3541e;
+}
+
+.streak-sub {
+  font-size: var(--fs-xs);
+  font-weight: 700;
+  color: #8a6a00;
+  margin-top: 1px;
+}
+
+.streak-week {
+  display: flex;
+  justify-content: space-between;
+  gap: 4px;
+  margin-top: var(--sp-3);
+}
+
+.streak-day {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  flex: 1;
+}
+
+.streak-dot {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #ffffff8c;
+  border: 2px solid #ffcf9e;
+}
+
+.streak-day--done .streak-dot {
+  background: radial-gradient(circle at 50% 35%, #ffb347, #ff7b1c);
+  border-color: #ff7b1c;
+  box-shadow: 0 2px 5px rgba(255, 123, 28, 0.4);
+}
+
+.streak-day--today .streak-dot {
+  outline: 2px solid #b3541e;
+  outline-offset: 1px;
+}
+
+.streak-day-label {
+  font-size: 0.62rem;
+  font-weight: 800;
+  color: #8a6a00;
+}
+
 .rewards-card-heading {
   margin: 0 0 var(--sp-2);
   font-size: var(--fs-md);
@@ -1855,6 +1931,54 @@ body.mascot-theme .chat-bubble--assistant {
 }
 
 /* ---------- 15. Reduced motion ---------- */
+/* End-of-lesson mascot antics — a random one plays when a lesson is finished
+   (see playMascotAntic in lessons.js). Two-class selectors so they win over
+   the base .mascot-avatar rules. */
+@keyframes antic-spin {
+  0% { transform: rotate(0) scale(1); }
+  65% { transform: rotate(380deg) scale(1.18); }
+  100% { transform: rotate(360deg) scale(1); }
+}
+@keyframes antic-jump {
+  0%, 100% { transform: translateY(0); }
+  25% { transform: translateY(-26px) scale(1.05); }
+  45% { transform: translateY(0); }
+  62% { transform: translateY(-14px); }
+  80% { transform: translateY(0); }
+}
+@keyframes antic-wiggle {
+  0%, 100% { transform: rotate(0); }
+  20% { transform: rotate(-15deg); }
+  40% { transform: rotate(13deg); }
+  60% { transform: rotate(-9deg); }
+  80% { transform: rotate(6deg); }
+}
+@keyframes antic-tada {
+  0% { transform: scale(1) rotate(0); }
+  10%, 20% { transform: scale(0.9) rotate(-6deg); }
+  30%, 50%, 70%, 90% { transform: scale(1.18) rotate(6deg); }
+  40%, 60%, 80% { transform: scale(1.18) rotate(-6deg); }
+  100% { transform: scale(1) rotate(0); }
+}
+@keyframes antic-flip {
+  0% { transform: perspective(500px) rotateY(0) scale(1); }
+  50% { transform: perspective(500px) rotateY(180deg) scale(1.12); }
+  100% { transform: perspective(500px) rotateY(360deg) scale(1); }
+}
+/* Scoped with body.mascot-theme so these beat the always-on mascot-idle
+   animation (body.mascot-theme .mascot-avatar), which is more specific than a
+   bare .mascot-avatar.antic-* selector would be. */
+body.mascot-theme .mascot-avatar.antic-spin,
+.mascot-avatar.antic-spin { animation: antic-spin 1s var(--ease-out) both; }
+body.mascot-theme .mascot-avatar.antic-jump,
+.mascot-avatar.antic-jump { animation: antic-jump 1s var(--ease-out) both; }
+body.mascot-theme .mascot-avatar.antic-wiggle,
+.mascot-avatar.antic-wiggle { animation: antic-wiggle 0.9s var(--ease-out) both; }
+body.mascot-theme .mascot-avatar.antic-tada,
+.mascot-avatar.antic-tada { animation: antic-tada 1.1s var(--ease-out) both; }
+body.mascot-theme .mascot-avatar.antic-flip,
+.mascot-avatar.antic-flip { animation: antic-flip 1.1s var(--ease-out) both; }
+
 @media (prefers-reduced-motion: reduce) {
   .lesson-option-btn--incorrect,
   .word-chip--wrong-order,
@@ -1867,6 +1991,11 @@ body.mascot-theme .chat-bubble--assistant {
   body.mascot-theme .mascot-avatar.mascot-celebrate,
   .mascot-avatar.mascot-sad,
   body.mascot-theme .mascot-avatar.mascot-sad,
+  .mascot-avatar.antic-spin,
+  .mascot-avatar.antic-jump,
+  .mascot-avatar.antic-wiggle,
+  .mascot-avatar.antic-tada,
+  .mascot-avatar.antic-flip,
   .confetti-piece,
   .lesson-node--current .lesson-node-circle {
     animation: none;

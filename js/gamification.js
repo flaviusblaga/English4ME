@@ -40,7 +40,7 @@ function daysBetween(dateStrA, dateStrB) {
 function updateStreak(gamification) {
   const today = todayLocalDateString();
   if (gamification.lastPracticeDate === today) {
-    return; // already practiced today, streak unchanged
+    return; // already practiced today, nothing to add
   }
   if (gamification.lastPracticeDate === null) {
     gamification.currentStreak = 1;
@@ -50,6 +50,17 @@ function updateStreak(gamification) {
   }
   gamification.lastPracticeDate = today;
   gamification.longestStreak = Math.max(gamification.longestStreak, gamification.currentStreak);
+
+  // Reaching here means this is a NEW practice day. currentStreak counts days
+  // IN A ROW (resets after a missed day); totalActiveDays just keeps adding up
+  // every distinct day the child practised, never resetting. practiceDays is a
+  // rolling list of recent dates, so the home screen can draw a week strip.
+  gamification.totalActiveDays = (gamification.totalActiveDays || 0) + 1;
+  if (!Array.isArray(gamification.practiceDays)) gamification.practiceDays = [];
+  gamification.practiceDays.push(today);
+  if (gamification.practiceDays.length > 60) {
+    gamification.practiceDays = gamification.practiceDays.slice(-60);
+  }
 }
 
 function applyPointsAndCheckBadges(state, points) {

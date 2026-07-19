@@ -18,8 +18,17 @@ function applyFeatureDefaults(state, features) {
       currentStreak: 0,
       longestStreak: 0,
       lastPracticeDate: null,
+      totalActiveDays: 0,
+      practiceDays: [],
       badges: [],
     };
+  }
+
+  // Older gamification objects predate the days-practised tracker — patch the
+  // two new fields in without touching existing points/streak/badges.
+  if (state.gamification && state.gamification.totalActiveDays === undefined) {
+    state.gamification.totalActiveDays = 0;
+    state.gamification.practiceDays = [];
   }
 
   if (features && features.parentVisible && !state.parentSync) {

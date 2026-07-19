@@ -14,11 +14,11 @@ export const SCREEN_TIME_PER_LESSON_MIN = 20;
 // Expert's module includes the reading passages — "finishing the module"
 // means finishing everything the tier offers, and reading is half of Expert.
 const TIER_REWARD_SPECS = {
-  beginner: { bonusLei: 150, buckets: ["lessons"], total: LESSONS.length },
-  intermediate: { bonusLei: 200, buckets: ["lessonsIntermediate"], total: SENTENCE_LESSONS.length },
-  advanced: { bonusLei: 300, buckets: ["lessonsAdvanced"], total: ADVANCED_LESSONS.length },
+  beginner: { bonusLei: 50, buckets: ["lessons"], total: LESSONS.length },
+  intermediate: { bonusLei: 100, buckets: ["lessonsIntermediate"], total: SENTENCE_LESSONS.length },
+  advanced: { bonusLei: 150, buckets: ["lessonsAdvanced"], total: ADVANCED_LESSONS.length },
   expert: {
-    bonusLei: 400,
+    bonusLei: 200,
     buckets: ["lessonsExpert", "reading"],
     total: EXPERT_LESSONS.length + READING_PASSAGES.length,
   },

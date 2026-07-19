@@ -254,6 +254,48 @@ function setNavVisible(visible) {
   if (nav) nav.hidden = !visible;
 }
 
+// Local YYYY-MM-DD for a Date (matches gamification's date keys exactly, so
+// the week strip lines up with the recorded practice days).
+function localDateKey(d) {
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+}
+
+// The "days practised" zone on the home screen: current run of days-in-a-row,
+// a strip of the last 7 days (lit for each day practised), and the running
+// totals. Shown for any learner profile with gamification.
+function renderStreakCard() {
+  const card = el("lesson-streak-card");
+  const g = session.state.gamification;
+  if (!g || !session.profile.features.gamification) {
+    card.hidden = true;
+    return;
+  }
+
+  const practiced = new Set(g.practiceDays || []);
+  const initials = ["D", "L", "Ma", "Mi", "J", "V", "S"]; // getDay(): 0=Sun..6=Sat
+  const today = new Date();
+
+  let strip = "";
+  for (let i = 6; i >= 0; i--) {
+    const d = new Date(today);
+    d.setDate(today.getDate() - i);
+    const done = practiced.has(localDateKey(d));
+    const cls = `streak-day${done ? " streak-day--done" : ""}${i === 0 ? " streak-day--today" : ""}`;
+    strip += `<div class="${cls}"><span class="streak-dot"></span><span class="streak-day-label">${initials[d.getDay()]}</span></div>`;
+  }
+
+  const streak = g.currentStreak || 0;
+  card.innerHTML =
+    `<div class="streak-head">` +
+    `<span class="streak-flame">🔥</span>` +
+    `<div class="streak-headtext">` +
+    `<div class="streak-count">${streak} ${streak === 1 ? "zi" : "zile"} la rând!</div>` +
+    `<div class="streak-sub">📅 ${g.totalActiveDays || 0} zile în total · 🏆 record ${g.longestStreak || 0}</div>` +
+    `</div></div>` +
+    `<div class="streak-week">${strip}</div>`;
+  card.hidden = false;
+}
+
 function showMenu() {
   el("lesson-menu-view").hidden = false;
   el("lesson-exercise-view").hidden = true;
@@ -276,6 +318,7 @@ function showMenu() {
   }
 
   renderRewardsCard();
+  renderStreakCard();
 
   const tier = currentTierConfig();
   const bucket = currentStateBucket();
@@ -728,7 +771,10 @@ function showComplete(score, total, newlyUnlocked, rewardInfo = {}) {
     completeAvatar.hidden = false;
     const closer = activeMascotForComplete();
     setMascotAvatar(completeAvatar, closer);
-    el("lesson-complete-line").textContent = `${closer}: ${getLessonCompleteLine(score, total)}`;
+    // A different silly little "antic" (spin, jump, backflip...) every time, so
+    // finishing a lesson always ends with Bobo or Fizz doing something fun.
+    const antic = playMascotAntic(completeAvatar);
+    el("lesson-complete-line").textContent = `${closer}: ${antic} ${getLessonCompleteLine(score, total)}`;
   } else {
     completeAvatar.hidden = true;
     el("lesson-complete-line").textContent = getLessonCompleteLine(score, total);
@@ -804,6 +850,26 @@ function renderCompleteRewards({ rewards, isFirstCompletion, bonusJustEarned }) 
   }
 
   box.hidden = false;
+}
+
+// A random playful "antic" the mascot performs on the completion screen — a
+// spin, a jump, a wobbly backflip. The CSS class drives the motion; the
+// returned text is the matching action shown in the speech bubble, so what the
+// child SEES and READS agree. A fresh pick each time keeps it a little surprise.
+const MASCOT_ANTICS = [
+  { cls: "antic-spin", action: "*does a big happy spin*" },
+  { cls: "antic-jump", action: "*bounces up and down*" },
+  { cls: "antic-wiggle", action: "*wiggles like jelly*" },
+  { cls: "antic-tada", action: "*strikes a superhero pose*" },
+  { cls: "antic-flip", action: "*does a wobbly backflip*" },
+];
+
+function playMascotAntic(avatarEl) {
+  for (const a of MASCOT_ANTICS) avatarEl.classList.remove(a.cls);
+  void avatarEl.offsetWidth; // reflow so the animation replays on repeat completions
+  const pick = MASCOT_ANTICS[Math.floor(Math.random() * MASCOT_ANTICS.length)];
+  avatarEl.classList.add(pick.cls);
+  return pick.action;
 }
 
 // Celebration confetti when a lesson finishes on the mascot tiers — pure
