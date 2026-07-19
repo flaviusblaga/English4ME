@@ -68,9 +68,9 @@ export function getProfile(profileId) {
 export const MEMBERS = [
   { id: "flavius", name: "Flavius", emoji: "💼", kind: "adult", role: "admin", profileId: "business-conversational" },
   { id: "andrea",  name: "Andrea",  emoji: "☕", kind: "adult", role: "admin", profileId: "business-conversational" },
-  { id: "darius",  name: "Darius",  emoji: "🦫", kind: "kid", img: "assets/socatei/bobo-face.png",
+  { id: "darius",  name: "Darius",  emoji: "🦫", kind: "kid", img: "assets/socatei/bobo-sticker.png",
     emails: ["blagadariusmarcus@gmail.com", "dariusmblaga@gmail.com"] },
-  { id: "rares",   name: "Rareș",   emoji: "🐿️", kind: "kid", img: "assets/socatei/fizz-face.png",
+  { id: "rares",   name: "Rareș",   emoji: "🐿️", kind: "kid", img: "assets/socatei/fizz-sticker.png",
     emails: ["blagararesoctavian@gmail.com", "raresoblaga@gmail.com"] },
 ];
 

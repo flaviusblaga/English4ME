@@ -750,6 +750,22 @@ body.mascot-theme .identity-avatar {
 .profile-card--adult .profile-card-icon { background: var(--tile-yellow); }
 .profile-card--kid .profile-card-icon { background: var(--tile-blue); }
 
+/* Kids show the WHOLE die-cut mascot sticker (Bobo for Darius, Fizz for Rareș),
+   not a round face crop — so a taller, transparent, un-clipped tile that fits
+   the standing character. The sticker's own white outline gives the badge look. */
+.profile-card--kid .profile-card-icon {
+  width: 60px;
+  height: 78px;
+  border-radius: 0;
+  background: transparent;
+  overflow: visible;
+}
+.profile-card--kid .profile-card-portrait {
+  object-fit: contain;
+  object-position: bottom center;
+  filter: drop-shadow(0 2px 3px rgba(16, 74, 88, 0.28));
+}
+
 /* "Recomandat" badge on the level picker (highlights the test's suggestion,
    without locking the others). */
 .level-recommended-badge {
