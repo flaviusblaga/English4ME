@@ -265,6 +265,9 @@ function localDateKey(d) {
 // totals. Shown for any learner profile with gamification.
 function renderStreakCard() {
   const card = el("lesson-streak-card");
+  // Guard: an older/cached index.html may not have this element yet. Bail out
+  // quietly instead of throwing, which would break the whole lesson menu.
+  if (!card) return;
   const g = session.state.gamification;
   if (!g || !session.profile.features.gamification) {
     card.hidden = true;
@@ -371,6 +374,7 @@ function showMenu() {
 // time per lesson, and the level's money bonus at 100%.
 function renderRewardsCard() {
   const card = el("lesson-rewards-card");
+  if (!card) return; // older/cached index.html without this element — skip, don't crash
   const rewards = computeRewards(session.state, session.profile.contentTier);
   if (!rewards) {
     card.hidden = true;
