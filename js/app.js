@@ -1,4 +1,4 @@
-import { initAuth, signIn, signOut, getAccessToken, whenGoogleReady, wasSignedIn } from "./auth.js";
+import { initAuth, signIn, signOut, getAccessToken, whenGoogleReady, restoreSession } from "./auth.js";
 import { getOrCreateState } from "./drive.js";
 import { initChat } from "./chat.js";
 import { initLessons } from "./lessons.js";
@@ -308,24 +308,20 @@ function wireSettingsToggle(btnId, panelId) {
   });
 }
 
-// Silently restore a previous session so a page refresh never forces a manual
-// re-login. The access token lives only in memory and dies on reload; here we
-// ask Google for a fresh one WITHOUT any popup (prompt:'' succeeds silently as
-// long as the Google session is still active and consent was granted before).
-// Only an explicit "Sign out" clears the flag, so refresh keeps you in.
-async function restoreOrShowLogin() {
-  if (!wasSignedIn()) {
-    showScreen("login");
-    return;
-  }
-  try {
-    currentUser = await signIn(); // silent for a returning user (prompt:'')
+// Restore a previous session so a refresh never forces a manual re-login. The
+// cached access token is reused directly — no Google call, no popup — so this
+// is instant and reliable. Only an explicit "Sign out", or the token expiring
+// (~1h), ends it. Returns true if a session was restored.
+function restoreOrShowLogin() {
+  const restored = restoreSession();
+  if (restored) {
+    currentUser = restored;
     renderProfilePicker();
     showScreen("profile-picker");
-  } catch {
-    // Session expired or consent revoked — fall back to the normal login.
-    showScreen("login");
+    return true;
   }
+  showScreen("login");
+  return false;
 }
 
 window.addEventListener("DOMContentLoaded", async () => {
@@ -354,17 +350,21 @@ window.addEventListener("DOMContentLoaded", async () => {
   initParentView();
   initPwa();
 
-  // Auth needs the async-loaded Google script; wait for it, then init and try
-  // a silent restore. Guard the button until the token client exists.
+  // Restore instantly from the cached token — no Google needed, so a refresh
+  // never bounces you to the login screen while the token is still valid.
+  restoreOrShowLogin();
+
+  // Google's script is only needed for a fresh sign-in (first time, or after the
+  // token expires). Load it in the background and keep the button disabled until
+  // the token client exists, so a first-time click can't fire too early.
   el("login-btn").disabled = true;
-  try {
-    await whenGoogleReady();
-    initAuth();
-    el("login-btn").disabled = false;
-    await restoreOrShowLogin();
-  } catch (err) {
-    console.error("Auth init failed:", err);
-    el("login-btn").disabled = false;
-    showScreen("login");
-  }
+  whenGoogleReady()
+    .then(() => {
+      initAuth();
+      el("login-btn").disabled = false;
+    })
+    .catch((err) => {
+      console.error("Auth init failed:", err);
+      el("login-btn").disabled = false;
+    });
 });

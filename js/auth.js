@@ -5,11 +5,13 @@ import { CONFIG } from "./config.js";
 // files. Existing users are re-prompted for consent once at next sign-in.
 const SCOPES = "https://www.googleapis.com/auth/drive.appdata https://www.googleapis.com/auth/drive.file openid email profile";
 
-// Remembers that the user completed a real sign-in at least once on this
-// device. The Google access token itself lives only in memory (below) and is
-// lost on every page refresh — this flag is the cue to quietly ask Google for
-// a fresh token on the next load instead of forcing a manual re-login.
-const SIGNED_IN_KEY = "engleza-familie:signed-in";
+// The whole session — the access token, who it belongs to, and when it
+// expires — is cached here so a page refresh REUSES it directly instead of
+// forcing a new Google sign-in. Google access tokens are short-lived (~1 hour);
+// within that window every refresh restores instantly and only an explicit
+// "Sign out" ends the session. (True beyond-1-hour persistence would need a
+// server-side refresh-token flow — a larger change.)
+const SESSION_KEY = "engleza-familie:session";
 
 let tokenClient = null;
 let accessToken = null;
@@ -38,9 +40,44 @@ export function whenGoogleReady(timeoutMs = 10000) {
   });
 }
 
-// True if the user has signed in before — the cue to attempt a silent restore.
-export function wasSignedIn() {
-  return localStorage.getItem(SIGNED_IN_KEY) === "true";
+function storeSession(token, expiresInSeconds, info) {
+  const ttlMs = (Number(expiresInSeconds) > 0 ? Number(expiresInSeconds) : 3600) * 1000;
+  localStorage.setItem(
+    SESSION_KEY,
+    JSON.stringify({
+      accessToken: token,
+      // 60s safety margin so we never hand back a token that dies mid-request
+      expiresAt: Date.now() + ttlMs - 60000,
+      email: info.email,
+      name: info.name,
+    })
+  );
+}
+
+function readStoredSession() {
+  const raw = localStorage.getItem(SESSION_KEY);
+  if (!raw) return null;
+  try {
+    const s = JSON.parse(raw);
+    if (!s.accessToken || !s.expiresAt || Date.now() >= s.expiresAt) return null;
+    return s;
+  } catch {
+    return null;
+  }
+}
+
+// Reuse a still-valid token cached from a previous load — NO Google interaction
+// and no popup, so a refresh restores the session instantly and reliably.
+// Returns userInfo ({ email, name }) or null if there's no usable token.
+export function restoreSession() {
+  const s = readStoredSession();
+  if (!s) {
+    localStorage.removeItem(SESSION_KEY);
+    return null;
+  }
+  accessToken = s.accessToken;
+  userInfo = { email: s.email, name: s.name };
+  return userInfo;
 }
 
 // Called once, after the Google Identity Services script (gsi/client) has loaded.
@@ -62,7 +99,7 @@ export function signIn() {
       accessToken = response.access_token;
       try {
         userInfo = await fetchUserInfo(accessToken);
-        localStorage.setItem(SIGNED_IN_KEY, "true"); // enable silent restore on future loads
+        storeSession(accessToken, response.expires_in, userInfo); // survive refreshes
         resolve(userInfo);
       } catch (err) {
         reject(err);
@@ -80,7 +117,7 @@ export function signOut() {
   }
   accessToken = null;
   userInfo = null;
-  localStorage.removeItem(SIGNED_IN_KEY); // an explicit sign-out must NOT silently restore
+  localStorage.removeItem(SESSION_KEY); // an explicit sign-out ends the cached session
 }
 
 export function getAccessToken() {
