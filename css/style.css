@@ -1336,6 +1336,16 @@ body.mascot-theme .chat-bubble--assistant {
   text-align: left;
 }
 
+/* Picture-match: the options ARE emoji, so render them large enough for a
+   child to tell apart at a glance. Higher specificity than the mobile rule
+   below, so it wins there too. */
+.lesson-options-grid--emoji .lesson-option-btn {
+  font-size: 3.6rem;
+  line-height: 1;
+  padding: 0.6rem 0.4rem;
+  min-height: 104px;
+}
+
 .lesson-option-btn {
   background: var(--surface-raised);
   color: var(--text);

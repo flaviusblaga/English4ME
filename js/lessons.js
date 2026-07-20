@@ -532,6 +532,9 @@ function renderQuestion() {
     question.type === "picture-sentence" ||
     (question.type === "grammar-mcq" && question.options.some((o) => o.value.length > 18));
   optionsGrid.classList.toggle("lesson-options-grid--sentences", hasLongOptions);
+  // "picture" is the only type whose OPTIONS are emoji (pick the picture for the
+  // word) — render those big so a child can actually tell them apart.
+  optionsGrid.classList.toggle("lesson-options-grid--emoji", question.type === "picture");
 
   optionsGrid.innerHTML = "";
   for (const option of question.options) {
