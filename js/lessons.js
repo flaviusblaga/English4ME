@@ -994,6 +994,19 @@ function renderLessonSummary() {
   heading.textContent = usesMascots ? "📋 Lesson recap · Ce ai învățat azi" : "📋 Lesson recap";
   summary.appendChild(heading);
 
+  // Show the EXERCISE score here too, so it never seems to disagree with the
+  // word groups below. A word appears in a few exercises, so "2 words to
+  // practice" and, say, "13/16 exercises" are both true — spelling out the
+  // exercise count removes the confusion.
+  const exerciseTotal = currentQueue.length;
+  const exerciseCorrect = currentQueue.filter((q) => q.wasCorrect).length;
+  const sub = document.createElement("p");
+  sub.className = "lesson-summary-sub";
+  sub.textContent = usesMascots
+    ? `Ai făcut bine ${exerciseCorrect} din ${exerciseTotal} exerciții! Mai jos, grupate pe cuvinte:`
+    : `${exerciseCorrect} of ${exerciseTotal} exercises correct. Grouped by word below:`;
+  summary.appendChild(sub);
+
   function addGroup(titleText, cssClass, entries, showExplain) {
     if (entries.length === 0) return;
     const group = document.createElement("div");
@@ -1023,8 +1036,10 @@ function renderLessonSummary() {
     knew,
     false
   );
+  const practiceWord = practice.length === 1 ? "word" : "words";
+  const practiceCuv = practice.length === 1 ? "cuvânt" : "cuvinte";
   addGroup(
-    usesMascots ? "🔁 Practice these again · Mai exersează-le" : "🔁 Worth another look",
+    usesMascots ? `🔁 Practice these words · ${practice.length} ${practiceCuv} de reluat` : "🔁 Words worth another look",
     "lesson-summary-group--practice",
     practice,
     true
@@ -1038,8 +1053,8 @@ function renderLessonSummary() {
       : "🎉 Perfect run — every single one!";
   } else {
     cheer.textContent = usesMascots
-      ? `💪 You finished the whole lesson — great job! Next time those ${practice.length} will be yours too! · Ai terminat toată lecția — data viitoare le prinzi și pe celelalte!`
-      : `💪 Solid work finishing the lesson — those ${practice.length} will stick next time.`;
+      ? `💪 Ai terminat toată lecția — bravo! Mai exersează cele ${practice.length} ${practiceCuv} de mai sus și le prinzi data viitoare!`
+      : `💪 Solid work — the ${practice.length} ${practiceWord} above will stick with a little more practice.`;
   }
   summary.appendChild(cheer);
 
