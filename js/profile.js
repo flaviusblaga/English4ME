@@ -82,6 +82,10 @@ export const FAMILIES = [
   {
     id: "blaga",
     name: "Familia Blaga",
+    // Publishes a progress report as a Google Doc in the CHILD's own Drive,
+    // shared with this family's adults. Nothing is stored by the app owner, so
+    // this is the option to give families outside his household.
+    driveReport: true,
     members: [
       { id: "flavius", name: "Flavius", emoji: "💼", kind: "adult", role: "admin",
         profileId: "business-conversational", emails: ["flaviusblaga@gmail.com"] },
@@ -160,6 +164,22 @@ export function getMember(memberId) {
   const member = MEMBERS.find((m) => m.id === memberId);
   if (!member) throw new Error(`Unknown memberId: ${memberId}`);
   return member;
+}
+
+// Addresses a child's progress report should be shared with — the adults of
+// that child's own family, and nobody else.
+//
+// Empty (so the feature switches itself off) when the signed-in account isn't
+// a child's, or when the family hasn't enabled reports. The kid check matters:
+// a parent trying out a child's tile is signed in as themselves, and without it
+// they'd publish a report about their own session to their spouse.
+export function parentEmailsForEmail(email) {
+  const found = lookupEmail(email);
+  if (!found || found.member.kind !== "kid") return [];
+  if (!found.family.driveReport) return [];
+  return found.family.members
+    .filter((m) => m.kind === "adult")
+    .flatMap((m) => m.emails || []);
 }
 
 // A kid's placement result (which profile the test put them in) is remembered

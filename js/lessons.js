@@ -1,4 +1,6 @@
 import { saveState, saveRecapToDrive } from "./drive.js";
+import { publishProgressDoc } from "./progress-doc.js";
+import { parentEmailsForEmail } from "./profile.js";
 import { syncProgress } from "./worker-client.js";
 import { updateGamificationAfterLesson, BADGES } from "./gamification.js";
 import { computeRewards, gamificationWithRewards, SCREEN_TIME_PER_LESSON_MIN } from "./rewards.js";
@@ -1017,6 +1019,27 @@ function finishLesson() {
   }
 
   saveState(session.accessToken, session.fileId, session.state);
+
+  // Publishes the parent-readable report into the child's own Drive. Throttled
+  // to once a day inside publishProgressDoc, so calling it after every lesson
+  // costs nothing. Deliberately fire-and-forget: the child moves straight on to
+  // the completion screen regardless of what Drive does.
+  const parentEmails = parentEmailsForEmail(session.userEmail);
+  if (parentEmails.length) {
+    publishProgressDoc({
+      accessToken: session.accessToken,
+      state: session.state,
+      memberName: session.displayName,
+      profileId: session.profile.id,
+      parentEmails,
+    })
+      .then(({ changed }) => {
+        // The doc's id and share list live in the state file, so a successful
+        // publish has to be persisted or the next session makes a second doc.
+        if (changed) saveState(session.accessToken, session.fileId, session.state);
+      })
+      .catch((err) => console.warn("Progress report failed (non-fatal):", err));
+  }
 
   if (session.profile.features.parentVisible) {
     syncProgress({
