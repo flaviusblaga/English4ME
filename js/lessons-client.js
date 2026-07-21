@@ -693,6 +693,37 @@ export function buildExerciseQueue(lesson) {
   return shuffle(questions);
 }
 
+// ---- Spaced-repetition support: every word practised in MANY ways ----------
+// Each word can be drilled with several exercise types. "recognition" types
+// (see it, pick it) come first while a word is new; "production" types (recall
+// it, say it) take over as it becomes known — output beats input.
+export const BEGINNER_EXERCISE_TYPES = [
+  { type: "picture", tier: "recognition" },      // word shown → pick the picture
+  { type: "listen", tier: "recognition" },       // word SPOKEN → pick the picture
+  { type: "en-ro", tier: "recognition" },        // English shown → pick the Romanian
+  { type: "translation", tier: "production" },   // Romanian shown → recall the English
+  // "say" (spoken answer) is built but not scheduled yet — it needs the mic UI.
+];
+
+// Every Beginner word across all themes — the pool the daily practice draws on.
+export const ALL_BEGINNER_WORDS = LESSONS.flatMap((l) => l.words);
+
+export function buildWordQuestion(word, allWords, type) {
+  switch (type) {
+    case "listen":
+      return { type, word, options: buildOptions(allWords, word, "emoji") };
+    case "en-ro":
+      return { type, word, options: buildOptions(allWords, word, "ro") };
+    case "translation":
+      return { type, word, options: buildOptions(allWords, word, "en") };
+    case "say":
+      return { type, word, options: [] }; // spoken answer, no buttons
+    case "picture":
+    default:
+      return { type: "picture", word, options: buildOptions(allWords, word, "emoji") };
+  }
+}
+
 function buildBlankOptions(sentence) {
   const options = [
     { value: sentence.blankWord, isCorrect: true },
@@ -727,6 +758,33 @@ export function buildSentenceExerciseQueue(lesson) {
   return shuffle(questions);
 }
 
+// ---- Spaced-repetition support for Intermediate sentences -----------------
+export const INTERMEDIATE_EXERCISE_TYPES = [
+  { type: "picture-sentence", tier: "recognition" },
+  { type: "fill-blank", tier: "recognition" },
+  { type: "listen-sentence", tier: "recognition" }, // sentence SPOKEN → pick it
+  { type: "unscramble", tier: "production" },       // rebuild it word by word
+  // "say-sentence" (spoken answer) is built but not scheduled yet — needs mic UI.
+];
+
+export const ALL_INTERMEDIATE_SENTENCES = SENTENCE_LESSONS.flatMap((l) => l.sentences);
+
+export function buildSentenceQuestion(sentence, type) {
+  switch (type) {
+    case "unscramble":
+      return { type, sentence, tokens: shuffle(sentence.en.split(" ")) };
+    case "picture-sentence":
+      return { type, sentence, options: buildPictureSentenceOptions(sentence) };
+    case "listen-sentence":
+      return { type, sentence, options: buildPictureSentenceOptions(sentence) };
+    case "say-sentence":
+      return { type, sentence, options: [] };
+    case "fill-blank":
+    default:
+      return { type: "fill-blank", sentence, options: buildBlankOptions(sentence) };
+  }
+}
+
 export function getRandomLine(lines) {
   return lines[Math.floor(Math.random() * lines.length)];
 }
@@ -746,6 +804,16 @@ export const QUESTION_STEM_LINES = {
     "Ooh, tricky! Which English word means this?",
     "I bet you know this one — can you?",
   ],
+  listen: [
+    "Listen carefully — which picture is it?",
+    "Ears ready! Tap the speaker and pick the picture!",
+    "Ooh, a listening one! What did you hear?",
+  ],
+  "en-ro": [
+    "What does this word mean in Romanian?",
+    "Ce înseamnă cuvântul ăsta? Alege în română!",
+    "You know this one — which Romanian word is it?",
+  ],
 };
 
 export const SENTENCE_QUESTION_STEM_LINES = {
@@ -763,6 +831,11 @@ export const SENTENCE_QUESTION_STEM_LINES = {
     "Which sentence matches this picture?",
     "Can you pick the sentence that's really true?",
     "Ooh, look closely — which one is right?",
+  ],
+  "listen-sentence": [
+    "Listen! Which sentence did you hear?",
+    "Ears on! Tap the speaker, then pick the sentence.",
+    "Ooh, a listening one — what did I just say?",
   ],
 };
 

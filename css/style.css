@@ -1876,6 +1876,44 @@ body.mascot-theme .chat-bubble--assistant {
   margin: 0 var(--sp-4) var(--sp-3);
 }
 
+/* ---------- Daily practice (spaced repetition) card ---------- */
+.daily-card {
+  margin: 0 var(--sp-4) var(--sp-3);
+  background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+  color: #fff;
+  border-radius: var(--r-lg);
+  padding: var(--sp-4);
+  box-shadow: var(--shadow-md);
+  text-align: center;
+}
+
+.daily-card-title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: var(--fs-md);
+}
+
+.daily-card-line {
+  margin: 4px 0 0;
+  font-weight: 700;
+  font-size: var(--fs-sm);
+}
+
+.daily-card-progress {
+  margin: 2px 0 0;
+  font-size: var(--fs-xs);
+  opacity: 0.85;
+}
+
+.daily-card-btn {
+  margin-top: var(--sp-3);
+  width: 100%;
+  background: #fff;
+  color: var(--primary-dark);
+  box-shadow: none;
+}
+
 /* ---------- Days-practised (streak) zone ---------- */
 .streak-card {
   margin: 0 var(--sp-4) var(--sp-3);

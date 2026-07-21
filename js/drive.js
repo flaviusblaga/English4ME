@@ -31,6 +31,12 @@ function applyFeatureDefaults(state, features) {
     state.gamification.practiceDays = [];
   }
 
+  // Spaced-repetition memory: per content tier, per word/sentence mastery and
+  // due date. Additive — an existing file simply starts with an empty book.
+  if (features && features.lessons && !state.srs) {
+    state.srs = {}; // { beginner: { "dog": { level, due, seen, wrong } }, ... }
+  }
+
   if (features && features.parentVisible && !state.parentSync) {
     state.parentSync = {
       todayDate: null,

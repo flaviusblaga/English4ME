@@ -25,7 +25,20 @@ import {
   INCORRECT_REACTION_LINES,
   LESSON_MENU_INTRO_LINES,
   getLessonCompleteLine,
+  ALL_BEGINNER_WORDS,
+  BEGINNER_EXERCISE_TYPES,
+  buildWordQuestion,
+  ALL_INTERMEDIATE_SENTENCES,
+  INTERMEDIATE_EXERCISE_TYPES,
+  buildSentenceQuestion,
 } from "./lessons-client.js";
+import {
+  buildDailyItems,
+  recordAnswer,
+  getEntry,
+  srsStats,
+  exerciseTypeForLevel,
+} from "./srs.js";
 import {
   ADVANCED_LESSONS,
   EXPERT_LESSONS,
@@ -51,6 +64,12 @@ const TIER_CONFIG = {
     stateKey: "lessons",
     masteryField: "wordsEverCorrect", // unchanged field name — matches existing saved Beginner data
     maxScore: (lesson) => lesson.words.length * 2,
+    // Daily-practice (spaced repetition) support: the whole-tier item pool and
+    // the exercise types a single item can be drilled with.
+    pool: ALL_BEGINNER_WORDS,
+    exerciseTypes: BEGINNER_EXERCISE_TYPES,
+    itemLabel: (w) => w.en,
+    buildQuestion: (item, pool, type) => buildWordQuestion(item, pool, type),
   },
   intermediate: {
     lessonSet: SENTENCE_LESSONS,
@@ -60,6 +79,10 @@ const TIER_CONFIG = {
     stateKey: "lessonsIntermediate",
     masteryField: "itemsEverCorrect",
     maxScore: (lesson) => lesson.sentences.length * 3,
+    pool: ALL_INTERMEDIATE_SENTENCES,
+    exerciseTypes: INTERMEDIATE_EXERCISE_TYPES,
+    itemLabel: (s) => s.en,
+    buildQuestion: (item, pool, type) => buildSentenceQuestion(item, type),
   },
   advanced: {
     lessonSet: ADVANCED_LESSONS,
@@ -90,6 +113,7 @@ let currentQueue = [];
 let currentIndex = 0;
 let currentScore = 0;
 let currentLesson = null;
+let isDailyPractice = false; // true while running a spaced-repetition session
 
 function el(id) {
   return document.getElementById(id);
@@ -130,6 +154,9 @@ function getItemTranslation(question) {
 function questionTypeLabel(type) {
   switch (type) {
     case "picture": return "Picture match";
+    case "listen": return "Listening";
+    case "listen-sentence": return "Listening (sentence)";
+    case "en-ro": return "English → Romanian";
     case "translation": return "Translation match";
     case "fill-blank": return "Fill-in-the-blank";
     case "unscramble": return "Word order";
@@ -299,6 +326,55 @@ function renderStreakCard() {
   card.hidden = false;
 }
 
+// The daily-practice entry point: how many words are due for review today plus
+// how many brand-new ones are waiting, and a button to start. This is what
+// brings a child back day after day once the themed lessons are all played.
+function renderDailyCard() {
+  const card = el("lesson-daily-card");
+  if (!card) return;
+  const tier = currentTierConfig();
+  if (!tier.pool) {
+    card.hidden = true;
+    return;
+  }
+
+  const contentTier = session.profile.contentTier;
+  const labels = tier.pool.map(tier.itemLabel);
+  const stats = srsStats(session.state, contentTier, labels);
+  const { due, fresh } = buildDailyItems(session.state, contentTier, labels, { maxDue: 14, maxNew: 6 });
+  const sessionSize = due.length + fresh.length;
+
+  card.innerHTML = "";
+
+  const title = document.createElement("p");
+  title.className = "daily-card-title";
+  title.textContent = "🎯 Practica de azi";
+  card.appendChild(title);
+
+  const line = document.createElement("p");
+  line.className = "daily-card-line";
+  line.textContent = sessionSize
+    ? `${due.length} de repetat · ${fresh.length} cuvinte noi`
+    : "Ai terminat tot pentru azi — revino mâine! 🎉";
+  card.appendChild(line);
+
+  const progress = document.createElement("p");
+  progress.className = "daily-card-progress";
+  progress.textContent = `🌟 ${stats.mastered} știute · 📚 ${stats.learning} în lucru · din ${stats.total}`;
+  card.appendChild(progress);
+
+  if (sessionSize) {
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "btn btn-primary daily-card-btn";
+    btn.textContent = `Începe (${sessionSize})`;
+    btn.addEventListener("click", startDailyPractice);
+    card.appendChild(btn);
+  }
+
+  card.hidden = false;
+}
+
 function showMenu() {
   el("lesson-menu-view").hidden = false;
   el("lesson-exercise-view").hidden = true;
@@ -320,6 +396,7 @@ function showMenu() {
     menuIntroRow.hidden = true;
   }
 
+  renderDailyCard();
   renderRewardsCard();
   renderStreakCard();
 
@@ -429,8 +506,50 @@ function starsForScore(score, max) {
   return 0;
 }
 
+// Today's spaced-repetition session: everything due for review, topped up with
+// a few brand-new words. Each item is drilled with an exercise type matched to
+// how well it is already known (recognition first, production once it sticks),
+// so the same vocabulary keeps producing fresh practice for months.
+function startDailyPractice() {
+  const tier = currentTierConfig();
+  if (!tier.pool) return;
+  const contentTier = session.profile.contentTier;
+
+  const labels = tier.pool.map(tier.itemLabel);
+  const { all } = buildDailyItems(session.state, contentTier, labels, { maxDue: 14, maxNew: 6 });
+  if (all.length === 0) return;
+
+  const byLabel = new Map(tier.pool.map((i) => [tier.itemLabel(i), i]));
+  const questions = all.map((label) => {
+    const item = byLabel.get(label);
+    const entry = getEntry(session.state, contentTier, label);
+    const type = exerciseTypeForLevel(entry ? entry.level : 0, tier.exerciseTypes);
+    return tier.buildQuestion(item, tier.pool, type);
+  });
+
+  // Fisher-Yates so review and new items are interleaved, not grouped.
+  for (let i = questions.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [questions[i], questions[j]] = [questions[j], questions[i]];
+  }
+
+  isDailyPractice = true;
+  currentLesson = { id: "__daily__", label: "Practica de azi" };
+  currentQueue = questions;
+  currentIndex = 0;
+  currentScore = 0;
+
+  el("lesson-menu-view").hidden = true;
+  el("lesson-exercise-view").hidden = false;
+  el("lesson-complete-view").hidden = true;
+  setNavVisible(false);
+
+  renderQuestion();
+}
+
 function startLesson(lessonId) {
   const tier = currentTierConfig();
+  isDailyPractice = false;
   currentLesson = tier.getLessonFn(lessonId);
   currentQueue = tier.buildQueue(currentLesson);
   currentIndex = 0;
@@ -496,6 +615,21 @@ function renderQuestion() {
     stem.textContent = question.word.en;
     spokenTarget = question.word.en;
     canReplayNow = true;
+  } else if (question.type === "listen") {
+    // Listening drill: the WORD is the audio, never shown as text.
+    stem.textContent = "🔊";
+    spokenTarget = question.word.en;
+    canReplayNow = true;
+  } else if (question.type === "en-ro") {
+    // English shown, pick the Romanian meaning — hearing it helps, and the
+    // answer (Romanian) isn't given away.
+    stem.textContent = question.word.en;
+    spokenTarget = question.word.en;
+    canReplayNow = true;
+  } else if (question.type === "listen-sentence") {
+    stem.textContent = "🔊";
+    spokenTarget = question.sentence.en;
+    canReplayNow = true;
   } else if (question.type === "translation") {
     stem.textContent = question.word.ro;
   } else if (question.type === "fill-blank") {
@@ -534,7 +668,10 @@ function renderQuestion() {
   optionsGrid.classList.toggle("lesson-options-grid--sentences", hasLongOptions);
   // "picture" is the only type whose OPTIONS are emoji (pick the picture for the
   // word) — render those big so a child can actually tell them apart.
-  optionsGrid.classList.toggle("lesson-options-grid--emoji", question.type === "picture");
+  optionsGrid.classList.toggle(
+    "lesson-options-grid--emoji",
+    question.type === "picture" || question.type === "listen"
+  );
 
   optionsGrid.innerHTML = "";
   for (const option of question.options) {
@@ -628,6 +765,13 @@ function finalizeAnswer(question, wasCorrect) {
   question.wasCorrect = wasCorrect; // recorded for the lesson-completion mastery summary
   if (wasCorrect) currentScore += 1;
 
+  // Feed the spaced-repetition schedule from EVERY answer — a normal themed
+  // lesson advances mastery just like the daily review does, so the two share
+  // one memory of what this child actually knows.
+  if (currentTierConfig().pool) {
+    recordAnswer(session.state, session.profile.contentTier, getItemLabel(question), wasCorrect);
+  }
+
   const usesMascots = session.profile.features.mascots;
   const reactionAvatar = el("lesson-reaction-avatar");
   const spokenAnswer = getSpokenAnswer(question);
@@ -705,21 +849,25 @@ function finishLesson() {
   // the final lesson is detectable as "the bonus was JUST earned".
   const rewardsBefore = computeRewards(session.state, session.profile.contentTier);
 
-  const existing = bucket.completed[currentLesson.id];
-  const masteredSet = new Set(existing ? existing[tier.masteryField] : []);
-  // An item counts once it's been answered correctly at least once, in this
-  // or any past attempt — a simple accumulating mastery set, not a full
-  // per-attempt history (see plan's fast-follow for spaced repetition).
-  for (const q of currentQueue) {
-    if (q.wasCorrect) masteredSet.add(getItemLabel(q));
-  }
+  // The daily review isn't a themed lesson, so there is no lesson to mark as
+  // completed — its progress lives entirely in the spaced-repetition schedule
+  // (already updated per answer in finalizeAnswer).
+  const existing = isDailyPractice ? null : bucket.completed[currentLesson.id];
+  if (!isDailyPractice) {
+    const masteredSet = new Set(existing ? existing[tier.masteryField] : []);
+    // An item counts once it's been answered correctly at least once, in this
+    // or any past attempt — a simple accumulating mastery set.
+    for (const q of currentQueue) {
+      if (q.wasCorrect) masteredSet.add(getItemLabel(q));
+    }
 
-  bucket.completed[currentLesson.id] = {
-    bestScore: existing ? Math.max(existing.bestScore, score) : score,
-    attempts: existing ? existing.attempts + 1 : 1,
-    lastCompletedAt: new Date().toISOString(),
-    [tier.masteryField]: [...masteredSet],
-  };
+    bucket.completed[currentLesson.id] = {
+      bestScore: existing ? Math.max(existing.bestScore, score) : score,
+      attempts: existing ? existing.attempts + 1 : 1,
+      lastCompletedAt: new Date().toISOString(),
+      [tier.masteryField]: [...masteredSet],
+    };
+  }
 
   const newlyUnlocked = updateGamificationAfterLesson(session.state);
   renderGamificationBar();
