@@ -107,6 +107,61 @@ export function stopListening() {
   if (recognizer) recognizer.stop();
 }
 
+// One-shot recognition for the pronunciation exercises. Deliberately creates
+// its OWN recognizer instead of reusing the chat one above, so a lesson can
+// listen without disturbing (or being disturbed by) the chat's voice input.
+// Resolves with the recognised text (may be empty), rejects if unsupported or
+// on a hard error. Always stops itself, so the mic never stays open.
+export function recognizeOnce({ lang = "en-US", timeoutMs = 7000 } = {}) {
+  return new Promise((resolve, reject) => {
+    if (!SpeechRecognitionCtor) {
+      reject(new Error("unsupported"));
+      return;
+    }
+    const rec = new SpeechRecognitionCtor();
+    rec.lang = lang;
+    rec.continuous = false;
+    rec.interimResults = false;
+    rec.maxAlternatives = 3;
+
+    let settled = false;
+    const finish = (fn, value) => {
+      if (settled) return;
+      settled = true;
+      clearTimeout(timer);
+      try { rec.stop(); } catch { /* already stopped */ }
+      fn(value);
+    };
+
+    const timer = setTimeout(() => finish(resolve, ""), timeoutMs);
+
+    rec.onresult = (event) => {
+      // Collect every alternative — a child's pronunciation often lands on the
+      // 2nd or 3rd guess, and the caller decides how forgiving to be.
+      const alternatives = [];
+      for (const result of event.results) {
+        for (let i = 0; i < result.length; i++) alternatives.push(result[i].transcript);
+      }
+      finish(resolve, alternatives.join(" | "));
+    };
+    rec.onerror = (e) => {
+      if (e && (e.error === "no-speech" || e.error === "aborted")) finish(resolve, "");
+      else finish(reject, new Error(e && e.error ? e.error : "speech-error"));
+    };
+    rec.onend = () => finish(resolve, "");
+
+    try {
+      rec.start();
+    } catch (err) {
+      finish(reject, err);
+    }
+  });
+}
+
+export function isSpeechInputAvailable() {
+  return !!SpeechRecognitionCtor;
+}
+
 export function isTtsMuted() {
   return localStorage.getItem(TTS_MUTE_KEY) === "true";
 }

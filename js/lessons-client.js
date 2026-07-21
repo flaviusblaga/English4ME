@@ -1428,7 +1428,8 @@ export const BEGINNER_EXERCISE_TYPES = [
   { type: "listen", tier: "recognition" },       // word SPOKEN → pick the picture
   { type: "en-ro", tier: "recognition" },        // English shown → pick the Romanian
   { type: "translation", tier: "production" },   // Romanian shown → recall the English
-  // "say" (spoken answer) is built but not scheduled yet — it needs the mic UI.
+  { type: "say", tier: "production" },           // say it out loud (pronunciation)
+  { type: "spell", tier: "production" },         // build the word letter by letter
 ];
 
 // Every Beginner word across all themes — the pool the daily practice draws on.
@@ -1444,6 +1445,10 @@ export function buildWordQuestion(word, allWords, type) {
       return { type, word, options: buildOptions(allWords, word, "en") };
     case "say":
       return { type, word, options: [] }; // spoken answer, no buttons
+    case "spell":
+      // Letter chips to tap in order. Spaces are kept as their own chip so
+      // two-word entries ("ice cream") still work.
+      return { type, word, options: [], tokens: shuffle(word.en.split("")) };
     case "picture":
     default:
       return { type: "picture", word, options: buildOptions(allWords, word, "emoji") };
@@ -1490,7 +1495,7 @@ export const INTERMEDIATE_EXERCISE_TYPES = [
   { type: "fill-blank", tier: "recognition" },
   { type: "listen-sentence", tier: "recognition" }, // sentence SPOKEN → pick it
   { type: "unscramble", tier: "production" },       // rebuild it word by word
-  // "say-sentence" (spoken answer) is built but not scheduled yet — needs mic UI.
+  { type: "say-sentence", tier: "production" },     // say the whole sentence out loud
 ];
 
 export const ALL_INTERMEDIATE_SENTENCES = SENTENCE_LESSONS.flatMap((l) => l.sentences);
@@ -1540,6 +1545,16 @@ export const QUESTION_STEM_LINES = {
     "Ce înseamnă cuvântul ăsta? Alege în română!",
     "You know this one — which Romanian word is it?",
   ],
+  say: [
+    "Your turn to talk! Say it out loud!",
+    "Ooh, say this one for us — nice and clear!",
+    "Tap the microphone and say the word!",
+  ],
+  spell: [
+    "Can you build the word, letter by letter?",
+    "Ooh, the letters got mixed up! Put them back!",
+    "Tap the letters in the right order!",
+  ],
 };
 
 export const SENTENCE_QUESTION_STEM_LINES = {
@@ -1562,6 +1577,11 @@ export const SENTENCE_QUESTION_STEM_LINES = {
     "Listen! Which sentence did you hear?",
     "Ears on! Tap the speaker, then pick the sentence.",
     "Ooh, a listening one — what did I just say?",
+  ],
+  "say-sentence": [
+    "Read it out loud — the whole sentence!",
+    "Tap the microphone and say the sentence!",
+    "Your turn to speak! Say it nice and clear.",
   ],
 };
 

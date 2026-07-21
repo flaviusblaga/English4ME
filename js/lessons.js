@@ -10,7 +10,7 @@ import {
   getMascotPreference,
   setMascotPreference,
 } from "./chat.js";
-import { speak } from "./voice.js";
+import { speak, recognizeOnce, isSpeechInputAvailable } from "./voice.js";
 import {
   LESSONS,
   getLesson,
@@ -157,6 +157,9 @@ function questionTypeLabel(type) {
     case "listen": return "Listening";
     case "listen-sentence": return "Listening (sentence)";
     case "en-ro": return "English → Romanian";
+    case "say": return "Pronunciation";
+    case "say-sentence": return "Pronunciation (sentence)";
+    case "spell": return "Spelling";
     case "translation": return "Translation match";
     case "fill-blank": return "Fill-in-the-blank";
     case "unscramble": return "Word order";
@@ -595,12 +598,47 @@ function renderQuestion() {
   const stem = el("lesson-question-stem");
   const optionsGrid = el("lesson-options-grid");
   const unscrambleArea = el("lesson-unscramble-area");
+  const sayArea = el("lesson-say-area");
+  if (sayArea) sayArea.hidden = true;
 
   if (question.type === "unscramble") {
     stem.hidden = true;
     optionsGrid.hidden = true;
     unscrambleArea.hidden = false;
-    renderUnscramble(question);
+    renderUnscramble(question, { target: question.sentence.en, joiner: " " });
+    return;
+  }
+
+  // Spelling: build the English word letter by letter. The prompt shows the
+  // picture and the Romanian meaning — never the English, that IS the answer.
+  if (question.type === "spell") {
+    stem.hidden = false;
+    stem.textContent = `${question.word.emoji}  ${question.word.ro}`;
+    stem.className = "lesson-question-stem lesson-question-stem--spell";
+    stem.style.cursor = "default";
+    stem.onclick = null;
+    optionsGrid.hidden = true;
+    unscrambleArea.hidden = false;
+    renderUnscramble(question, { target: question.word.en, joiner: "" });
+    return;
+  }
+
+  // Pronunciation: show the text, model it out loud, then let the child say it.
+  if (question.type === "say" || question.type === "say-sentence") {
+    const target = question.type === "say" ? question.word.en : question.sentence.en;
+    stem.hidden = false;
+    stem.textContent = target;
+    stem.className = `lesson-question-stem lesson-question-stem--${question.type}`;
+    optionsGrid.hidden = true;
+    unscrambleArea.hidden = true;
+
+    // Hear it first, then repeat it — model before production.
+    const askerVoice = MASCOT_VOICES[asker] || KIDS_VOICE_OPTIONS;
+    stem.style.cursor = "pointer";
+    stem.onclick = () => speakAsMascot(target, askerVoice, promptAvatar);
+    speakAsMascot(target, askerVoice, promptAvatar);
+
+    renderSayExercise(question, target);
     return;
   }
 
@@ -687,11 +725,15 @@ function renderQuestion() {
 // Word-chip tap-to-build interaction for the "unscramble" exercise type —
 // tap a bank chip to move it into the build strip (in tap order), tap a
 // build-strip chip to send it back, then "Check" validates exact order.
-function renderUnscramble(question) {
+// Tap-to-build interaction, shared by two exercise types: "unscramble" joins
+// WORD chips with spaces to rebuild a sentence, "spell" joins LETTER chips with
+// nothing to rebuild a word. Only the target string and the joiner differ.
+function renderUnscramble(question, { target, joiner = " " } = {}) {
   const bank = el("lesson-unscramble-bank");
   const build = el("lesson-unscramble-build");
   const checkBtn = el("lesson-unscramble-check-btn");
   const placedIndexes = [];
+  const isLetters = joiner === "";
 
   function draw() {
     bank.innerHTML = "";
@@ -699,8 +741,8 @@ function renderUnscramble(question) {
       if (placedIndexes.includes(idx)) return;
       const chip = document.createElement("button");
       chip.type = "button";
-      chip.className = "word-chip";
-      chip.textContent = token;
+      chip.className = isLetters ? "word-chip word-chip--letter" : "word-chip";
+      chip.textContent = token === " " ? "␣" : token;
       chip.addEventListener("click", () => {
         placedIndexes.push(idx);
         draw();
@@ -712,8 +754,8 @@ function renderUnscramble(question) {
     placedIndexes.forEach((idx, pos) => {
       const chip = document.createElement("button");
       chip.type = "button";
-      chip.className = "word-chip word-chip--placed";
-      chip.textContent = question.tokens[idx];
+      chip.className = isLetters ? "word-chip word-chip--placed word-chip--letter" : "word-chip word-chip--placed";
+      chip.textContent = question.tokens[idx] === " " ? "␣" : question.tokens[idx];
       chip.addEventListener("click", () => {
         placedIndexes.splice(pos, 1);
         draw();
@@ -727,8 +769,8 @@ function renderUnscramble(question) {
 
   checkBtn.onclick = () => {
     checkBtn.disabled = true;
-    const builtSentence = placedIndexes.map((idx) => question.tokens[idx]).join(" ");
-    const wasCorrect = builtSentence === question.sentence.en;
+    const built = placedIndexes.map((idx) => question.tokens[idx]).join(joiner);
+    const wasCorrect = built === target;
     if (!wasCorrect) {
       build.querySelectorAll(".word-chip").forEach((c) => c.classList.add("word-chip--wrong-order"));
     }
@@ -736,6 +778,81 @@ function renderUnscramble(question) {
       c.disabled = true;
     });
     finalizeAnswer(question, wasCorrect);
+  };
+}
+
+// Deliberately forgiving: a child's accent plus browser speech recognition is
+// never exact. A single word passes if any alternative contains it; a sentence
+// passes when most of its words came through. Better to encourage than to fail
+// a child who actually said it fine.
+function matchesSpoken(heard, target) {
+  const norm = (s) => s.toLowerCase().replace(/[^a-z0-9 ]/g, " ").replace(/\s+/g, " ").trim();
+  const wanted = norm(target);
+  if (!wanted) return false;
+  const alternatives = String(heard || "").split("|").map(norm).filter(Boolean);
+  if (!alternatives.length) return false;
+
+  const wantedWords = wanted.split(" ");
+  for (const alt of alternatives) {
+    if (alt === wanted || alt.includes(wanted)) return true;
+    if (wantedWords.length > 1) {
+      const altWords = new Set(alt.split(" "));
+      const hits = wantedWords.filter((w) => altWords.has(w)).length;
+      if (hits / wantedWords.length >= 0.6) return true;
+    }
+  }
+  return false;
+}
+
+function renderSayExercise(question, target) {
+  const sayArea = el("lesson-say-area");
+  const micBtn = el("lesson-mic-btn");
+  const status = el("lesson-say-status");
+  const skipBtn = el("lesson-say-skip-btn");
+  if (!sayArea || !micBtn) return;
+
+  sayArea.hidden = false;
+  micBtn.disabled = false;
+  micBtn.classList.remove("mic-btn--listening");
+  skipBtn.hidden = false;
+
+  const supported = isSpeechInputAvailable();
+
+  if (!supported) {
+    // No speech recognition on this browser: fall back to an honest self-check
+    // rather than pretending to grade something we cannot hear.
+    micBtn.textContent = "✅";
+    status.textContent = "Spune cuvântul cu voce tare, apoi apasă ✅";
+    micBtn.onclick = () => {
+      sayArea.hidden = true;
+      finalizeAnswer(question, true);
+    };
+  } else {
+    micBtn.textContent = "🎤";
+    status.textContent = "Apasă microfonul și spune-l! 🎤";
+    micBtn.onclick = async () => {
+      micBtn.disabled = true;
+      micBtn.classList.add("mic-btn--listening");
+      status.textContent = "Te ascult... 🎧";
+      try {
+        const heard = await recognizeOnce({ lang: "en-US" });
+        const wasCorrect = matchesSpoken(heard, target);
+        const first = String(heard || "").split("|")[0].trim();
+        status.textContent = first ? `Am auzit: „${first}"` : "Nu am auzit nimic 😅";
+        sayArea.hidden = true;
+        finalizeAnswer(question, wasCorrect);
+      } catch {
+        // Mic blocked or unavailable — never trap the child on this question.
+        micBtn.disabled = false;
+        micBtn.classList.remove("mic-btn--listening");
+        status.textContent = "Microfonul nu a mers. Poți sări peste. 🙂";
+      }
+    };
+  }
+
+  skipBtn.onclick = () => {
+    sayArea.hidden = true;
+    finalizeAnswer(question, false); // counts as missed, so it comes back sooner
   };
 }
 
