@@ -102,9 +102,22 @@ function renderProfilePicker() {
 
   const levelLabel = { "kids-primar": "Beginner", "kids-intermediate": "Intermediate", "kids-advanced": "Advanced", "kids-expert": "Expert" };
 
-  // Admins (parents) see every member; a kid signed in with their own Google
-  // account only sees the kids' tiles — never the grown-ups' Business profile.
+  // Adults see their own family; a kid signed in with their own Google account
+  // sees only their own tile — never the grown-ups' Business profile. An
+  // address that belongs to no family sees no tiles at all.
   const visibleMembers = membersForEmail(currentUser ? currentUser.email : null);
+
+  if (visibleMembers.length === 0) {
+    // The Worker refuses this account too, so this is an explanation rather
+    // than the thing keeping them out.
+    const notice = document.createElement("p");
+    notice.className = "profile-picker-empty";
+    notice.textContent = currentUser
+      ? `Contul ${currentUser.email} nu este înscris în nicio familie din aplicație. Cere-i lui Flavius să te adauge.`
+      : "Conectează-te ca să vezi cine învață azi.";
+    list.appendChild(notice);
+    return;
+  }
 
   for (const member of visibleMembers) {
     const card = document.createElement("button");

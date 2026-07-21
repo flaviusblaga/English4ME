@@ -1,11 +1,40 @@
 import { CONFIG } from "./config.js";
+import { getAccessToken } from "./auth.js";
 
-export async function sendChatMessage({ userEmail, profileId, messages, conversationSummary, scenarioId, documentContext, lessonWordList }) {
+// The Worker derives WHO you are from this token and ignores any email in the
+// request itself, so every call must carry it. `userEmail` is still accepted by
+// the callers below for the one case the Worker cannot infer — asking about a
+// specific child — but it is no longer what proves identity.
+function authHeaders(extra) {
+  const token = getAccessToken();
+  if (!token) {
+    const err = new Error("Sesiunea a expirat. Conectează-te din nou.");
+    err.code = "no_session";
+    throw err;
+  }
+  return { authorization: `Bearer ${token}`, ...(extra || {}) };
+}
+
+// Turns a non-OK response into an Error carrying the Worker's own error code,
+// so callers can distinguish "signed out" from "not allowed" from a real fault.
+async function failFrom(response) {
+  let data = {};
+  try {
+    data = await response.json();
+  } catch {
+    /* non-JSON error body — fall back to the status code below */
+  }
+  const err = new Error(data.message || `Worker request failed: ${response.status}`);
+  err.code = data.error || `http_${response.status}`;
+  err.status = response.status;
+  return err;
+}
+
+export async function sendChatMessage({ profileId, messages, conversationSummary, scenarioId, documentContext, lessonWordList }) {
   const response = await fetch(`${CONFIG.WORKER_URL}/chat`, {
     method: "POST",
-    headers: { "content-type": "application/json" },
+    headers: authHeaders({ "content-type": "application/json" }),
     body: JSON.stringify({
-      userEmail,
       profileId,
       messages,
       conversationSummary,
@@ -14,47 +43,35 @@ export async function sendChatMessage({ userEmail, profileId, messages, conversa
       lessonWordList: lessonWordList || null,
     }),
   });
-  if (!response.ok) {
-    throw new Error(`Worker request failed: ${response.status}`);
-  }
+  if (!response.ok) throw await failFrom(response);
   return response.json();
 }
 
-export async function extractDocuments({ userEmail, scenarioId, files }) {
+export async function extractDocuments({ scenarioId, files }) {
   const response = await fetch(`${CONFIG.WORKER_URL}/chat`, {
     method: "POST",
-    headers: { "content-type": "application/json" },
-    body: JSON.stringify({ mode: "extract_documents", userEmail, scenarioId, files }),
+    headers: authHeaders({ "content-type": "application/json" }),
+    body: JSON.stringify({ mode: "extract_documents", scenarioId, files }),
   });
-  const data = await response.json();
-  if (!response.ok) {
-    const err = new Error(data.message || `Worker request failed: ${response.status}`);
-    err.code = data.error;
-    throw err;
-  }
-  return data;
-}
-
-export async function syncProgress({ userEmail, profileId, displayName, gamification, progress, date, turns }) {
-  const response = await fetch(`${CONFIG.WORKER_URL}/progress/sync`, {
-    method: "POST",
-    headers: { "content-type": "application/json" },
-    body: JSON.stringify({ userEmail, profileId, displayName, gamification, progress, date, turns }),
-  });
-  if (!response.ok) {
-    throw new Error(`Progress sync failed: ${response.status}`);
-  }
+  if (!response.ok) throw await failFrom(response);
   return response.json();
 }
 
+export async function syncProgress({ profileId, displayName, gamification, progress, date, turns }) {
+  const response = await fetch(`${CONFIG.WORKER_URL}/progress/sync`, {
+    method: "POST",
+    headers: authHeaders({ "content-type": "application/json" }),
+    body: JSON.stringify({ profileId, displayName, gamification, progress, date, turns }),
+  });
+  if (!response.ok) throw await failFrom(response);
+  return response.json();
+}
+
+// `userEmail` here is the CHILD being asked about, not the caller. The Worker
+// checks that the signed-in adult is in the same family before answering.
 export async function fetchChildProgress({ userEmail, profileId }) {
   const url = `${CONFIG.WORKER_URL}/progress?userEmail=${encodeURIComponent(userEmail)}&profileId=${encodeURIComponent(profileId)}`;
-  const response = await fetch(url);
-  const data = await response.json();
-  if (!response.ok) {
-    const err = new Error(data.message || `Progress fetch failed: ${response.status}`);
-    err.code = data.error;
-    throw err;
-  }
-  return data;
+  const response = await fetch(url, { headers: authHeaders() });
+  if (!response.ok) throw await failFrom(response);
+  return response.json();
 }

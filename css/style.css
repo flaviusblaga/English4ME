@@ -2162,3 +2162,16 @@ body.mascot-theme .mascot-avatar.antic-flip,
 [hidden] {
   display: none !important;
 }
+
+/* Shown instead of member tiles when the signed-in Google account belongs to
+   no family. The Worker refuses it as well — this only explains why. */
+.profile-picker-empty {
+  margin: 0;
+  padding: 1.25rem 1rem;
+  text-align: center;
+  line-height: 1.5;
+  color: var(--text-muted, #5b6b7a);
+  background: var(--surface-alt, rgba(5, 135, 189, 0.06));
+  border: 1px dashed var(--border, rgba(5, 135, 189, 0.35));
+  border-radius: 14px;
+}
