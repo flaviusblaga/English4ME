@@ -310,6 +310,56 @@ body.mascot-theme .btn-primary {
   z-index: 0;
 }
 
+/* Category banner splitting the trail into named groups. It sits ON the dashed
+   spine, so it needs its own background to break the line cleanly — that break
+   is what makes each group read as a separate stage rather than one long path. */
+.lesson-category {
+  position: relative;
+  z-index: 1;
+  align-self: stretch;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 16px;
+  margin: 10px 0 -4px;
+  border-radius: var(--r-lg);
+  background: var(--surface-raised);
+  box-shadow: var(--shadow-sm);
+}
+
+.lesson-category-emoji {
+  font-size: 1.6rem;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.lesson-category-text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  min-width: 0;
+}
+
+.lesson-category-text strong {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1rem;
+}
+
+.lesson-category-text small {
+  color: var(--text-muted);
+  font-size: var(--fs-xs);
+}
+
+/* Finished groups fade back so the eye lands on the one still in progress. */
+.lesson-category--done {
+  opacity: 0.72;
+}
+.lesson-category--done .lesson-category-text small {
+  color: var(--primary);
+  font-weight: 700;
+}
+
 .lesson-node {
   position: relative;
   z-index: 1;

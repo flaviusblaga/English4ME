@@ -5,22 +5,24 @@
 // no double-counting (completed{} is keyed by lesson id, so repeating a
 // lesson never earns twice).
 
-import { LESSONS, SENTENCE_LESSONS } from "./lessons-client.js";
-import { ADVANCED_LESSONS, EXPERT_LESSONS } from "./grammar-client.js";
 import { READING_PASSAGES } from "./reading-client.js";
+import { totalLessons } from "./lesson-structure.js";
 
+// Paid per completed lesson. A lesson is 50 exercises (lesson-structure.js) —
+// before the restructure it was 16, which is how 800 Beginner exercises turned
+// into nearly 17 hours of screen time in a single weekend.
 export const SCREEN_TIME_PER_LESSON_MIN = 20;
 
 // Expert's module includes the reading passages — "finishing the module"
 // means finishing everything the tier offers, and reading is half of Expert.
 const TIER_REWARD_SPECS = {
-  beginner: { bonusLei: 50, buckets: ["lessons"], total: LESSONS.length },
-  intermediate: { bonusLei: 100, buckets: ["lessonsIntermediate"], total: SENTENCE_LESSONS.length },
-  advanced: { bonusLei: 150, buckets: ["lessonsAdvanced"], total: ADVANCED_LESSONS.length },
+  beginner: { bonusLei: 50, buckets: ["lessons"], total: totalLessons("beginner") },
+  intermediate: { bonusLei: 100, buckets: ["lessonsIntermediate"], total: totalLessons("intermediate") },
+  advanced: { bonusLei: 150, buckets: ["lessonsAdvanced"], total: totalLessons("advanced") },
   expert: {
     bonusLei: 200,
     buckets: ["lessonsExpert", "reading"],
-    total: EXPERT_LESSONS.length + READING_PASSAGES.length,
+    total: totalLessons("expert") + READING_PASSAGES.length,
   },
 };
 

@@ -1,6 +1,17 @@
 import { saveState, saveRecapToDrive } from "./drive.js";
 import { publishProgressDoc } from "./progress-doc.js";
 import { parentEmailsForEmail } from "./profile.js";
+import {
+  getCategories,
+  getStructuredLesson,
+  getStructuredLessons,
+  buildFiftyWordQueue,
+  buildFiftySentenceQueue,
+  buildFiftyGrammarQueue,
+  migrateCompletions,
+  needsMigration,
+  EXERCISES_PER_LESSON,
+} from "./lesson-structure.js";
 import { syncProgress } from "./worker-client.js";
 import { updateGamificationAfterLesson, BADGES } from "./gamification.js";
 import { computeRewards, gamificationWithRewards, SCREEN_TIME_PER_LESSON_MIN } from "./rewards.js";
@@ -59,13 +70,13 @@ const MASCOT_AVATARS = {
 // tier's lesson content ships.
 const TIER_CONFIG = {
   beginner: {
-    lessonSet: LESSONS,
-    getLessonFn: getLesson,
-    buildQueue: buildExerciseQueue,
+    lessonSet: getStructuredLessons("beginner"),
+    getLessonFn: (id) => getStructuredLesson("beginner", id),
+    buildQueue: (lesson) => buildFiftyWordQueue(lesson, ALL_BEGINNER_WORDS),
     stemLines: QUESTION_STEM_LINES,
     stateKey: "lessons",
     masteryField: "wordsEverCorrect", // unchanged field name — matches existing saved Beginner data
-    maxScore: (lesson) => lesson.words.length * 2,
+    maxScore: () => EXERCISES_PER_LESSON,
     // Daily-practice (spaced repetition) support: the whole-tier item pool and
     // the exercise types a single item can be drilled with.
     pool: ALL_BEGINNER_WORDS,
@@ -74,35 +85,35 @@ const TIER_CONFIG = {
     buildQuestion: (item, pool, type) => buildWordQuestion(item, pool, type),
   },
   intermediate: {
-    lessonSet: SENTENCE_LESSONS,
-    getLessonFn: getSentenceLesson,
-    buildQueue: buildSentenceExerciseQueue,
+    lessonSet: getStructuredLessons("intermediate"),
+    getLessonFn: (id) => getStructuredLesson("intermediate", id),
+    buildQueue: buildFiftySentenceQueue,
     stemLines: SENTENCE_QUESTION_STEM_LINES,
     stateKey: "lessonsIntermediate",
     masteryField: "itemsEverCorrect",
-    maxScore: (lesson) => lesson.sentences.length * 3,
+    maxScore: () => EXERCISES_PER_LESSON,
     pool: ALL_INTERMEDIATE_SENTENCES,
     exerciseTypes: INTERMEDIATE_EXERCISE_TYPES,
     itemLabel: (s) => s.en,
     buildQuestion: (item, pool, type) => buildSentenceQuestion(item, type),
   },
   advanced: {
-    lessonSet: ADVANCED_LESSONS,
-    getLessonFn: getAdvancedLesson,
-    buildQueue: buildGrammarExerciseQueue,
+    lessonSet: getStructuredLessons("advanced"),
+    getLessonFn: (id) => getStructuredLesson("advanced", id),
+    buildQueue: buildFiftyGrammarQueue,
     stemLines: GRAMMAR_QUESTION_STEM_LINES,
     stateKey: "lessonsAdvanced",
     masteryField: "itemsEverCorrect",
-    maxScore: (lesson) => lesson.questions.length,
+    maxScore: () => EXERCISES_PER_LESSON,
   },
   expert: {
-    lessonSet: EXPERT_LESSONS,
-    getLessonFn: getExpertLesson,
-    buildQueue: buildGrammarExerciseQueue,
+    lessonSet: getStructuredLessons("expert"),
+    getLessonFn: (id) => getStructuredLesson("expert", id),
+    buildQueue: buildFiftyGrammarQueue,
     stemLines: GRAMMAR_QUESTION_STEM_LINES,
     stateKey: "lessonsExpert",
     masteryField: "itemsEverCorrect",
-    maxScore: (lesson) => lesson.questions.length,
+    maxScore: () => EXERCISES_PER_LESSON,
   },
 };
 
@@ -123,6 +134,36 @@ function el(id) {
 
 function currentTierConfig() {
   return TIER_CONFIG[session.profile.contentTier];
+}
+
+// Progress saved before the restructure is keyed by THEME id; the new lessons
+// have their own ids. Without this, a child who had finished everything would
+// open the app to an empty path and be asked to redo all of it.
+//
+// A new lesson is credited only when every theme inside it was already done, so
+// nothing is granted that wasn't earned. The old record is kept under
+// `legacyCompleted` — it is what the pre-restructure screen time was paid on,
+// and throwing it away would make the history unauditable.
+function applyStructureMigration() {
+  const tierName = session.profile.contentTier;
+  const config = TIER_CONFIG[tierName];
+  if (!config) return; // adult profile — no lesson tier
+
+  const bucket = session.state[config.stateKey];
+  if (!bucket || !bucket.completed || !needsMigration(tierName, bucket.completed)) return;
+
+  const { completed, migrated } = migrateCompletions(tierName, bucket.completed);
+  const previousCount = Object.keys(bucket.completed).length;
+  bucket.legacyCompleted = bucket.completed;
+  bucket.legacyScreenTimeMin = previousCount * SCREEN_TIME_PER_LESSON_MIN;
+  bucket.completed = completed;
+
+  saveState(session.accessToken, session.fileId, session.state).catch((err) =>
+    console.warn("Could not save the restructured progress:", err)
+  );
+  console.info(
+    `[lessons] ${tierName}: ${previousCount} old lessons → ${migrated} new lessons of ${EXERCISES_PER_LESSON} exercises`
+  );
 }
 
 function currentStateBucket() {
@@ -232,6 +273,7 @@ function updateLessonMascotSelectUi() {
 
 export function initLessons({ accessToken, userEmail, displayName, fileId, state, profile, onJustChat, onChatAboutIt }) {
   session = { accessToken, userEmail, displayName, fileId, state, profile };
+  applyStructureMigration();
   onJustChatCallback = onJustChat;
   onChatAboutItCallback = onChatAboutIt;
 
@@ -415,40 +457,71 @@ function showMenu() {
   // are coloured with their star count; the first not-yet-finished lesson is
   // marked "current" (pulsing). Every node stays tappable — no hard locking,
   // so kids keep the freedom to replay or jump ahead.
+  // The path is now split into CATEGORIES, each introduced by a banner showing
+  // how far the child is inside that group. Without the banners a 17-node trail
+  // reads as one endless list; with them it reads as five short journeys.
   let currentMarked = false;
-  tier.lessonSet.forEach((lesson, i) => {
-    const record = bucket.completed[lesson.id];
-    const maxScore = tier.maxScore(lesson);
+  let nodeIndex = 0;
 
-    const node = document.createElement("button");
-    node.type = "button";
-    node.className = "lesson-node";
-    node.style.setProperty("--node-shift", i % 2 === 0 ? "36px" : "-36px"); // zig-zag left/right
-    if (record) {
-      node.classList.add("lesson-node--done");
-    } else if (!currentMarked) {
-      node.classList.add("lesson-node--current");
-      currentMarked = true;
+  for (const category of getCategories(session.profile.contentTier)) {
+    const doneInCategory = category.lessons.filter((l) => bucket.completed[l.id]).length;
+
+    const banner = document.createElement("div");
+    banner.className = "lesson-category";
+    if (doneInCategory === category.lessons.length) banner.classList.add("lesson-category--done");
+
+    const badge = document.createElement("span");
+    badge.className = "lesson-category-emoji";
+    badge.textContent = category.emoji;
+    banner.appendChild(badge);
+
+    const titles = document.createElement("span");
+    titles.className = "lesson-category-text";
+    const name = document.createElement("strong");
+    name.textContent = category.label;
+    const count = document.createElement("small");
+    count.textContent = `${doneInCategory}/${category.lessons.length} lecții`;
+    titles.append(name, count);
+    banner.appendChild(titles);
+
+    grid.appendChild(banner);
+
+    for (const lesson of category.lessons) {
+      const record = bucket.completed[lesson.id];
+      const maxScore = tier.maxScore(lesson);
+
+      const node = document.createElement("button");
+      node.type = "button";
+      node.className = "lesson-node";
+      // zig-zag left/right, continuing across categories so the trail stays one line
+      node.style.setProperty("--node-shift", nodeIndex % 2 === 0 ? "36px" : "-36px");
+      nodeIndex++;
+      if (record) {
+        node.classList.add("lesson-node--done");
+      } else if (!currentMarked) {
+        node.classList.add("lesson-node--current");
+        currentMarked = true;
+      }
+
+      const circle = document.createElement("span");
+      circle.className = "lesson-node-circle";
+      circle.textContent = lesson.emoji || "📘";
+      node.appendChild(circle);
+
+      const label = document.createElement("span");
+      label.className = "lesson-node-label";
+      label.textContent = lesson.label;
+      node.appendChild(label);
+
+      const stars = document.createElement("span");
+      stars.className = "lesson-node-stars";
+      stars.textContent = record ? ("⭐".repeat(starsForScore(record.bestScore, maxScore)) || "·") : "";
+      node.appendChild(stars);
+
+      node.addEventListener("click", () => startLesson(lesson.id));
+      grid.appendChild(node);
     }
-
-    const circle = document.createElement("span");
-    circle.className = "lesson-node-circle";
-    circle.textContent = lesson.emoji || "📘";
-    node.appendChild(circle);
-
-    const label = document.createElement("span");
-    label.className = "lesson-node-label";
-    label.textContent = lesson.label;
-    node.appendChild(label);
-
-    const stars = document.createElement("span");
-    stars.className = "lesson-node-stars";
-    stars.textContent = record ? ("⭐".repeat(starsForScore(record.bestScore, maxScore)) || "·") : "";
-    node.appendChild(stars);
-
-    node.addEventListener("click", () => startLesson(lesson.id));
-    grid.appendChild(node);
-  });
+  }
 }
 
 // The reward ladder agreed with the parents, always visible above the lesson
