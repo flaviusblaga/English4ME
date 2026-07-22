@@ -751,18 +751,23 @@ body.mascot-theme .identity-avatar {
 .profile-card--adult .profile-card-icon { background: var(--tile-yellow); }
 .profile-card--kid .profile-card-icon { background: var(--tile-blue); }
 
-/* Kids get a big, playful, CENTRED die-cut sticker (Bobo for Darius, Fizz for
-   Rareș) with the name UNDER it — a vertical card, not the horizontal adult row.
-   The sticker's own white outline gives the badge look; a gentle bob adds life. */
-.profile-card--kid {
+/* Every family member gets a big, CENTRED die-cut sticker with the name UNDER
+   it — a vertical card, not a horizontal row. Kids get Bobo and Fizz, the
+   grown-ups get their own cut-out photos. The sticker's white outline gives the
+   badge look. Only the kids' bob, so the adults' side stays business-like. */
+.profile-card--kid,
+.profile-card--adult {
   flex-direction: column;
   align-items: center;
   text-align: center;
   gap: 6px;
   padding: 18px 12px 14px;
 }
-.profile-card--kid::after { display: none; } /* no chevron on the vertical kid card */
-.profile-card--kid .profile-card-icon {
+/* no chevron on the vertical cards */
+.profile-card--kid::after,
+.profile-card--adult::after { display: none; }
+.profile-card--kid .profile-card-icon,
+.profile-card--adult .profile-card-icon {
   width: auto;
   height: auto;
   border-radius: 0;
@@ -772,18 +777,23 @@ body.mascot-theme .identity-avatar {
 }
 /* Fixed HEIGHT + auto width (aspect preserved) so the sticker sizes itself and
    never overflows onto the name below (object-fit misbehaves inside the grid). */
-.profile-card--kid .profile-card-portrait {
+.profile-card--kid .profile-card-portrait,
+.profile-card--adult .profile-card-portrait {
   display: block;
   width: auto;
   height: 150px;
   object-fit: contain;
   filter: drop-shadow(0 5px 7px rgba(16, 74, 88, 0.3));
+}
+.profile-card--kid .profile-card-portrait {
   animation: kid-bob 3.4s ease-in-out infinite;
 }
-.profile-card--kid .profile-card-text {
+.profile-card--kid .profile-card-text,
+.profile-card--adult .profile-card-text {
   align-items: center;
 }
-.profile-card--kid .profile-card-text strong {
+.profile-card--kid .profile-card-text strong,
+.profile-card--adult .profile-card-text strong {
   font-size: 1.15rem;
 }
 

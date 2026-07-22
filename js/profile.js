@@ -88,8 +88,10 @@ export const FAMILIES = [
     driveReport: true,
     members: [
       { id: "flavius", name: "Flavius", emoji: "💼", kind: "adult", role: "admin",
+        img: "assets/socatei/flavius-sticker.png",
         profileId: "business-conversational", emails: ["flaviusblaga@gmail.com"] },
       { id: "andrea",  name: "Andrea",  emoji: "☕", kind: "adult", role: "admin",
+        img: "assets/socatei/andrea-sticker.png",
         profileId: "business-conversational", emails: ["andrea.bartha1@gmail.com"] },
       { id: "darius",  name: "Darius",  emoji: "🦫", kind: "kid", img: "assets/socatei/bobo-sticker.png",
         emails: ["blagadariusmarcus@gmail.com", "dariusmblaga@gmail.com"] },
