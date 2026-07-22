@@ -20,6 +20,7 @@ import {
   todayLocalDateString,
   KIDS_VOICE_OPTIONS,
   MASCOT_VOICES,
+  MASCOT_NAMES,
   getMascotPreference,
   setMascotPreference,
 } from "./chat.js";
@@ -64,6 +65,7 @@ import {
 const MASCOT_AVATARS = {
   Bobo: { emoji: "🦫", img: "assets/socatei/bobo-face.png" },
   Fizz: { emoji: "🐿️", img: "assets/socatei/fizz-face.png" },
+  Sushi: { emoji: "🎀", img: "assets/socatei/sushi-face.png" },
 };
 
 // One entry per contentTier — the only place that needs to grow when a new
@@ -242,31 +244,33 @@ function speakAsMascot(text, voiceOpts, avatarEl) {
 }
 
 // Which mascot leads (asks the current question): a single-mascot preference
-// always uses that one; "both" alternates by question index so the child
-// actually sees both mascots take turns asking, not just Bobo dominating
-// with Fizz only ever showing up to react to a wrong answer.
+// always uses that one; "both" rotates through all three by question index so
+// the child actually sees each of them take turns asking, rather than one
+// dominating and the others only showing up to react.
 function activeMascotForAsking(questionIndex) {
   const pref = getMascotPreference();
-  if (pref === "Bobo" || pref === "Fizz") return pref;
-  return questionIndex % 2 === 0 ? "Bobo" : "Fizz";
+  if (MASCOT_NAMES.includes(pref)) return pref;
+  return MASCOT_NAMES[questionIndex % MASCOT_NAMES.length];
 }
 
 // Which mascot reacts to an answer: with "both" (the default), Bobo
 // celebrates correct answers and Fizz softens incorrect ones (their original
-// personalities); picking a single mascot makes that one handle everything.
+// personalities — Sushi leads questions instead, since her role is asking);
+// picking a single mascot makes that one handle everything.
 function activeMascotForReaction(wasCorrect) {
   const pref = getMascotPreference();
-  if (pref === "Bobo" || pref === "Fizz") return pref;
+  if (MASCOT_NAMES.includes(pref)) return pref;
   return wasCorrect ? "Bobo" : "Fizz";
 }
 
 function activeMascotForComplete() {
-  return getMascotPreference() === "Bobo" ? "Bobo" : "Fizz";
+  const pref = getMascotPreference();
+  return MASCOT_NAMES.includes(pref) ? pref : "Fizz";
 }
 
 function updateLessonMascotSelectUi() {
   const preference = getMascotPreference();
-  for (const pref of ["Bobo", "Fizz", "both"]) {
+  for (const pref of [...MASCOT_NAMES, "both"]) {
     el(`lesson-mascot-select-${pref.toLowerCase()}`).classList.toggle("mascot-select-btn--active", pref === preference);
   }
 }
@@ -281,7 +285,7 @@ export function initLessons({ accessToken, userEmail, displayName, fileId, state
   el("lesson-profile-tag").textContent = profile.displayName;
   el("lesson-header-avatar").textContent = (displayName[0] || "?").toUpperCase();
   el("lesson-just-chat-btn").textContent = profile.features.mascots
-    ? "💬 Chat with Bobo & Fizz"
+    ? "💬 Chat with the Socatei"
     : "💬 Back to chat";
   el("lesson-just-chat-btn").onclick = () => {
     if (onJustChatCallback) onJustChatCallback(null);
@@ -295,7 +299,7 @@ export function initLessons({ accessToken, userEmail, displayName, fileId, state
 
   if (!listenersInitialized) {
     listenersInitialized = true;
-    for (const pref of ["Bobo", "Fizz", "both"]) {
+    for (const pref of [...MASCOT_NAMES, "both"]) {
       el(`lesson-mascot-select-${pref.toLowerCase()}`).addEventListener("click", () => {
         setMascotPreference(pref);
         updateLessonMascotSelectUi();
@@ -1171,7 +1175,7 @@ function showComplete(score, total, newlyUnlocked, rewardInfo = {}) {
   if (session.profile.features.mascots) launchConfetti();
 
   el("lesson-chat-about-it-btn").textContent = session.profile.features.mascots
-    ? "💬 Chat about it with Bobo & Fizz"
+    ? "💬 Chat about it with the Socatei"
     : "💬 Chat about what you practiced";
   el("lesson-chat-about-it-btn").onclick = () => {
     if (onChatAboutItCallback) {

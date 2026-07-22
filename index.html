@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <title>Socatei — Invata engleza cu Bobo &amp; Fizz</title>
+  <title>Socatei — Invata engleza cu Bobo, Fizz si Sushi</title>
 
   <!-- Installable-app (PWA) wiring -->
   <link rel="manifest" href="manifest.webmanifest" />
@@ -26,14 +26,22 @@
 
   <main id="screen-login" class="screen">
     <div class="login-card">
+      <!-- Two rows on purpose: three stickers side by side measured 406px and
+           ran off a 391px phone screen. Bobo and Fizz up top, Sushi below. -->
       <div class="login-mascots">
-        <img class="mascot-sticker-hero" src="assets/socatei/bobo-sticker.png" alt="Bobo"
-             onerror="this.replaceWith(Object.assign(document.createElement('span'),{className:'mascot-avatar mascot-avatar--big mascot-avatar--emoji-fallback',textContent:'🦫'}))" />
-        <img class="mascot-sticker-hero" src="assets/socatei/fizz-sticker.png" alt="Fizz"
-             onerror="this.replaceWith(Object.assign(document.createElement('span'),{className:'mascot-avatar mascot-avatar--big mascot-avatar--emoji-fallback',textContent:'🐿️'}))" />
+        <div class="login-mascots-row">
+          <img class="mascot-sticker-hero" src="assets/socatei/bobo-sticker.png" alt="Bobo"
+               onerror="this.replaceWith(Object.assign(document.createElement('span'),{className:'mascot-avatar mascot-avatar--big mascot-avatar--emoji-fallback',textContent:'🦫'}))" />
+          <img class="mascot-sticker-hero" src="assets/socatei/fizz-sticker.png" alt="Fizz"
+               onerror="this.replaceWith(Object.assign(document.createElement('span'),{className:'mascot-avatar mascot-avatar--big mascot-avatar--emoji-fallback',textContent:'🐿️'}))" />
+        </div>
+        <div class="login-mascots-row">
+          <img class="mascot-sticker-hero" src="assets/socatei/sushi-sticker.png" alt="Sushi"
+               onerror="this.replaceWith(Object.assign(document.createElement('span'),{className:'mascot-avatar mascot-avatar--big mascot-avatar--emoji-fallback',textContent:'🎀'}))" />
+        </div>
       </div>
-      <h1>Bobo &amp; Fizz English</h1>
-      <p class="subtitle">Învață engleza jucându-te, cu prietenii tăi Bobo &amp; Fizz! 🎉</p>
+      <h1>Socatei English</h1>
+      <p class="subtitle">Învață engleza jucându-te, cu prietenii tăi Bobo, Fizz și Sushi! 🎉</p>
       <button id="login-btn" class="btn btn-google">🔵 Sign in with Google</button>
       <p id="login-error" class="error" hidden></p>
       <button id="install-app-btn" class="btn btn-small" hidden>📲 Instalează pe telefon</button>
@@ -141,7 +149,12 @@
              onerror="this.replaceWith(Object.assign(document.createElement('span'),{textContent:'🐿️'}))" />
         Fizz
       </button>
-      <button id="mascot-select-both" type="button" class="mascot-select-btn">👥 Both</button>
+      <button id="mascot-select-sushi" type="button" class="mascot-select-btn">
+        <img class="mascot-avatar mascot-avatar--tiny" src="assets/socatei/sushi-face.png" alt="Sushi"
+             onerror="this.replaceWith(Object.assign(document.createElement('span'),{textContent:'🎀'}))" />
+        Sushi
+      </button>
+      <button id="mascot-select-both" type="button" class="mascot-select-btn">👥 All</button>
     </div>
 
     <div id="scenario-documents" class="scenario-documents" hidden>
@@ -217,7 +230,12 @@
              onerror="this.replaceWith(Object.assign(document.createElement('span'),{textContent:'🐿️'}))" />
         Fizz
       </button>
-      <button id="lesson-mascot-select-both" type="button" class="mascot-select-btn">👥 Both</button>
+      <button id="lesson-mascot-select-sushi" type="button" class="mascot-select-btn">
+        <img class="mascot-avatar mascot-avatar--tiny" src="assets/socatei/sushi-face.png" alt="Sushi"
+             onerror="this.replaceWith(Object.assign(document.createElement('span'),{textContent:'🎀'}))" />
+        Sushi
+      </button>
+      <button id="lesson-mascot-select-both" type="button" class="mascot-select-btn">👥 All</button>
     </div>
 
     <div id="lesson-menu-view">
@@ -288,7 +306,7 @@
       <div id="lesson-complete-rewards" class="rewards-callout" hidden></div>
       <div id="lesson-summary" class="lesson-summary" hidden></div>
       <div class="lesson-complete-actions">
-        <button id="lesson-chat-about-it-btn" class="btn btn-primary">💬 Chat about it with Bobo &amp; Fizz</button>
+        <button id="lesson-chat-about-it-btn" class="btn btn-primary">💬 Chat about it with the Socatei</button>
         <button id="lesson-save-recap-btn" class="btn btn-small">💾 Save recap to Drive · Salvează pe Drive</button>
         <button id="lesson-back-to-menu-btn" class="btn btn-small">← Back to lessons</button>
       </div>

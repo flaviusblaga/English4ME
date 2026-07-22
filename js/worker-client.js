@@ -30,7 +30,7 @@ async function failFrom(response) {
   return err;
 }
 
-export async function sendChatMessage({ profileId, messages, conversationSummary, scenarioId, documentContext, lessonWordList }) {
+export async function sendChatMessage({ profileId, messages, conversationSummary, scenarioId, documentContext, lessonWordList, mascotPreference }) {
   const response = await fetch(`${CONFIG.WORKER_URL}/chat`, {
     method: "POST",
     headers: authHeaders({ "content-type": "application/json" }),
@@ -41,6 +41,9 @@ export async function sendChatMessage({ profileId, messages, conversationSummary
       scenarioId: scenarioId || null,
       documentContext: documentContext || null,
       lessonWordList: lessonWordList || null,
+      // Which Socatei the child picked, so the Worker can guarantee that one
+      // speaks — the reply is filtered by name in the browser.
+      mascotPreference: mascotPreference || null,
     }),
   });
   if (!response.ok) throw await failFrom(response);

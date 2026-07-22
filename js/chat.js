@@ -21,19 +21,26 @@ import {
 const ROLLING_WINDOW_SIZE = 10; // messages (not turns) sent to the Worker each request
 const MAX_STORED_TURNS = 20; // messages kept in Drive before older ones are dropped
 
+// The three Socatei. Exported so js/lessons.js draws the same faces without a
+// second copy of the list drifting out of sync.
+export const MASCOT_NAMES = ["Bobo", "Fizz", "Sushi"];
+
 const MASCOT_AVATARS = {
   Bobo: { emoji: "🦫", img: "assets/socatei/bobo-face.png" },
   Fizz: { emoji: "🐿️", img: "assets/socatei/fizz-face.png" },
+  Sushi: { emoji: "🎀", img: "assets/socatei/sushi-face.png" }, // her bow reads as "Sushi" even without the art
 };
 
-// Which mascot(s) the child wants to see/hear talk. Claude still always
-// replies with both lines (no prompt/Worker change needed) — this is a
-// purely presentational filter applied at render/speak time, so switching
-// preference mid-conversation is instant and never loses conversation data.
-const MASCOT_PREFERENCE_KEY = "engleza-familie-mascot-preference"; // "Bobo" | "Fizz" | "both"
+// Which Socatei the child wants to see/hear talk. A reply is always two lines,
+// now drawn from three characters, so the preference is sent to the Worker too
+// (it pins the chosen one into every reply) AND applied here as a render/speak
+// filter — switching mid-conversation stays instant and loses no history.
+const MASCOT_PREFERENCE_KEY = "engleza-familie-mascot-preference"; // a name, or "both" for all three
 
 // Exported: js/lessons.js reuses the same preference so choosing a mascot in
 // either screen (chat or lessons) stays consistent across both.
+// "both" is kept as the all-of-them value rather than renamed to "all" so that
+// preferences already saved in a child's browser keep working.
 export function getMascotPreference() {
   return localStorage.getItem(MASCOT_PREFERENCE_KEY) || "both";
 }
@@ -57,17 +64,32 @@ export const KIDS_VOICE_OPTIONS = { pitch: 1.35, rate: 1.05 };
 // Bobo capped at 1.45 — pitches beyond ~1.5 make Windows' local SAPI voices
 // stutter and sound broken (reported on the family laptop), and 1.45 vs 1.15
 // keeps the two audibly distinct.
+// Sushi sits between the two in pitch but is the fastest talker — she's the
+// theatrical one, and rate is what keeps her distinct from Bobo without going
+// near the 1.5 ceiling that breaks Windows' local SAPI voices.
 export const MASCOT_VOICES = {
   Bobo: { pitch: 1.45, rate: 1.1 },
   Fizz: { pitch: 1.15, rate: 0.98 },
+  Sushi: { pitch: 1.25, rate: 1.2 },
 };
 
 function parseMascotLines(text) {
   return text
     .split("\n")
-    .map((line) => line.match(/^(Bobo|Fizz):\s*(.*)$/))
+    .map((line) => line.match(/^(Bobo|Fizz|Sushi):\s*(.*)$/))
     .filter(Boolean)
     .map((match) => ({ name: match[1], line: match[2] }));
+}
+
+// The two lines in a reply come from a cast of three, so filtering to one name
+// can legitimately match nothing. Falling back to the whole reply means the
+// child sees SOMETHING rather than an empty bubble — a silent reply would look
+// like the app broke.
+function visibleMascotLines(parsed) {
+  const preference = getMascotPreference();
+  if (preference === "both") return parsed;
+  const picked = parsed.filter((p) => p.name === preference);
+  return picked.length ? picked : parsed;
 }
 
 let session = null; // { accessToken, userEmail, displayName, fileId, state, profile, lessonWordList }
@@ -114,7 +136,7 @@ export function initChat({ accessToken, userEmail, displayName, fileId, state, p
     });
     initVoiceUi();
 
-    for (const pref of ["Bobo", "Fizz", "both"]) {
+    for (const pref of [...MASCOT_NAMES, "both"]) {
       el(`mascot-select-${pref.toLowerCase()}`).addEventListener("click", () => {
         setMascotPreference(pref);
         updateMascotSelectUi();
@@ -278,7 +300,7 @@ function updateTtsButtonLabel() {
 
 function updateMascotSelectUi() {
   const preference = getMascotPreference();
-  for (const pref of ["Bobo", "Fizz", "both"]) {
+  for (const pref of [...MASCOT_NAMES, "both"]) {
     el(`mascot-select-${pref.toLowerCase()}`).classList.toggle("mascot-select-btn--active", pref === preference);
   }
 }
@@ -310,8 +332,7 @@ function appendMessageToLog(role, text, profile) {
 function renderMascotLines(text) {
   const wrap = document.createElement("div");
   const parsed = parseMascotLines(text);
-  const preference = getMascotPreference();
-  const visible = preference === "both" ? parsed : parsed.filter((p) => p.name === preference);
+  const visible = visibleMascotLines(parsed);
 
   for (const { name, line } of visible) {
     const avatar = MASCOT_AVATARS[name];
@@ -356,9 +377,7 @@ function renderMascotLines(text) {
 function buildSpokenSegments(text) {
   const parsed = parseMascotLines(text);
   if (parsed.length === 0) return [{ text, ...KIDS_VOICE_OPTIONS }];
-  const preference = getMascotPreference();
-  const visible = preference === "both" ? parsed : parsed.filter((p) => p.name === preference);
-  return visible.map((p) => ({ text: p.line, ...MASCOT_VOICES[p.name] }));
+  return visibleMascotLines(parsed).map((p) => ({ text: p.line, ...MASCOT_VOICES[p.name] }));
 }
 
 function appendSystemNotice(text) {
@@ -453,6 +472,7 @@ async function handleSend() {
       scenarioId: currentScenarioId,
       documentContext: documentEntry ? documentEntry.text : null,
       lessonWordList: session.lessonWordList,
+      mascotPreference: getMascotPreference(),
     });
 
     if (result.budgetStatus === "soft_block") {

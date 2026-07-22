@@ -140,7 +140,7 @@ function renderDay(day) {
     const line = document.createElement("p");
     line.className = `parent-view-line parent-view-line--${turn.role}`;
     const time = new Date(turn.ts).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
-    line.textContent = `[${time}] ${turn.role === "user" ? "Child" : "Bobo & Fizz"}: ${turn.text}`;
+    line.textContent = `[${time}] ${turn.role === "user" ? "Child" : "Socatei"}: ${turn.text}`;
     transcript.appendChild(line);
   }
   details.appendChild(transcript);

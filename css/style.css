@@ -635,19 +635,35 @@ body.mascot-theme .identity-avatar {
   align-items: center;
 }
 
+/* Stacked rows rather than one line: three stickers abreast came to 406px and
+   spilled off a 391px phone. The split is in the markup, not a wrap rule, so
+   the grouping stays the same on every screen instead of reflowing by width. */
 .login-mascots {
   display: flex;
-  justify-content: center;
-  align-items: flex-end;
-  gap: 2px;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
   margin-bottom: 8px;
 }
 
-/* Full die-cut stickers (character + name plaque) as the login hero. */
+.login-mascots-row {
+  display: flex;
+  justify-content: center;
+  align-items: flex-end; /* different sticker heights, but the plaques line up */
+  gap: 2px;
+}
+
+/* Full die-cut stickers (character + name plaque) as the login hero. Capped by
+   percentage too, so a narrow phone shrinks them instead of clipping. */
 .mascot-sticker-hero {
-  width: 134px;
+  width: min(134px, 46%);
   height: auto;
   filter: drop-shadow(0 6px 10px rgba(16, 74, 88, 0.26));
+}
+
+/* Alone on its row, Sushi would otherwise be capped at 46% of the full card. */
+.login-mascots-row:last-child:not(:only-child) .mascot-sticker-hero {
+  width: min(134px, 92%);
 }
 
 /* If a sticker PNG fails to load, the emoji fallback swaps in as a round badge. */
