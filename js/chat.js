@@ -28,7 +28,7 @@ export const MASCOT_NAMES = ["Bobo", "Fizz", "Sushi"];
 const MASCOT_AVATARS = {
   Bobo: { emoji: "🦫", img: "assets/socatei/bobo-face.png" },
   Fizz: { emoji: "🐿️", img: "assets/socatei/fizz-face.png" },
-  Sushi: { emoji: "🎀", img: "assets/socatei/sushi-face.png" }, // her bow reads as "Sushi" even without the art
+  Sushi: { emoji: "🐱", img: "assets/socatei/sushi-face.png" }, // the only cat among the two weasels
 };
 
 // Which Socatei the child wants to see/hear talk. A reply is always two lines,

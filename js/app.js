@@ -3,7 +3,17 @@ import { getOrCreateState } from "./drive.js";
 import { initChat } from "./chat.js";
 import { initLessons } from "./lessons.js";
 import { initReading } from "./reading.js";
-import { getProfile, MEMBERS, membersForEmail, getMember, getMemberPlacement, clearMemberPlacement } from "./profile.js";
+import {
+  getProfile,
+  MEMBERS,
+  membersForEmail,
+  getMember,
+  getMemberPlacement,
+  clearMemberPlacement,
+  getMemberAvatar,
+  setMemberAvatar,
+  avatarOptionsFor,
+} from "./profile.js";
 import { getRememberedProfileId, rememberProfileId } from "./profile-picker.js";
 import { initParentView } from "./parent-view.js";
 import { initPwa } from "./pwa.js";
@@ -120,6 +130,12 @@ function renderProfilePicker() {
   }
 
   for (const member of visibleMembers) {
+    // The tile is a button, so the "change picture" control cannot live inside
+    // it (a button inside a button is invalid and swallows the click). They are
+    // siblings in a wrapper, which is also what positions the little badge.
+    const wrap = document.createElement("div");
+    wrap.className = "profile-card-wrap";
+
     const card = document.createElement("button");
     card.type = "button";
     card.className = `profile-card profile-card--${member.kind}`;
@@ -127,12 +143,14 @@ function renderProfilePicker() {
 
     const icon = document.createElement("span");
     icon.className = "profile-card-icon";
-    if (member.img) {
-      // Kids get a round portrait of their mascot (Bobo / Fizz) instead of an
-      // emoji. Fall back to the emoji badge if the image ever fails to load.
+    const avatar = getMemberAvatar(member);
+    if (avatar) {
+      // A die-cut sticker rather than an emoji: one of the three Socatei for a
+      // kid, a photo or a generic grown-up for an adult. Falls back to the
+      // emoji badge if the image ever fails to load.
       const img = document.createElement("img");
       img.className = "profile-card-portrait";
-      img.src = member.img;
+      img.src = avatar;
       img.alt = member.name;
       img.onerror = function () {
         this.replaceWith(document.createTextNode(member.emoji));
@@ -159,8 +177,59 @@ function renderProfilePicker() {
     card.appendChild(icon);
     card.appendChild(textCol);
     card.addEventListener("click", () => handleMemberPicked(member.id));
-    list.appendChild(card);
+    wrap.appendChild(card);
+
+    if (avatarOptionsFor(member).length > 1) {
+      const edit = document.createElement("button");
+      edit.type = "button";
+      edit.className = "profile-avatar-edit";
+      edit.textContent = "🎭";
+      edit.title = `Schimbă poza lui ${member.name}`;
+      edit.setAttribute("aria-label", `Schimbă poza lui ${member.name}`);
+      edit.addEventListener("click", (event) => {
+        event.stopPropagation(); // never open the member as a side effect
+        openAvatarPicker(member);
+      });
+      wrap.appendChild(edit);
+    }
+
+    list.appendChild(wrap);
   }
+}
+
+// Lets a child pick which Socatel represents them, and a grown-up pick a
+// mum/dad tile. Cosmetic and per-device (same as the placement memory), so
+// there is no Drive write and nothing to undo server-side.
+function openAvatarPicker(member) {
+  const overlay = el("avatar-picker");
+  const grid = el("avatar-picker-grid");
+  el("avatar-picker-title").textContent =
+    member.kind === "kid" ? `Cine te reprezintă, ${member.name}?` : `Alege poza pentru ${member.name}`;
+  grid.innerHTML = "";
+
+  const current = getMemberAvatar(member);
+  for (const option of avatarOptionsFor(member)) {
+    const choice = document.createElement("button");
+    choice.type = "button";
+    choice.className = "avatar-choice";
+    if (option.img === current) choice.classList.add("avatar-choice--active");
+
+    const img = document.createElement("img");
+    img.src = option.img;
+    img.alt = option.name;
+    const name = document.createElement("span");
+    name.textContent = option.name;
+    choice.append(img, name);
+
+    choice.addEventListener("click", () => {
+      setMemberAvatar(member.id, option.id);
+      overlay.hidden = true;
+      renderProfilePicker();
+    });
+    grid.appendChild(choice);
+  }
+
+  overlay.hidden = false;
 }
 
 // A member tap: adults go straight to their Business profile; a kid takes the
@@ -344,6 +413,14 @@ function restoreOrShowLogin() {
 window.addEventListener("DOMContentLoaded", async () => {
   el("login-btn").addEventListener("click", handleLogin);
   el("logout-btn").addEventListener("click", handleLogout);
+  el("avatar-picker-close").addEventListener("click", () => {
+    el("avatar-picker").hidden = true;
+  });
+  // Tapping the dimmed area closes it too — the panel itself must not, or
+  // every tap inside the chooser would dismiss it.
+  el("avatar-picker").addEventListener("click", (event) => {
+    if (event.target === el("avatar-picker")) el("avatar-picker").hidden = true;
+  });
   el("lesson-logout-btn").addEventListener("click", handleLogout);
   el("view-child-progress-btn").addEventListener("click", () => {
     showScreen("parent-view");

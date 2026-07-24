@@ -65,7 +65,7 @@ import {
 const MASCOT_AVATARS = {
   Bobo: { emoji: "🦫", img: "assets/socatei/bobo-face.png" },
   Fizz: { emoji: "🐿️", img: "assets/socatei/fizz-face.png" },
-  Sushi: { emoji: "🎀", img: "assets/socatei/sushi-face.png" },
+  Sushi: { emoji: "🐱", img: "assets/socatei/sushi-face.png" },
 };
 
 // One entry per contentTier — the only place that needs to grow when a new

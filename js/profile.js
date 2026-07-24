@@ -101,18 +101,30 @@ export const FAMILIES = [
   },
 
   // ---- Template for a new family: copy, fill in, mirror in worker/src/families.js.
+  //
+  // `img` is only the STARTING picture — everyone can change theirs from the
+  // picker (see AVATARS below), so the values here just decide what a brand-new
+  // tile looks like before anyone touches it. Give the two children different
+  // mascots so their tiles are told apart at a glance on day one.
+  //
+  // driveReport: true is the setting to give families outside the author's
+  // household — their child's progress goes to their own Drive and never to
+  // the app owner. Pair it with progressMirror: false in worker/src/families.js.
   // {
   //   id: "popescu",
   //   name: "Familia Popescu",
+  //   driveReport: true,
   //   members: [
   //     { id: "popescu-tata", name: "Tata", emoji: "💼", kind: "adult", role: "admin",
+  //       img: "assets/socatei/tata-sticker.png",
   //       profileId: "business-conversational", emails: ["tata@gmail.com"] },
   //     { id: "popescu-mama", name: "Mama", emoji: "☕", kind: "adult", role: "admin",
+  //       img: "assets/socatei/mama-sticker.png",
   //       profileId: "business-conversational", emails: ["mama@gmail.com"] },
   //     { id: "popescu-copil1", name: "Copil 1", emoji: "🦫", kind: "kid",
   //       img: "assets/socatei/bobo-sticker.png", emails: ["copil1@gmail.com"] },
-  //     { id: "popescu-copil2", name: "Copil 2", emoji: "🐿️", kind: "kid",
-  //       img: "assets/socatei/fizz-sticker.png", emails: ["copil2@gmail.com"] },
+  //     { id: "popescu-copil2", name: "Copil 2", emoji: "🎀", kind: "kid",
+  //       img: "assets/socatei/sushi-sticker.png", emails: ["copil2@gmail.com"] },
   //   ],
   // },
 ];
@@ -182,6 +194,55 @@ export function parentEmailsForEmail(email) {
   return found.family.members
     .filter((m) => m.kind === "adult")
     .flatMap((m) => m.emails || []);
+}
+
+// ---- Avatars ----
+// Who a member is DRAWN as on the picker. Families other than the author's
+// have no photo stickers of their own, so everyone gets a catalogue to choose
+// from: kids pick one of the three Socatei, grown-ups pick a generic mum/dad.
+//
+// This is only the picture on the tile. It is deliberately NOT the same thing
+// as the "Talk to:" mascot preference in chat.js — a child can be drawn as
+// Sushi while practising with all three, and conflating the two would take a
+// choice away rather than add one.
+export const AVATARS = {
+  kid: [
+    { id: "bobo", name: "Bobo", img: "assets/socatei/bobo-sticker.png" },
+    { id: "fizz", name: "Fizz", img: "assets/socatei/fizz-sticker.png" },
+    { id: "sushi", name: "Sushi", img: "assets/socatei/sushi-sticker.png" },
+  ],
+  adult: [
+    { id: "mama", name: "Mama", img: "assets/socatei/mama-sticker.png" },
+    { id: "tata", name: "Tata", img: "assets/socatei/tata-sticker.png" },
+  ],
+};
+
+const AVATAR_KEY_PREFIX = "engleza-familie:avatar:";
+
+// What this member may choose from. A member who ships with their own artwork
+// (the author's household has photo stickers) keeps it as the first option, so
+// choosing a generic one is never a one-way door.
+export function avatarOptionsFor(member) {
+  const catalogue = AVATARS[member.kind] || [];
+  const ownArt = member.img && !catalogue.some((a) => a.img === member.img);
+  return ownArt ? [{ id: "own", name: member.name, img: member.img }, ...catalogue] : catalogue;
+}
+
+// Falls back to the member's shipped artwork, then to nothing (the caller
+// draws the emoji badge instead).
+export function getMemberAvatar(member) {
+  const chosen = localStorage.getItem(AVATAR_KEY_PREFIX + member.id);
+  if (chosen) {
+    const match = avatarOptionsFor(member).find((a) => a.id === chosen);
+    if (match) return match.img;
+    // A stored id that no longer exists (artwork renamed, or the member
+    // changed kind) must not blank the tile — fall through to the default.
+  }
+  return member.img || null;
+}
+
+export function setMemberAvatar(memberId, avatarId) {
+  localStorage.setItem(AVATAR_KEY_PREFIX + memberId, avatarId);
 }
 
 // A kid's placement result (which profile the test put them in) is remembered
