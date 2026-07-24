@@ -5,7 +5,7 @@ E scris ca să poată fi copiat ca atare într-un mesaj.
 
 ---
 
-## Ce e „Socatei"
+## Ce e „English4ME"
 
 O aplicație de învățat engleza pe care am făcut-o pentru copiii mei. O găzduiesc eu,
 pe cont propriu, și o ofer gratuit. Nu e un produs comercial și nu are în spate o firmă.
@@ -17,7 +17,7 @@ Progresul, punctajul și nivelul se salvează într-un folder ascuns din contul 
 **al copilului**. Eu nu am acces la el — nici tehnic, nici altfel.
 
 **Cum vezi tu ce a exersat copilul**
-Aplicația creează automat un document Google numit **„Socatei — Progres [nume]"**,
+Aplicația creează automat un document Google numit **„English4ME — Progres [nume]"**,
 îl păstrează în Drive-ul copilului și **ți-l partajează ție**. Primești un email cu
 linkul, o singură dată. Documentul se actualizează singur, o dată pe zi, și conține
 punctajul, șirul de zile, câte cuvinte știe și ce mai are de exersat.
@@ -47,7 +47,7 @@ confidențialitate. Eu plătesc pentru utilizare; vouă nu vi se cere nimic.
 
 Google va afișa un avertisment: *„Google hasn't verified this app"*. E normal —
 aplicația e privată și nu a trecut prin procesul de verificare Google, care e gândit
-pentru aplicații publice. Apăsați **Advanced** → **Go to Socatei**.
+pentru aplicații publice. Apăsați **Advanced** → **Go to English4ME**.
 
 ## Dacă vrei să te retragi
 

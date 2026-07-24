@@ -13,9 +13,9 @@
 //
 // Bump CACHE_VERSION whenever you want installed apps to drop their old
 // offline copy on next launch.
-// v2: new Socatei artwork (Bobo and Fizz redrawn, Sushi added). Installed apps
-// keep serving the old faces until this string changes.
-const CACHE_VERSION = "socatei-v2";
+// v3: new app icon, Sushi redrawn as a cat, mum/dad stickers added. Installed
+// apps keep serving the old artwork until this string changes.
+const CACHE_VERSION = "socatei-v3";
 
 self.addEventListener("install", (event) => {
   // Activate this new worker immediately instead of waiting for every old

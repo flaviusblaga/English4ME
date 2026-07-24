@@ -12,7 +12,7 @@ export const PROFILES = [
   },
   {
     id: "kids-primar",
-    displayName: "Socatei — Beginner (Bobo, Fizz & Sushi)",
+    displayName: "English4ME — Beginner (Bobo, Fizz & Sushi)",
     level: "beginner",
     contentTier: "beginner",
     emoji: "🌱",
@@ -21,7 +21,7 @@ export const PROFILES = [
   },
   {
     id: "kids-intermediate",
-    displayName: "Socatei — Intermediate (Bobo, Fizz & Sushi)",
+    displayName: "English4ME — Intermediate (Bobo, Fizz & Sushi)",
     level: "intermediate",
     contentTier: "intermediate",
     emoji: "🌿",
@@ -30,7 +30,7 @@ export const PROFILES = [
   },
   {
     id: "kids-advanced",
-    displayName: "Socatei — Advanced",
+    displayName: "English4ME — Advanced",
     level: "advanced",
     contentTier: "advanced",
     emoji: "🌳",
@@ -42,7 +42,7 @@ export const PROFILES = [
   },
   {
     id: "kids-expert",
-    displayName: "Socatei — Expert",
+    displayName: "English4ME — Expert",
     level: "expert",
     contentTier: "expert",
     emoji: "🏆",

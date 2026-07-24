@@ -90,7 +90,7 @@ export function buildReportHtml({ state, memberName, profileId }) {
 
   return `<html><body>
 <h1>Progres — ${escapeHtml(memberName)}</h1>
-<p><i>Raport generat automat de aplicația Socatei pe ${formatRoDate(todayLocalDate())}.
+<p><i>Raport generat automat de aplicația English4ME pe ${formatRoDate(todayLocalDate())}.
 Se actualizează singur după fiecare zi de practică.</i></p>
 
 <h2>Pe scurt</h2>
@@ -198,7 +198,9 @@ export async function publishProgressDoc({ accessToken, state, memberName, profi
 
   try {
     if (!doc.fileId) {
-      const created = await createReportDoc(accessToken, `Socatei — Progres ${memberName}`, html);
+      // Only NEW reports get this name — Drive keeps a file's title when it is
+      // updated, so a report created before the rename stays "Socatei — …".
+      const created = await createReportDoc(accessToken, `English4ME — Progres ${memberName}`, html);
       doc.fileId = created.id;
       doc.webViewLink = created.webViewLink || null;
     } else {
