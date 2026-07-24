@@ -1,5 +1,6 @@
-import { fetchChildProgress } from "./worker-client.js";
+import { fetchChildProgress, fetchFamilyRewards, saveFamilyRewards } from "./worker-client.js";
 import { BADGES } from "./gamification.js";
+import { setActiveRewards } from "./rewards.js";
 
 const LAST_CHILD_EMAIL_KEY = "engleza-familie:lastChildEmail";
 
@@ -13,6 +14,64 @@ export function initParentView() {
   if (remembered) emailInput.value = remembered;
 
   el("parent-view-load-btn").addEventListener("click", handleLoad);
+
+  el("reward-settings-save").addEventListener("click", handleSaveRewards);
+  fillRewardForm();
+}
+
+const BONUS_TIERS = ["beginner", "intermediate", "advanced", "expert"];
+
+// Shows what is currently in force. Failing quietly is right here: a parent
+// opening this panel while the Worker is unreachable should see the defaults,
+// not an error blocking the rest of the screen.
+async function fillRewardForm() {
+  let scheme;
+  try {
+    scheme = (await fetchFamilyRewards()).rewards;
+  } catch {
+    return;
+  }
+  el("reward-per-lesson-amount").value = scheme.perLesson.amount;
+  el("reward-per-lesson-unit").value = scheme.perLesson.unit;
+  el("reward-bonus-unit").value = scheme.moduleBonus.unit;
+  for (const tier of BONUS_TIERS) {
+    el(`reward-bonus-${tier}`).value = scheme.moduleBonus[tier];
+  }
+}
+
+async function handleSaveRewards() {
+  const status = el("reward-settings-status");
+  const button = el("reward-settings-save");
+
+  const payload = {
+    perLesson: {
+      amount: el("reward-per-lesson-amount").value,
+      unit: el("reward-per-lesson-unit").value,
+    },
+    moduleBonus: { unit: el("reward-bonus-unit").value },
+  };
+  for (const tier of BONUS_TIERS) {
+    payload.moduleBonus[tier] = el(`reward-bonus-${tier}`).value;
+  }
+
+  button.disabled = true;
+  status.hidden = false;
+  status.textContent = "Se salvează…";
+
+  try {
+    const result = await saveFamilyRewards(payload);
+    // Apply to this session too, so the parent sees the new wording without
+    // signing out and back in.
+    setActiveRewards(result.rewards);
+    status.textContent = "✅ Salvat. Copiii vor vedea noile recompense la următoarea deschidere.";
+  } catch (err) {
+    status.textContent =
+      err.code === "forbidden"
+        ? "Doar un părinte din familie poate schimba recompensele."
+        : `Nu s-a putut salva: ${err.message}`;
+  } finally {
+    button.disabled = false;
+  }
 }
 
 async function handleLoad() {
@@ -109,16 +168,16 @@ function renderRewards(rewards) {
 
   const screenTimeLine = document.createElement("p");
   screenTimeLine.className = "rewards-row";
-  screenTimeLine.textContent = `⏱ Timp de tehnologie câștigat: ${rewards.screenTimeMin} min (20 min / lecție)`;
+  screenTimeLine.textContent = `⏱ Câștigat: ${rewards.earnedAmount} ${rewards.perLessonUnit} (${rewards.perLessonAmount} / lecție)`;
   card.appendChild(screenTimeLine);
 
   const bonusLine = document.createElement("p");
   bonusLine.className = "rewards-row rewards-row--bonus";
   if (rewards.bonusEarned) {
     bonusLine.classList.add("rewards-row--earned");
-    bonusLine.textContent = `🎁 BONUS DE PLĂTIT: ${rewards.bonusLei} lei — modulul e terminat integral!`;
+    bonusLine.textContent = `🎁 BONUS DE ONORAT: ${rewards.bonusAmount} ${rewards.bonusUnit} — modulul e terminat integral!`;
   } else {
-    bonusLine.textContent = `🎁 Bonus la modul complet: ${rewards.bonusLei} lei (mai are ${rewards.totalLessons - rewards.lessonsCompleted} lecții)`;
+    bonusLine.textContent = `🎁 Bonus la modul complet: ${rewards.bonusAmount} ${rewards.bonusUnit} (mai are ${rewards.totalLessons - rewards.lessonsCompleted} lecții)`;
   }
   card.appendChild(bonusLine);
 

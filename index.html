@@ -366,6 +366,44 @@
     </header>
 
     <div class="parent-view-body">
+      <!-- Each household decides what practice is worth. Saved per FAMILY on
+           the Worker, so it reaches the children's devices too. -->
+      <details id="reward-settings" class="reward-settings">
+        <summary>⚙️ Recompensele familiei — ce câștigă copiii</summary>
+        <p class="hint">
+          Tu decizi ce primesc copiii. Poate fi orice — minute pe tabletă, puncte
+          spre o bicicletă, lei. Se aplică imediat pe telefoanele lor.
+        </p>
+
+        <div class="reward-settings-row">
+          <label for="reward-per-lesson-amount">La fiecare lecție terminată</label>
+          <div class="reward-settings-pair">
+            <input id="reward-per-lesson-amount" type="number" min="0" step="1" inputmode="numeric" />
+            <input id="reward-per-lesson-unit" type="text" maxlength="40" placeholder="minute de tehnologie" />
+          </div>
+        </div>
+
+        <p class="reward-settings-subhead">Bonus la terminarea unui nivel întreg</p>
+        <div class="reward-settings-grid">
+          <label for="reward-bonus-beginner">🌱 Începător</label>
+          <input id="reward-bonus-beginner" type="number" min="0" step="1" inputmode="numeric" />
+          <label for="reward-bonus-intermediate">🌿 Intermediar</label>
+          <input id="reward-bonus-intermediate" type="number" min="0" step="1" inputmode="numeric" />
+          <label for="reward-bonus-advanced">🌳 Avansat</label>
+          <input id="reward-bonus-advanced" type="number" min="0" step="1" inputmode="numeric" />
+          <label for="reward-bonus-expert">🏆 Expert</label>
+          <input id="reward-bonus-expert" type="number" min="0" step="1" inputmode="numeric" />
+        </div>
+
+        <div class="reward-settings-row">
+          <label for="reward-bonus-unit">Bonusul se măsoară în</label>
+          <input id="reward-bonus-unit" type="text" maxlength="40" placeholder="lei" />
+        </div>
+
+        <button id="reward-settings-save" type="button" class="btn btn-primary">Salvează</button>
+        <p id="reward-settings-status" class="hint" hidden></p>
+      </details>
+
       <div class="parent-view-lookup">
         <label for="parent-view-email-input">Child's email:</label>
         <input id="parent-view-email-input" type="email" placeholder="child@gmail.com" />

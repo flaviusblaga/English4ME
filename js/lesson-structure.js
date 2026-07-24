@@ -11,14 +11,19 @@
 // under a category so the menu stays navigable. Same 20 minutes, roughly a
 // third of the lessons, three times the work per lesson.
 //
-//   Beginner      50 → 17 lessons   (1000 → 340 min)
+//   Beginner      50 → 17 lessons
 //   Intermediate  20 → 10 lessons
-//   Advanced       6 →  4 lessons   (needed new content — grammar-extra.js)
-//   Expert         4 →  3 lessons   (same)
+//   Advanced       6 → 17 lessons
+//   Expert         4 → 17 lessons
 //
-// The authored content in lessons-client.js / grammar-client.js is untouched.
-// A lesson here is a BUNDLE of existing themes; this file only regroups them,
-// which is why no words, sentences or questions had to be rewritten.
+// Advanced and Expert started far smaller than Beginner, which meant an older
+// child earned a quarter of the rewards for the same effort. Two things fixed
+// that: four exercise types per grammar question instead of one (see
+// js/grammar-client.js), and new question banks (grammar-extra.js and
+// grammar-extra2.js) taking both tiers to 34 themes.
+//
+// The Beginner and Intermediate content is untouched — a lesson there is just a
+// BUNDLE of existing themes, which is why no words or sentences were rewritten.
 
 import {
   LESSONS,
@@ -26,8 +31,9 @@ import {
   buildWordQuestion,
   buildSentenceQuestion,
 } from "./lessons-client.js";
-import { ADVANCED_LESSONS, EXPERT_LESSONS } from "./grammar-client.js";
+import { ADVANCED_LESSONS, EXPERT_LESSONS, buildGrammarQuestion } from "./grammar-client.js";
 import { ADVANCED_EXTRA, EXPERT_EXTRA } from "./grammar-extra.js";
+import { ADVANCED_EXTRA2, EXPERT_EXTRA2 } from "./grammar-extra2.js";
 
 export const EXERCISES_PER_LESSON = 50;
 
@@ -35,8 +41,8 @@ export const EXERCISES_PER_LESSON = 50;
 const BANKS = {
   beginner: LESSONS,
   intermediate: SENTENCE_LESSONS,
-  advanced: [...ADVANCED_LESSONS, ...ADVANCED_EXTRA],
-  expert: [...EXPERT_LESSONS, ...EXPERT_EXTRA],
+  advanced: [...ADVANCED_LESSONS, ...ADVANCED_EXTRA, ...ADVANCED_EXTRA2],
+  expert: [...EXPERT_LESSONS, ...EXPERT_EXTRA, ...EXPERT_EXTRA2],
 };
 
 // Which field holds a theme's items, per tier.
@@ -54,8 +60,11 @@ const ITEMS_FIELD = {
 const CYCLE_TYPES = {
   beginner: ["picture", "translation", "en-ro", "spell", "listen", "say"],
   intermediate: ["fill-blank", "unscramble", "picture-sentence", "listen-sentence", "say-sentence"],
-  advanced: ["grammar-mcq"],
-  expert: ["grammar-mcq"],
+  // Four ways to drill one question (see js/grammar-client.js). This is what
+  // lets the grammar tiers hold as many lessons as the vocabulary ones without
+  // asking the same question over and over.
+  advanced: ["grammar-mcq", "grammar-fix", "grammar-why", "grammar-recall"],
+  expert: ["grammar-mcq", "grammar-fix", "grammar-why", "grammar-recall"],
 };
 
 // ---------------------------------------------------------------------------
@@ -145,48 +154,88 @@ export const TIER_CATEGORIES = {
     {
       id: "adv-tenses", label: "Timpuri verbale", emoji: "⏳",
       lessons: [
-        { id: "adv-tenses-1", label: "Trecut, prezent perfect, viitor", emoji: "🕰️",
-          themes: ["past-tenses", "present-perfect", "future-forms", "used-to-would", "reported-speech"] },
+        { id: "adv-tenses-1", label: "Trecut si prezent perfect", emoji: "🕰️", themes: ["past-tenses", "present-perfect"] },
+        { id: "adv-tenses-2", label: "Viitor si viitor perfect", emoji: "🔮", themes: ["future-forms", "future-perfect"] },
+        { id: "adv-tenses-3", label: "Obiceiuri trecute si timp", emoji: "⏮️", themes: ["used-to-would", "time-clauses"] },
+        { id: "adv-tenses-4", label: "Vorbire si intrebari indirecte", emoji: "💬", themes: ["reported-speech", "indirect-questions"] },
       ],
     },
     {
-      id: "adv-structures", label: "Structuri de frază", emoji: "🏗️",
+      id: "adv-structures", label: "Structuri de fraza", emoji: "🏗️",
       lessons: [
-        { id: "adv-struct-1", label: "Pasiv, relative, condiționale", emoji: "🔄",
-          themes: ["passive-voice", "relative-clauses", "conditionals", "gerunds-infinitives", "question-tags"] },
+        { id: "adv-struct-1", label: "Pasiv si cauzativ", emoji: "🔄", themes: ["passive-voice", "causative"] },
+        { id: "adv-struct-2", label: "Relative si participiale", emoji: "🔗", themes: ["relative-clauses", "participle-clauses"] },
+        { id: "adv-struct-3", label: "Conditionale", emoji: "🔀", themes: ["conditionals", "mixed-conditionals"] },
+        { id: "adv-struct-4", label: "Gerunziu si tipare verbale", emoji: "🎯", themes: ["gerunds-infinitives", "verb-patterns"] },
       ],
     },
     {
-      id: "adv-precision", label: "Precizie și nuanță", emoji: "🎯",
+      id: "adv-precision", label: "Precizie", emoji: "⚖️",
       lessons: [
-        { id: "adv-prec-1", label: "Articole, cantități, comparații", emoji: "⚖️",
-          themes: ["articles", "quantifiers", "comparatives", "adverb-order", "so-such-enough"] },
-        { id: "adv-prec-2", label: "Verbe cu particulă și conectori", emoji: "🧭",
-          themes: ["phrasal-verbs", "modals-deduction", "linking-contrast", "prepositions-advanced"] },
+        { id: "adv-prec-1", label: "Articole si nenumarabile", emoji: "📌", themes: ["articles", "countable-uncountable"] },
+        { id: "adv-prec-2", label: "Cantitati si determinanti", emoji: "🔢", themes: ["quantifiers", "determiners"] },
+        { id: "adv-prec-3", label: "Comparatii", emoji: "📈", themes: ["comparatives", "double-comparatives"] },
+        { id: "adv-prec-4", label: "Ordinea si acordul", emoji: "🔤", themes: ["adverb-order", "agreement"] },
+      ],
+    },
+    {
+      id: "adv-nuance", label: "Nuanta si legaturi", emoji: "🧭",
+      lessons: [
+        { id: "adv-nuance-1", label: "Modale: deductie si obligatie", emoji: "🕵️", themes: ["modals-deduction", "obligation-permission"] },
+        { id: "adv-nuance-2", label: "Contrast si scop", emoji: "🪢", themes: ["linking-contrast", "purpose-result"] },
+        { id: "adv-nuance-3", label: "Intensitate si intrebari scurte", emoji: "📏", themes: ["so-such-enough", "question-tags"] },
+      ],
+    },
+    {
+      id: "adv-words", label: "Cuvinte si forma", emoji: "🔌",
+      lessons: [
+        { id: "adv-words-1", label: "Verbe cu particula si prepozitie", emoji: "🧲", themes: ["phrasal-verbs", "prepositional-verbs"] },
+        { id: "adv-words-2", label: "Prepozitii dificile si ortografie", emoji: "✒️", themes: ["prepositions-advanced", "spelling-rules"] },
       ],
     },
   ],
 
   expert: [
     {
-      id: "exp-nuance", label: "Nuanțe și expresii", emoji: "🎭",
+      id: "exp-idioms", label: "Expresii", emoji: "🎭",
       lessons: [
-        { id: "exp-nuance-1", label: "Idiomuri și colocații", emoji: "🧲",
-          themes: ["idioms", "idioms-work", "collocations", "register"] },
+        { id: "exp-idioms-1", label: "Idiomuri generale si de birou", emoji: "💼", themes: ["idioms", "idioms-work"] },
+        { id: "exp-idioms-2", label: "Natura si corp", emoji: "🌦️", themes: ["idioms-nature", "idioms-body"] },
+        { id: "exp-idioms-3", label: "Bani si timp", emoji: "💰", themes: ["idioms-money", "idioms-time"] },
+        { id: "exp-idioms-4", label: "Proverbe si perechi fixe", emoji: "📜", themes: ["proverbs", "binomials"] },
       ],
     },
     {
-      id: "exp-traps", label: "Capcane", emoji: "🪞",
+      id: "exp-traps", label: "Capcane", emoji: "⚠️",
       lessons: [
-        { id: "exp-traps-1", label: "Confuzii și prieteni falși", emoji: "⚠️",
-          themes: ["confusables", "false-friends-ro", "word-formation", "phrasal-verbs-advanced"] },
+        { id: "exp-traps-1", label: "Confuzii si prieteni falsi", emoji: "🪞", themes: ["confusables", "false-friends-ro"] },
+        { id: "exp-traps-2", label: "Greseli frecvente si omofone", emoji: "🔊", themes: ["commonly-misused", "sound-alikes"] },
+        { id: "exp-traps-3", label: "Verbe cu particula: pozitia", emoji: "🔀", themes: ["phrasal-verbs-advanced", "phrasal-separable"] },
+        { id: "exp-traps-4", label: "Nuante de cantitate si timp", emoji: "🥄", themes: ["quantifier-nuance", "tense-nuance"] },
       ],
     },
     {
       id: "exp-style", label: "Stil avansat", emoji: "✍️",
       lessons: [
-        { id: "exp-style-1", label: "Inversiune, ireal, reformulare", emoji: "🔀",
-          themes: ["paraphrase", "inversion", "unreal-past", "nuance-modals", "advanced-connectors"] },
+        { id: "exp-style-1", label: "Inversiune si scindare", emoji: "🔦", themes: ["inversion", "cleft-sentences"] },
+        { id: "exp-style-2", label: "Ireal si modale fine", emoji: "🌙", themes: ["unreal-past", "nuance-modals"] },
+        { id: "exp-style-3", label: "Elipsa si emfaza", emoji: "➖", themes: ["ellipsis", "emphasis-adverbs"] },
+        { id: "exp-style-4", label: "Reformulare si substantivizare", emoji: "🏛️", themes: ["paraphrase", "nominalisation"] },
+      ],
+    },
+    {
+      id: "exp-register", label: "Registru", emoji: "🎩",
+      lessons: [
+        { id: "exp-reg-1", label: "Formal si informal", emoji: "✉️", themes: ["register", "formal-writing"] },
+        { id: "exp-reg-2", label: "Prudenta si verbe academice", emoji: "🎓", themes: ["hedging", "academic-verbs"] },
+        { id: "exp-reg-3", label: "Conotatie si marcatori", emoji: "🎨", themes: ["connotation", "discourse-markers"] },
+      ],
+    },
+    {
+      id: "exp-words", label: "Cuvinte", emoji: "🧲",
+      lessons: [
+        { id: "exp-words-1", label: "Colocatii si verbe golite", emoji: "🧲", themes: ["collocations", "delexical-verbs"] },
+        { id: "exp-words-2", label: "Formarea cuvintelor si conectori", emoji: "🧩", themes: ["word-formation", "advanced-connectors"] },
       ],
     },
   ],
@@ -271,11 +320,12 @@ export function buildFiftySentenceQueue(lesson) {
 }
 
 export function buildFiftyGrammarQueue(lesson) {
-  return buildCyclingQueue(lesson.questions, CYCLE_TYPES.advanced, (mcq) => ({
-    type: "grammar-mcq",
-    mcq,
-    options: shuffle(mcq.options.map((value, idx) => ({ value, isCorrect: idx === mcq.correct }))),
-  }));
+  // The whole lesson's questions are the distractor pool for "why" exercises,
+  // so the wrong explanations are always about related grammar.
+  const pool = lesson.questions;
+  return buildCyclingQueue(pool, CYCLE_TYPES.advanced, (mcq, type) =>
+    buildGrammarQuestion(mcq, type, pool)
+  );
 }
 
 // ---------------------------------------------------------------------------

@@ -310,6 +310,69 @@ body.mascot-theme .btn-primary {
   z-index: 0;
 }
 
+/* Parent-only panel for setting what practice is worth in this household. */
+.reward-settings {
+  margin-bottom: var(--sp-4);
+  padding: var(--sp-3) var(--sp-4);
+  border-radius: var(--r-lg);
+  background: var(--surface-raised);
+  box-shadow: var(--shadow-sm);
+}
+.reward-settings > summary {
+  cursor: pointer;
+  font-family: var(--font-display);
+  font-weight: 700;
+}
+.reward-settings-subhead {
+  margin: var(--sp-3) 0 var(--sp-2);
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+.reward-settings-row {
+  margin-top: var(--sp-3);
+}
+.reward-settings-row > label {
+  display: block;
+  margin-bottom: 4px;
+  font-size: var(--fs-xs);
+  color: var(--text-muted);
+}
+/* Amount and unit sit together: "20" + "minute de tehnologie" reads as one
+   sentence, so it should look like one control. */
+.reward-settings-pair {
+  display: flex;
+  gap: var(--sp-2);
+}
+.reward-settings-pair input[type="number"] {
+  width: 5.5rem;
+  flex-shrink: 0;
+}
+.reward-settings-pair input[type="text"] {
+  flex: 1;
+  min-width: 0;
+}
+.reward-settings-grid {
+  display: grid;
+  grid-template-columns: 1fr 6rem;
+  gap: var(--sp-2);
+  align-items: center;
+}
+.reward-settings-grid label {
+  font-size: var(--fs-sm);
+}
+.reward-settings input {
+  padding: 8px 10px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+}
+.reward-settings #reward-settings-save {
+  margin-top: var(--sp-3);
+}
+
 /* Wrapper holding a member tile plus its little "change picture" badge. The
    badge cannot be inside the tile (button-in-button), so it is positioned
    against this instead. */

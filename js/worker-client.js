@@ -70,6 +70,25 @@ export async function syncProgress({ profileId, displayName, gamification, progr
   return response.json();
 }
 
+// The reward scheme this family agreed on. Readable by everyone in the family
+// (the children's screens are built from it); only an adult may change it —
+// enforced by the Worker, not here.
+export async function fetchFamilyRewards() {
+  const response = await fetch(`${CONFIG.WORKER_URL}/family/rewards`, { headers: authHeaders() });
+  if (!response.ok) throw await failFrom(response);
+  return response.json();
+}
+
+export async function saveFamilyRewards(rewards) {
+  const response = await fetch(`${CONFIG.WORKER_URL}/family/rewards`, {
+    method: "POST",
+    headers: authHeaders({ "content-type": "application/json" }),
+    body: JSON.stringify({ rewards }),
+  });
+  if (!response.ok) throw await failFrom(response);
+  return response.json();
+}
+
 // `userEmail` here is the CHILD being asked about, not the caller. The Worker
 // checks that the signed-in adult is in the same family before answering.
 export async function fetchChildProgress({ userEmail, profileId }) {

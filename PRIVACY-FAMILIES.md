@@ -63,7 +63,35 @@ Spune-mi și îl dezactivez pentru familia ta.
 
 # Note tehnice (pentru administrator, nu de trimis)
 
-Două comutatoare independente, per familie:
+## Adăugarea unei familii noi
+
+Registrul e acum **un singur fișier**: [`js/families.data.js`](js/families.data.js).
+Antetul lui conține lista completă de pași. Pe scurt:
+
+1. copiezi șablonul din `FAMILIES` și îl completezi;
+2. adaugi fiecare adresă ca **Test user** în Google Cloud Console (fără asta nu se
+   pot conecta deloc, iar mesajul de eroare al Google nu explică de ce);
+3. le trimiți acest document;
+4. `node scripts/build-worker-bundle.mjs`;
+5. urci frontend-ul pe GitHub și lipești pachetul în panoul Cloudflare.
+
+Înainte datele erau scrise de două ori (client + Worker) și trebuiau ținute manual
+în sincron; o nepotrivire dădea fie carduri care nu duc nicăieri, fie o familie
+invizibilă. Acum Worker-ul importă același fișier — dar **verificarea de acces
+rămâne pe server**, pe baza emailului validat de Google.
+
+## Recompensele
+
+Fiecare familie își setează singură ce câștigă copiii, din aplicație:
+**Parent view → ⚙️ Recompensele familiei**. Poate fi orice — minute pe tabletă,
+puncte spre o bicicletă, lei. Se salvează per familie în Cloudflare KV, deci
+ajunge și pe telefoanele copiilor, nu doar pe cel al părintelui.
+
+Doar un **adult** din familie poate schimba setarea; copiii doar o citesc
+(verificat pe server). Dacă o familie nu setează nimic, se folosesc valorile din
+`DEFAULT_REWARDS`.
+
+## Comutatoare per familie
 
 **`driveReport`** în `js/profile.js` — raportul Google Doc.
 - `true` — aplicația copilului creează documentul în Drive-ul LUI și îl partajează cu

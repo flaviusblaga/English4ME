@@ -58,93 +58,26 @@ export function getProfile(profileId) {
 }
 
 // ---- Family members ----
-// The picker now shows PEOPLE, not abstract levels. Each member maps onto one
-// of the profiles above:
+// The picker shows PEOPLE, not abstract levels. Each member maps onto one of
+// the profiles above:
 //   • adults (role "admin") → the Business English profile, and can view the
 //     children's progress;
 //   • kids → their level is NOT fixed here; it's decided by the placement test
 //     the first time they enter, then remembered (see placement.js). So a kid
 //     member has no profileId until the test assigns one.
-// Several households now share one deployment, so members are grouped into
-// families and nobody ever sees a family other than their own.
 //
-// IMPORTANT — this file decides only what the PICKER DRAWS. It is not a
-// security boundary: it ships to the browser and anyone with dev tools can
-// edit it. The real access control lives in worker/src/families.js, which is
-// checked against a Google-verified email on every request. Keep the two in
-// step: adding a family here without adding it there gets tiles that lead
-// nowhere, and adding it there without here makes it invisible.
-//
-// Member ids must be unique across ALL families — they key the per-device
-// placement memory below. (The original four keep their bare ids so existing
-// installs don't lose their placement; new families use an "<family>-" prefix.)
-export const FAMILIES = [
-  {
-    id: "blaga",
-    name: "Familia Blaga",
-    // Publishes a progress report as a Google Doc in the CHILD's own Drive,
-    // shared with this family's adults. Nothing is stored by the app owner, so
-    // this is the option to give families outside his household.
-    driveReport: true,
-    members: [
-      { id: "flavius", name: "Flavius", emoji: "💼", kind: "adult", role: "admin",
-        img: "assets/socatei/flavius-sticker.png",
-        profileId: "business-conversational", emails: ["flaviusblaga@gmail.com"] },
-      { id: "andrea",  name: "Andrea",  emoji: "☕", kind: "adult", role: "admin",
-        img: "assets/socatei/andrea-sticker.png",
-        profileId: "business-conversational", emails: ["andrea.bartha1@gmail.com"] },
-      { id: "darius",  name: "Darius",  emoji: "🦫", kind: "kid", img: "assets/socatei/bobo-sticker.png",
-        emails: ["blagadariusmarcus@gmail.com", "dariusmblaga@gmail.com"] },
-      { id: "rares",   name: "Rareș",   emoji: "🐿️", kind: "kid", img: "assets/socatei/fizz-sticker.png",
-        emails: ["blagararesoctavian@gmail.com", "raresoblaga@gmail.com"] },
-    ],
-  },
-
-  // ---- Template for a new family: copy, fill in, mirror in worker/src/families.js.
-  //
-  // `img` is only the STARTING picture — everyone can change theirs from the
-  // picker (see AVATARS below), so the values here just decide what a brand-new
-  // tile looks like before anyone touches it. Give the two children different
-  // mascots so their tiles are told apart at a glance on day one.
-  //
-  // driveReport: true is the setting to give families outside the author's
-  // household — their child's progress goes to their own Drive and never to
-  // the app owner. Pair it with progressMirror: false in worker/src/families.js.
-  // {
-  //   id: "popescu",
-  //   name: "Familia Popescu",
-  //   driveReport: true,
-  //   members: [
-  //     { id: "popescu-tata", name: "Tata", emoji: "💼", kind: "adult", role: "admin",
-  //       img: "assets/socatei/tata-sticker.png",
-  //       profileId: "business-conversational", emails: ["tata@gmail.com"] },
-  //     { id: "popescu-mama", name: "Mama", emoji: "☕", kind: "adult", role: "admin",
-  //       img: "assets/socatei/mama-sticker.png",
-  //       profileId: "business-conversational", emails: ["mama@gmail.com"] },
-  //     { id: "popescu-copil1", name: "Copil 1", emoji: "🦫", kind: "kid",
-  //       img: "assets/socatei/bobo-sticker.png", emails: ["copil1@gmail.com"] },
-  //     { id: "popescu-copil2", name: "Copil 2", emoji: "🎀", kind: "kid",
-  //       img: "assets/socatei/sushi-sticker.png", emails: ["copil2@gmail.com"] },
-  //   ],
-  // },
-];
+// The registry itself lives in js/families.data.js, which the Worker imports
+// too — one file to edit when a family joins. What THIS file adds is the
+// browser-side reading of that data; every access decision is re-made
+// server-side against a Google-verified email.
+export { FAMILIES, DEFAULT_REWARDS, rewardsFor } from "./families.data.js";
+import { FAMILIES, lookupEmailIn } from "./families.data.js";
 
 // Flat view of everyone, for lookups that don't care about grouping.
 export const MEMBERS = FAMILIES.flatMap((f) => f.members.map((m) => ({ ...m, familyId: f.id })));
 
-function normEmail(e) {
-  return (e || "").trim().toLowerCase();
-}
-
 function lookupEmail(email) {
-  const needle = normEmail(email);
-  if (!needle) return null;
-  for (const family of FAMILIES) {
-    for (const member of family.members) {
-      if ((member.emails || []).some((e) => normEmail(e) === needle)) return { family, member };
-    }
-  }
-  return null;
+  return lookupEmailIn(FAMILIES, email);
 }
 
 export function familyForEmail(email) {

@@ -277,3 +277,127 @@ export const GRAMMAR_QUESTION_STEM_LINES = {
     "Choose the best answer.",
   ],
 };
+
+// ---------------------------------------------------------------------------
+// Four ways to drill one grammar question
+// ---------------------------------------------------------------------------
+// The Advanced and Expert tiers had a single exercise type, which is why they
+// produced so few lessons: one authored question meant exactly one exercise,
+// while a Beginner word yields six. These three extra types are DERIVED from
+// the same authored record — no new content needed — and they test genuinely
+// different things: recognition, error-spotting, reasoning, and production.
+//
+//   grammar-mcq    the sentence with a gap → pick the right form
+//   grammar-fix    the sentence filled in WRONG → pick what it should be
+//   grammar-why    the correct sentence → pick the reason it is correct
+//   grammar-recall no options at all → build the answer from word/letter tiles
+
+export const GRAMMAR_EXERCISE_TYPES = [
+  { type: "grammar-mcq", tier: "recognition" },
+  { type: "grammar-fix", tier: "recognition" },
+  { type: "grammar-why", tier: "production" },
+  { type: "grammar-recall", tier: "production" },
+];
+
+function correctValue(mcq) {
+  return mcq.options[mcq.correct];
+}
+
+// A plausible wrong answer, chosen by position so the same question always
+// produces the same "fix" exercise — a child who meets it twice sees the same
+// error to spot, instead of a different one each time.
+function firstWrongValue(mcq) {
+  const wrong = mcq.options.filter((_, i) => i !== mcq.correct);
+  return wrong[0];
+}
+
+function fillGap(question, value) {
+  return question.includes("____") ? question.replace("____", value) : `${question} → ${value}`;
+}
+
+// Distractor explanations come from OTHER questions in the same pool, so the
+// child has to recognise the RIGHT reason rather than pick the only sentence
+// that sounds like an explanation.
+function buildWhyOptions(mcq, pool) {
+  const others = pool
+    .filter((q) => q !== mcq && q.explain && q.explain !== mcq.explain)
+    .map((q) => q.explain);
+
+  const picked = [];
+  // Deterministic spread through the pool rather than random sampling: it
+  // guarantees three DIFFERENT distractors even when the pool is small.
+  const step = Math.max(1, Math.floor(others.length / 3));
+  for (let i = 0; picked.length < 3 && i < others.length; i += step) {
+    if (!picked.includes(others[i])) picked.push(others[i]);
+  }
+  for (const other of others) {
+    if (picked.length >= 3) break;
+    if (!picked.includes(other)) picked.push(other);
+  }
+
+  return shuffle([
+    { value: mcq.explain, isCorrect: true },
+    ...picked.map((value) => ({ value, isCorrect: false })),
+  ]);
+}
+
+export function buildGrammarQuestion(mcq, type, pool) {
+  const answer = correctValue(mcq);
+
+  switch (type) {
+    case "grammar-fix":
+      return {
+        type,
+        mcq,
+        wrongSentence: fillGap(mcq.q, firstWrongValue(mcq)),
+        options: shuffle(mcq.options.map((value) => ({ value, isCorrect: value === answer }))),
+      };
+
+    case "grammar-why":
+      return {
+        type,
+        mcq,
+        correctSentence: fillGap(mcq.q, answer),
+        options: buildWhyOptions(mcq, pool || []),
+      };
+
+    case "grammar-recall":
+      return {
+        type,
+        mcq,
+        options: [],
+        // Multi-word answers are rebuilt word by word; a single word letter by
+        // letter. Spelling out "was watching" one letter at a time is tedious
+        // and tests typing, not grammar.
+        joiner: answer.includes(" ") ? " " : "",
+        tokens: shuffle(answer.includes(" ") ? answer.split(" ") : answer.split("")),
+      };
+
+    case "grammar-mcq":
+    default:
+      return {
+        type: "grammar-mcq",
+        mcq,
+        options: shuffle(mcq.options.map((value) => ({ value, isCorrect: value === answer }))),
+      };
+  }
+}
+
+export const GRAMMAR_STEM_LINES = {
+  "grammar-mcq": GRAMMAR_QUESTION_STEM_LINES["grammar-mcq"],
+  "grammar-fix": [
+    "This one is wrong — what should it be?",
+    "Spot the mistake and fix it.",
+    "Something's off here. Pick the correction.",
+  ],
+  "grammar-why": [
+    "This is correct — but why?",
+    "Pick the reason this works.",
+    "Which rule explains this?",
+  ],
+  "grammar-recall": [
+    "Build the missing part yourself.",
+    "No options this time — put it together.",
+    "Your turn: assemble the answer.",
+  ],
+};

@@ -321,6 +321,11 @@ function showLevelPicker(member, recommendedProfileId) {
 // account email + profileId, so each level keeps its own saved progress.
 async function loadSession(profile, displayName) {
   const accessToken = getAccessToken();
+
+  // The family's own reward scheme, fetched before any screen is drawn so the
+  // child never sees the coded defaults flash and then change. Best-effort by
+  // design — loadFamilyRewards swallows its own errors and keeps the defaults.
+  await loadFamilyRewards();
   const { fileId, data } = await getOrCreateState(accessToken, {
     profileId: profile.id,
     userEmail: currentUser.email,

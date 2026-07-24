@@ -14,7 +14,14 @@ import {
 } from "./lesson-structure.js";
 import { syncProgress } from "./worker-client.js";
 import { updateGamificationAfterLesson, BADGES } from "./gamification.js";
-import { computeRewards, gamificationWithRewards, SCREEN_TIME_PER_LESSON_MIN } from "./rewards.js";
+import {
+  computeRewards,
+  gamificationWithRewards,
+  loadFamilyRewards,
+  perLessonPhrase,
+  earnedPhrase,
+  bonusPhrase,
+} from "./rewards.js";
 import {
   recordTurnForParentSync,
   todayLocalDateString,
@@ -157,7 +164,7 @@ function applyStructureMigration() {
   const { completed, migrated } = migrateCompletions(tierName, bucket.completed);
   const previousCount = Object.keys(bucket.completed).length;
   bucket.legacyCompleted = bucket.completed;
-  bucket.legacyScreenTimeMin = previousCount * SCREEN_TIME_PER_LESSON_MIN;
+  bucket.legacyLessonCount = previousCount;
   bucket.completed = completed;
 
   saveState(session.accessToken, session.fileId, session.state).catch((err) =>
@@ -185,7 +192,11 @@ function getItemLabel(question) {
 function getSpokenAnswer(question) {
   if (question.word) return question.word.en;
   if (question.sentence) return question.sentence.en;
-  return question.options.find((o) => o.isCorrect).value;
+  // grammar-recall is answered with tiles and carries no options; every other
+  // grammar type marks its correct option.
+  if (question.mcq && !question.options.length) return question.mcq.options[question.mcq.correct];
+  const correct = question.options.find((o) => o.isCorrect);
+  return correct ? correct.value : "";
 }
 
 // Romanian meaning of the tested item — the word/sentence banks already
@@ -210,6 +221,9 @@ function questionTypeLabel(type) {
     case "unscramble": return "Word order";
     case "picture-sentence": return "Picture-sentence match";
     case "grammar-mcq": return "Grammar challenge";
+    case "grammar-fix": return "Spot the mistake";
+    case "grammar-why": return "Why it works";
+    case "grammar-recall": return "Build the answer";
     default: return "Answered";
   }
 }
@@ -562,16 +576,16 @@ function renderRewardsCard() {
 
   const screenTimeLine = document.createElement("p");
   screenTimeLine.className = "rewards-row";
-  screenTimeLine.textContent = `⏱ +${SCREEN_TIME_PER_LESSON_MIN} min screen time per lesson · Timp câștigat: ${rewards.screenTimeMin} min`;
+  screenTimeLine.textContent = `⏱ +${perLessonPhrase(rewards)} pe lecție · Ai strâns: ${earnedPhrase(rewards)}`;
   card.appendChild(screenTimeLine);
 
   const bonusLine = document.createElement("p");
   bonusLine.className = "rewards-row rewards-row--bonus";
   if (rewards.bonusEarned) {
     bonusLine.classList.add("rewards-row--earned");
-    bonusLine.textContent = `🎁 BONUS UNLOCKED: ${rewards.bonusLei} lei! · Bonus deblocat — spune-le părinților!`;
+    bonusLine.textContent = `🎁 BONUS: ${bonusPhrase(rewards)}! · Bonus deblocat — spune-le părinților!`;
   } else {
-    bonusLine.textContent = `🎁 Finish all ${rewards.totalLessons} → ${rewards.bonusLei} lei bonus · Termină tot modulul pentru bonus!`;
+    bonusLine.textContent = `🎁 Termină toate cele ${rewards.totalLessons} → bonus de ${bonusPhrase(rewards)}`;
   }
   card.appendChild(bonusLine);
 
@@ -702,6 +716,23 @@ function renderQuestion() {
     return;
   }
 
+  // Recall: the grammar answer, built from tiles instead of picked from a list.
+  // Production practice — the child must produce the form, not recognise it.
+  if (question.type === "grammar-recall") {
+    stem.hidden = false;
+    stem.textContent = question.mcq.q;
+    stem.className = "lesson-question-stem lesson-question-stem--grammar-recall";
+    stem.style.cursor = "default";
+    stem.onclick = null;
+    optionsGrid.hidden = true;
+    unscrambleArea.hidden = false;
+    renderUnscramble(question, {
+      target: question.mcq.options[question.mcq.correct],
+      joiner: question.joiner,
+    });
+    return;
+  }
+
   // Pronunciation: show the text, model it out loud, then let the child say it.
   if (question.type === "say" || question.type === "say-sentence") {
     const target = question.type === "say" ? question.word.en : question.sentence.en;
@@ -755,6 +786,10 @@ function renderQuestion() {
     stem.textContent = question.sentence.emoji;
   } else if (question.type === "grammar-mcq") {
     stem.textContent = question.mcq.q;
+  } else if (question.type === "grammar-fix") {
+    stem.textContent = question.wrongSentence;
+  } else if (question.type === "grammar-why") {
+    stem.textContent = question.correctSentence;
   }
   stem.className = `lesson-question-stem lesson-question-stem--${question.type}`;
 
@@ -781,7 +816,9 @@ function renderQuestion() {
   // readable; word/emoji options keep the bigger two-column layout.
   const hasLongOptions =
     question.type === "picture-sentence" ||
-    (question.type === "grammar-mcq" && question.options.some((o) => o.value.length > 18));
+    question.type === "grammar-why" ||
+    ((question.type === "grammar-mcq" || question.type === "grammar-fix") &&
+      question.options.some((o) => o.value.length > 18));
   optionsGrid.classList.toggle("lesson-options-grid--sentences", hasLongOptions);
   // "picture" is the only type whose OPTIONS are emoji (pick the picture for the
   // word) — render those big so a child can actually tell them apart.
@@ -1083,14 +1120,14 @@ function finishLesson() {
   if (rewards && isFirstCompletion) {
     recordTurnForParentSync(session.state, {
       role: "assistant",
-      text: `[Reward] First completion of "${currentLesson.label}" — earned +${SCREEN_TIME_PER_LESSON_MIN} min screen time (total earned: ${rewards.screenTimeMin} min).`,
+      text: `[Reward] First completion of "${currentLesson.label}" — earned +${perLessonPhrase(rewards)} (total: ${earnedPhrase(rewards)}).`,
       ts: new Date().toISOString(),
     });
   }
   if (bonusJustEarned) {
     recordTurnForParentSync(session.state, {
       role: "assistant",
-      text: `[Reward] 🎁 MODULE COMPLETE — all ${rewards.totalLessons} lessons of the ${rewards.tier} level done. The agreed bonus is ${rewards.bonusLei} lei!`,
+      text: `[Reward] 🎁 MODULE COMPLETE — all ${rewards.totalLessons} lessons of the ${rewards.tier} level done. The agreed bonus is ${bonusPhrase(rewards)}!`,
       ts: new Date().toISOString(),
     });
   }
@@ -1205,19 +1242,19 @@ function renderCompleteRewards({ rewards, isFirstCompletion, bonusJustEarned }) 
   const timeLine = document.createElement("p");
   timeLine.className = "rewards-row";
   timeLine.textContent = isFirstCompletion
-    ? `⏱ +${SCREEN_TIME_PER_LESSON_MIN} min screen time earned! · Ai câștigat +${SCREEN_TIME_PER_LESSON_MIN} min de tehnologie! (total: ${rewards.screenTimeMin} min)`
-    : `⏱ Lesson already counted — screen time earned so far: ${rewards.screenTimeMin} min · Timp câștigat până acum: ${rewards.screenTimeMin} min`;
+    ? `⏱ Ai câștigat +${perLessonPhrase(rewards)}! (total: ${earnedPhrase(rewards)})`
+    : `⏱ Lecția era deja numărată — ai strâns până acum ${earnedPhrase(rewards)}`;
   box.appendChild(timeLine);
 
   if (bonusJustEarned) {
     const bonusLine = document.createElement("p");
     bonusLine.className = "rewards-row rewards-row--bonus rewards-row--earned";
-    bonusLine.textContent = `🎁 MODULE COMPLETE! Bonus unlocked: ${rewards.bonusLei} lei! · Ai terminat tot modulul — spune-le părinților!`;
+    bonusLine.textContent = `🎁 MODUL COMPLET! Bonus: ${bonusPhrase(rewards)} · Spune-le părinților!`;
     box.appendChild(bonusLine);
   } else {
     const towardLine = document.createElement("p");
     towardLine.className = "rewards-row";
-    towardLine.textContent = `📚 ${rewards.lessonsCompleted} / ${rewards.totalLessons} lessons toward the ${rewards.bonusLei} lei bonus · lecții spre bonus`;
+    towardLine.textContent = `📚 ${rewards.lessonsCompleted} / ${rewards.totalLessons} lecții spre bonusul de ${bonusPhrase(rewards)}`;
     box.appendChild(towardLine);
   }
 
