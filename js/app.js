@@ -15,6 +15,7 @@ import {
   avatarOptionsFor,
 } from "./profile.js";
 import { getRememberedProfileId, rememberProfileId } from "./profile-picker.js";
+import { loadFamilyRewards } from "./rewards.js";
 import { initParentView } from "./parent-view.js";
 import { initPwa } from "./pwa.js";
 import { initPlacement } from "./placement.js";
