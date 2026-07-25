@@ -547,6 +547,7 @@ body.mascot-theme .btn-primary {
 }
 
 .lesson-node-circle {
+  position: relative;
   width: 88px; height: 88px;
   border-radius: 50%;
   display: grid; place-items: center;
@@ -558,9 +559,29 @@ body.mascot-theme .btn-primary {
   outline: 3px solid var(--line);
 }
 
+/* Available/upcoming nodes carry a little green play badge, bottom-right. The
+   ring is the page colour so the badge reads as "cut out" of the circle. */
+.lesson-node:not(.lesson-node--done) .lesson-node-circle::after {
+  content: "▶";
+  position: absolute; right: -2px; bottom: -2px;
+  width: 28px; height: 28px; border-radius: 50%;
+  background: var(--success); color: #fff;
+  border: 3px solid var(--surface);
+  display: grid; place-items: center;
+  font-size: 11px; padding-left: 2px;
+}
+
+/* Finished lessons: a solid green disc with a bold white tick (the emoji is
+   hidden via font-size:0; the tick is the ::after grid item, centred). */
 .lesson-node--done .lesson-node-circle {
-  background: var(--success-soft);
-  outline-color: var(--success);
+  background: var(--success);
+  outline-color: #bbf7d0;
+  border-color: #fff;
+  font-size: 0;
+}
+.lesson-node--done .lesson-node-circle::after {
+  content: "✓";
+  color: #fff; font-size: 42px; font-weight: 800; line-height: 1;
 }
 
 .lesson-node--current .lesson-node-circle {
@@ -578,12 +599,16 @@ body.mascot-theme .btn-primary {
 
 .lesson-node-label {
   font-family: var(--font-display);
-  font-weight: 600;
-  font-size: 0.85rem;
+  font-weight: 700;
+  font-size: 0.8rem;
   color: var(--text);
-  max-width: 130px;
+  max-width: 150px;
   text-align: center;
   line-height: 1.15;
+  background: var(--surface-raised);
+  padding: 5px 14px;
+  border-radius: 999px;
+  box-shadow: var(--shadow-sm);
 }
 
 .lesson-node-stars {
