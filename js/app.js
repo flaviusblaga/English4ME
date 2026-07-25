@@ -130,72 +130,134 @@ function renderProfilePicker() {
     return;
   }
 
-  for (const member of visibleMembers) {
-    // The tile is a button, so the "change picture" control cannot live inside
-    // it (a button inside a button is invalid and swallows the click). They are
-    // siblings in a wrapper, which is also what positions the little badge.
+  // Grouped like a Netflix profile switcher: grown-ups in a sober row up top,
+  // kids in a big colourful grid below. A kid signed in with their own account
+  // only ever has their own tile, so a section renders only when it has members.
+  const adults = visibleMembers.filter((m) => m.kind === "adult");
+  const kids = visibleMembers.filter((m) => m.kind === "kid");
+
+  if (adults.length) {
+    const sec = document.createElement("div");
+    sec.className = "picker-section";
+    sec.appendChild(sectionLabel("adults", "👥", "Adulți"));
     const wrap = document.createElement("div");
-    wrap.className = "profile-card-wrap";
-
-    const card = document.createElement("button");
-    card.type = "button";
-    card.className = `profile-card profile-card--${member.kind}`;
-    if (member.id === remembered) card.classList.add("profile-card--remembered");
-
-    const icon = document.createElement("span");
-    icon.className = "profile-card-icon";
-    const avatar = getMemberAvatar(member);
-    if (avatar) {
-      // A die-cut sticker rather than an emoji: one of the three Socatei for a
-      // kid, a photo or a generic grown-up for an adult. Falls back to the
-      // emoji badge if the image ever fails to load.
-      const img = document.createElement("img");
-      img.className = "profile-card-portrait";
-      img.src = avatar;
-      img.alt = member.name;
-      img.onerror = function () {
-        this.replaceWith(document.createTextNode(member.emoji));
-      };
-      icon.appendChild(img);
-    } else {
-      icon.textContent = member.emoji;
-    }
-
-    const textCol = document.createElement("div");
-    textCol.className = "profile-card-text";
-    const title = document.createElement("strong");
-    title.textContent = member.name;
-    const desc = document.createElement("span");
-    if (member.kind === "adult") {
-      desc.textContent = "Business English · Admin";
-    } else {
-      const placed = getMemberPlacement(member.id);
-      desc.textContent = placed ? `Copil · ${levelLabel[placed] || "nivel setat"}` : "Copil · dă testul de nivel";
-    }
-    textCol.appendChild(title);
-    textCol.appendChild(desc);
-
-    card.appendChild(icon);
-    card.appendChild(textCol);
-    card.addEventListener("click", () => handleMemberPicked(member.id));
-    wrap.appendChild(card);
-
-    if (avatarOptionsFor(member).length > 1) {
-      const edit = document.createElement("button");
-      edit.type = "button";
-      edit.className = "profile-avatar-edit";
-      edit.textContent = "🎭";
-      edit.title = `Schimbă poza lui ${member.name}`;
-      edit.setAttribute("aria-label", `Schimbă poza lui ${member.name}`);
-      edit.addEventListener("click", (event) => {
-        event.stopPropagation(); // never open the member as a side effect
-        openAvatarPicker(member);
-      });
-      wrap.appendChild(edit);
-    }
-
-    list.appendChild(wrap);
+    wrap.className = "adult-wrap";
+    for (const member of adults) wrap.appendChild(renderAdultCard(member, remembered));
+    sec.appendChild(wrap);
+    list.appendChild(sec);
   }
+
+  if (kids.length) {
+    const sec = document.createElement("div");
+    sec.className = "picker-section";
+    sec.appendChild(sectionLabel("kids", "🧒", "Copii"));
+    const grid = document.createElement("div");
+    grid.className = "kids-grid";
+    for (const member of kids) grid.appendChild(renderKidCard(member, remembered, levelLabel));
+    sec.appendChild(grid);
+    list.appendChild(sec);
+  }
+}
+
+const PICKER_CHEVRON =
+  '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.4"><path d="m9 18 6-6-6-6"/></svg>';
+const PICKER_PLAY = '<svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>';
+
+// Which of the three Socatei a sticker path shows, for the little name badge.
+function mascotFromAvatar(src) {
+  const m = src && src.match(/(bobo|fizz|sushi)/);
+  return m ? m[1] : null;
+}
+
+function sectionLabel(kind, emoji, text) {
+  const span = document.createElement("span");
+  span.className = `grp-label grp-label--${kind}`;
+  span.innerHTML = `<span class="grp-emoji">${emoji}</span> ${text}`;
+  return span;
+}
+
+// The tile is a <button>, so the "change picture" badge can't live inside it
+// (button-in-button is invalid). They sit as siblings in this wrapper.
+function pickerWrap(card, member) {
+  const wrap = document.createElement("div");
+  wrap.className = "picker-cardwrap";
+  wrap.appendChild(card);
+  if (avatarOptionsFor(member).length > 1) {
+    const edit = document.createElement("button");
+    edit.type = "button";
+    edit.className = "profile-avatar-edit";
+    edit.textContent = "🎭";
+    edit.title = `Schimbă poza lui ${member.name}`;
+    edit.setAttribute("aria-label", `Schimbă poza lui ${member.name}`);
+    edit.addEventListener("click", (event) => {
+      event.stopPropagation();
+      openAvatarPicker(member);
+    });
+    wrap.appendChild(edit);
+  }
+  return wrap;
+}
+
+function renderAdultCard(member, remembered) {
+  const card = document.createElement("button");
+  card.type = "button";
+  card.className = "adult-card" + (member.id === remembered ? " is-remembered" : "");
+  const avatar = getMemberAvatar(member);
+  const av = document.createElement("span");
+  av.className = "av";
+  if (avatar) {
+    const img = document.createElement("img");
+    img.src = avatar; img.alt = member.name;
+    img.onerror = function () { this.replaceWith(document.createTextNode(member.emoji)); };
+    av.appendChild(img);
+  } else av.textContent = member.emoji;
+  const who = document.createElement("span");
+  who.className = "who";
+  who.innerHTML = `<strong></strong><span class="sub">Business English</span><span class="role">Admin</span>`;
+  who.querySelector("strong").textContent = member.name;
+  const go = document.createElement("span");
+  go.className = "go"; go.innerHTML = PICKER_CHEVRON;
+  card.append(av, who, go);
+  card.addEventListener("click", () => handleMemberPicked(member.id));
+  return pickerWrap(card, member);
+}
+
+function renderKidCard(member, remembered, levelLabel) {
+  const card = document.createElement("button");
+  card.type = "button";
+  const avatar = getMemberAvatar(member);
+  const mascot = mascotFromAvatar(avatar);
+  card.className = "kid-card" + (mascot ? ` kid-card--${mascot}` : "") + (member.id === remembered ? " is-remembered" : "");
+
+  const stick = document.createElement("span");
+  stick.className = "stick";
+  if (avatar) {
+    const img = document.createElement("img");
+    img.src = avatar; img.alt = member.name;
+    img.onerror = function () { this.replaceWith(document.createTextNode(member.emoji)); };
+    stick.appendChild(img);
+  } else stick.textContent = member.emoji;
+
+  const name = document.createElement("span");
+  name.className = "kname"; name.textContent = member.name;
+
+  const placed = getMemberPlacement(member.id);
+  const lvl = document.createElement("span");
+  lvl.className = "klvl";
+  lvl.textContent = placed ? (levelLabel[placed] || "Nivel setat") : "Dă testul de nivel";
+
+  const go = document.createElement("span");
+  go.className = "kgo"; go.innerHTML = PICKER_PLAY;
+
+  card.append(stick, name);
+  if (mascot) {
+    const badge = document.createElement("span");
+    badge.className = "kid-badge"; badge.textContent = mascot.toUpperCase();
+    card.appendChild(badge);
+  }
+  card.append(lvl, go);
+  card.addEventListener("click", () => handleMemberPicked(member.id));
+  return pickerWrap(card, member);
 }
 
 // Lets a child pick which Socatel represents them, and a grown-up pick a
@@ -276,40 +338,66 @@ function retakePlacement() {
 const KID_LEVELS = ["kids-primar", "kids-intermediate", "kids-advanced", "kids-expert"];
 const LEVEL_LABEL = { "kids-primar": "Beginner", "kids-intermediate": "Intermediate", "kids-advanced": "Advanced", "kids-expert": "Expert" };
 
+// The four levels, re-skinned as adventure "modules". Each maps 1:1 onto a
+// profile id — same content underneath, playful framing on top. `mascot` is a
+// sticker filename, or "cup" for the trophy (Expert has no mascot).
+const MODULES = {
+  "kids-primar":       { m: "playroom", label: "Playroom with Bobo",   sub: "Joacă-te, învață și vorbește cu Bobo!",        mascot: "bobo" },
+  "kids-intermediate": { m: "adventure", label: "Adventure with Fizz",  sub: "Explorează, descoperă și devino curios!",       mascot: "fizz" },
+  "kids-advanced":     { m: "storytime", label: "Storytime with Sushi", sub: "Citește, ascultă și imaginează-ți poveștile!",  mascot: "sushi" },
+  "kids-expert":       { m: "mastery",   label: "Mastery Cup",          sub: "Provocări avansate pentru a deveni campion!",   mascot: "cup" },
+};
+
 function showLevelPicker(member, recommendedProfileId) {
   currentMember = member;
-  el("level-picker-title").textContent = `Alege nivelul, ${member.name}! 🎯`;
+  el("level-picker-title").textContent = `Alege aventura, ${member.name}!`;
 
   const list = el("level-picker-list");
   list.innerHTML = "";
+  list.className = "module-list"; // switch the container off the old card grid
+
   for (const levelId of KID_LEVELS) {
     const profile = getProfile(levelId);
+    const mod = MODULES[levelId];
+
     const card = document.createElement("button");
     card.type = "button";
-    card.className = `profile-card profile-card--${profile.level}`;
-    if (levelId === recommendedProfileId) card.classList.add("profile-card--remembered");
+    card.className = `mod-card mod-card--${mod.m}`;
+    if (levelId === recommendedProfileId) card.classList.add("mod-card--recommended");
 
-    const icon = document.createElement("span");
-    icon.className = "profile-card-icon";
-    icon.textContent = profile.emoji || "📘";
+    const art = document.createElement("span");
+    art.className = "mod-art";
+    if (mod.mascot === "cup") {
+      art.textContent = "🏆";
+      art.classList.add("mod-art--cup");
+    } else {
+      const img = document.createElement("img");
+      img.src = `assets/socatei/${mod.mascot}-sticker.png`;
+      img.alt = mod.label;
+      img.onerror = function () { this.replaceWith(document.createTextNode("🐾")); };
+      art.appendChild(img);
+    }
 
-    const textCol = document.createElement("div");
-    textCol.className = "profile-card-text";
-    const title = document.createElement("strong");
-    title.textContent = LEVEL_LABEL[levelId];
+    const txt = document.createElement("span");
+    txt.className = "mod-txt";
+    const h = document.createElement("strong");
+    h.textContent = mod.label;
     if (levelId === recommendedProfileId) {
       const badge = document.createElement("span");
-      badge.className = "level-recommended-badge";
-      badge.textContent = " ⭐ Recomandat";
-      title.appendChild(badge);
+      badge.className = "mod-reco";
+      badge.textContent = "⭐ Recomandat";
+      h.appendChild(badge);
     }
-    const desc = document.createElement("span");
-    desc.textContent = profile.description;
-    textCol.appendChild(title);
-    textCol.appendChild(desc);
+    const p = document.createElement("span");
+    p.className = "mod-sub";
+    p.textContent = mod.sub;
+    txt.append(h, p);
 
-    card.appendChild(icon);
-    card.appendChild(textCol);
+    const chev = document.createElement("span");
+    chev.className = "mod-chev";
+    chev.innerHTML = PICKER_CHEVRON;
+
+    card.append(art, txt, chev);
     card.addEventListener("click", () => loadSession(profile, member.name));
     list.appendChild(card);
   }

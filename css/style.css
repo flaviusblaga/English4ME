@@ -919,6 +919,117 @@ body.mascot-theme .identity-avatar {
   gap: 12px;
 }
 
+/* ===================== Redesigned profile switcher ===================== */
+.grp-label {
+  display: inline-flex; align-items: center; gap: 8px;
+  font-family: var(--font-display); font-weight: 800;
+  text-transform: uppercase; letter-spacing: 0.05em; font-size: 0.82rem;
+  padding: 7px 14px; border-radius: 999px; margin-bottom: 12px;
+}
+.grp-label .grp-emoji { font-size: 1rem; }
+.grp-label--adults { color: var(--primary); background: var(--primary-soft); }
+.grp-label--kids { color: var(--kid-pink-dark); background: #ffe6f2; }
+
+.picker-section + .picker-section { margin-top: 22px; }
+.adult-wrap { display: flex; flex-direction: column; gap: 12px; }
+.picker-cardwrap { position: relative; display: flex; }
+.picker-cardwrap > .adult-card { flex: 1; }
+
+.adult-card {
+  display: flex; align-items: center; gap: 14px;
+  background: var(--surface-raised); border: 1px solid var(--line);
+  border-radius: var(--r-xl); padding: 12px 16px; cursor: pointer;
+  box-shadow: var(--shadow-sm); text-align: left; font: inherit; color: var(--text);
+  transition: transform 120ms var(--ease-out), box-shadow 120ms var(--ease-out);
+}
+.adult-card:active { transform: scale(0.98); }
+.adult-card.is-remembered { box-shadow: 0 0 0 2px var(--primary), var(--shadow-sm); }
+.adult-card .av {
+  width: 76px; height: 76px; border-radius: 50%; flex-shrink: 0; overflow: hidden;
+  background: radial-gradient(circle at 50% 35%, #eaf3ff, #d7e9ff);
+  display: grid; place-items: end center; font-size: 1.8rem;
+}
+.adult-card .av img { width: 96%; }
+.adult-card .who { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.adult-card .who strong { font-family: var(--font-display); font-weight: 800; font-size: 1.3rem; }
+.adult-card .who .sub { color: var(--text-muted); font-weight: 600; font-size: 0.88rem; }
+.adult-card .who .role {
+  display: inline-flex; align-items: center; gap: 6px; color: var(--primary);
+  font-weight: 700; font-size: 0.8rem; margin-top: 2px;
+}
+.adult-card .who .role::before { content:""; width: 6px; height: 6px; border-radius: 50%; background: var(--primary); }
+.adult-card .go {
+  width: 42px; height: 42px; border-radius: 50%; background: #fff; box-shadow: var(--shadow-sm);
+  display: grid; place-items: center; color: var(--primary); flex-shrink: 0;
+}
+
+.kids-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.kids-grid .picker-cardwrap { display: block; }
+.kid-card {
+  position: relative; width: 100%; background: var(--surface-raised);
+  border: 2px solid var(--kc-soft); border-radius: var(--r-xl);
+  padding: 10px 10px 16px; text-align: center; overflow: hidden;
+  box-shadow: var(--shadow-sm); cursor: pointer; font: inherit; color: var(--text);
+  display: flex; flex-direction: column; align-items: center;
+  transition: transform 120ms var(--ease-out);
+  --kc: var(--kid-blue); --kc-soft: #e4f4fb;
+}
+.kid-card:active { transform: scale(0.97); }
+.kid-card--bobo  { --kc: var(--kid-blue); --kc-soft: #d9f0fb; }
+.kid-card--fizz  { --kc: var(--kid-teal); --kc-soft: #d4f6e8; }
+.kid-card--sushi { --kc: var(--kid-pink); --kc-soft: #ffe0f0; }
+.kid-card.is-remembered { box-shadow: 0 0 0 2px var(--kc), var(--shadow-sm); }
+.kid-card::after {
+  content:""; position: absolute; top: -18px; right: -18px; width: 58px; height: 58px;
+  border-radius: 50%; background: var(--kc-soft); opacity: 0.7;
+}
+.kid-card .stick { height: 140px; display: flex; align-items: flex-end; justify-content: center; position: relative; z-index: 1; }
+.kid-card .stick img {
+  max-width: 100%; max-height: 100%; width: auto; height: auto; object-fit: contain;
+  filter: drop-shadow(0 6px 8px rgba(16, 74, 88, 0.24));
+}
+.kid-card .kname { font-family: var(--font-display); font-weight: 800; font-size: 1.15rem; margin-top: 6px; }
+.kid-badge {
+  display: inline-block; font-family: var(--font-display); font-weight: 800; font-size: 0.62rem;
+  letter-spacing: 0.04em; padding: 3px 9px; border-radius: 999px; background: var(--kc-soft); color: var(--kc); margin: 3px 0;
+}
+.kid-card .klvl { font-size: 0.7rem; font-weight: 800; text-transform: uppercase; color: var(--text-faint); letter-spacing: 0.03em; }
+.kid-card .kgo {
+  width: 40px; height: 40px; border-radius: 50%; background: var(--kc); color: #fff;
+  display: grid; place-items: center; margin: 10px auto 0; box-shadow: 0 6px 14px var(--kc-soft);
+}
+
+/* ===================== Module cards (level picker) ===================== */
+.module-list { display: flex; flex-direction: column; gap: 14px; }
+.mod-card {
+  display: flex; align-items: center; gap: 12px; border: 0; cursor: pointer;
+  border-radius: var(--r-xl); padding: 14px 16px; overflow: hidden;
+  text-align: left; font: inherit;
+  background: linear-gradient(110deg, var(--mod-2), var(--mod-1));
+  box-shadow: 0 8px 20px var(--mod-sh);
+  transition: transform 120ms var(--ease-out);
+}
+.mod-card:active { transform: scale(0.98); }
+.mod-card--recommended { outline: 3px solid #fff; outline-offset: -3px; }
+.mod-card--playroom  { --mod-1:#93c5fd; --mod-2:#dbeafe; --mod-ink:#1e40af; --mod-sh:rgba(59,130,246,0.30); }
+.mod-card--adventure { --mod-1:#86efac; --mod-2:#dcfce7; --mod-ink:#166534; --mod-sh:rgba(34,197,94,0.28); }
+.mod-card--storytime { --mod-1:#f9a8d4; --mod-2:#fce7f3; --mod-ink:#9d174d; --mod-sh:rgba(236,72,153,0.26); }
+.mod-card--mastery   { --mod-1:#fcd34d; --mod-2:#fef3c7; --mod-ink:#92400e; --mod-sh:rgba(245,158,11,0.26); }
+.mod-art { width: 92px; align-self: stretch; min-height: 100px; flex-shrink: 0; display: flex; align-items: flex-end; justify-content: center; }
+.mod-art img { max-width: 100%; max-height: 114px; width: auto; height: auto; object-fit: contain; filter: drop-shadow(0 6px 8px rgba(0,0,0,0.26)); }
+.mod-art--cup { font-size: 3.6rem; align-items: center; filter: drop-shadow(0 6px 8px rgba(0,0,0,0.2)); }
+.mod-txt { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.mod-txt strong { font-family: var(--font-display); font-weight: 800; font-size: 1.25rem; line-height: 1.1; color: var(--mod-ink); }
+.mod-sub { color: var(--mod-ink); opacity: 0.85; font-weight: 600; font-size: 0.82rem; margin-top: 3px; }
+.mod-reco {
+  display: inline-block; font-size: 0.62rem; font-weight: 800; background: rgba(255,255,255,0.9);
+  color: var(--mod-ink); padding: 2px 7px; border-radius: 999px; margin-left: 6px; vertical-align: middle;
+}
+.mod-chev {
+  width: 40px; height: 40px; border-radius: 50%; background: rgba(255,255,255,0.92);
+  display: grid; place-items: center; color: var(--mod-ink); flex-shrink: 0; box-shadow: 0 4px 10px rgba(0,0,0,0.12);
+}
+
 .profile-card {
   display: flex;
   align-items: center;

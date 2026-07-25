@@ -56,10 +56,10 @@ export const FAMILIES = [
     // Omitted → DEFAULT_REWARDS. Parents override this from the app.
     members: [
       { id: "flavius", name: "Flavius", emoji: "💼", kind: "adult", role: "admin",
-        img: "assets/socatei/flavius-sticker.png",
+        img: "assets/socatei/tata-sticker.png",
         profileId: "business-conversational", emails: ["flaviusblaga@gmail.com"] },
       { id: "andrea",  name: "Andrea",  emoji: "☕", kind: "adult", role: "admin",
-        img: "assets/socatei/andrea-sticker.png",
+        img: "assets/socatei/mama-sticker.png",
         profileId: "business-conversational", emails: ["andrea.bartha1@gmail.com"] },
       { id: "darius",  name: "Darius",  emoji: "🦫", kind: "kid",
         img: "assets/socatei/bobo-sticker.png",
