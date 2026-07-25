@@ -424,10 +424,26 @@ async function loadSession(profile, displayName) {
   });
 
   document.body.className = `profile-${profile.id}${profile.features.mascots ? " mascot-theme" : ""}`;
+  // Drives the whole visual theme: kids (contentTier set) get the playful world,
+  // the adult Business profile gets the premium dashboard. Scoped in CSS to
+  // [data-usertype="adult"] so it never touches the kids' shared chat screen.
+  const isAdult = !profile.contentTier;
+  document.body.dataset.usertype = isAdult ? "adult" : "child";
 
   el("current-user-name").textContent = displayName;
   el("current-profile-name").textContent = profile.displayName;
-  el("header-avatar").textContent = (displayName[0] || "?").toUpperCase();
+  // Adults get their cartoon avatar in the header; kids keep the plain initial.
+  const headerAv = el("header-avatar");
+  const headerAvatar = currentMember ? getMemberAvatar(currentMember) : null;
+  if (isAdult && headerAvatar) {
+    headerAv.textContent = "";
+    const img = document.createElement("img");
+    img.src = headerAvatar; img.alt = displayName;
+    img.onerror = function () { this.parentElement.textContent = (displayName[0] || "?").toUpperCase(); };
+    headerAv.appendChild(img);
+  } else {
+    headerAv.textContent = (displayName[0] || "?").toUpperCase();
+  }
   el("view-child-progress-btn").hidden = !profile.features.canViewChildren;
   el("reading-btn").hidden = !profile.features.reading;
 
@@ -455,12 +471,14 @@ function handleLogout() {
   currentSession = null;
   currentMember = null;
   document.body.className = "";
+  document.body.dataset.usertype = "child";
   showScreen("login");
 }
 
 // "Alt membru" — back to the family picker (switch who's practicing).
 function goToMemberPicker() {
   document.body.className = "";
+  document.body.dataset.usertype = "child";
   currentMember = null;
   renderProfilePicker();
   showScreen("profile-picker");
@@ -471,6 +489,7 @@ function goToMemberPicker() {
 // family picker.
 function goHome() {
   document.body.className = "";
+  document.body.dataset.usertype = "child";
   if (currentMember && currentMember.kind === "kid") {
     showLevelPicker(currentMember, getMemberPlacement(currentMember.id));
   } else {

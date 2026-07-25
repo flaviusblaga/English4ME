@@ -754,6 +754,67 @@ body.mascot-theme .identity-avatar {
   white-space: nowrap;
 }
 
+/* ===================== Adult "premium dashboard" theme =====================
+   Everything here is scoped to body[data-usertype="adult"], set only for the
+   Business profile in loadSession — so the kids' shared chat screen is never
+   touched. It turns the chat header into a dark SaaS dashboard header. */
+body[data-usertype="adult"] .app-header {
+  background: linear-gradient(165deg, #12314a 0%, #0c2233 100%);
+  border-bottom: 0;
+  color: #fff;
+  padding-bottom: var(--sp-2);
+}
+body[data-usertype="adult"] .app-header-top { padding-top: 40px; }
+body[data-usertype="adult"] .app-identity { gap: var(--sp-3); }
+body[data-usertype="adult"] .identity-avatar {
+  width: 54px; height: 54px; overflow: hidden;
+  background: radial-gradient(circle at 50% 35%, #1c3a5a, #0e2338);
+  box-shadow: 0 0 0 2px rgba(90, 150, 220, 0.5), 0 6px 16px rgba(0, 0, 0, 0.4);
+}
+body[data-usertype="adult"] .identity-avatar img {
+  width: 100%; height: 100%; object-fit: cover; object-position: top center;
+}
+body[data-usertype="adult"] .app-identity strong { font-size: var(--fs-md); color: #fff; }
+body[data-usertype="adult"] .profile-tag { color: #9fb6c9; }
+
+/* usage read-out as a soft pill on the dark header */
+body[data-usertype="adult"] .budget-indicator {
+  color: #cfe0ee;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(120, 170, 220, 0.25);
+  border-radius: 999px;
+  padding: 6px 12px;
+  font-weight: 600;
+}
+body[data-usertype="adult"] #settings-btn {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  color: #cfe0ee;
+  box-shadow: none;
+}
+
+/* action row (View child's progress, Levels) as subtle dark cards */
+body[data-usertype="adult"] .app-header-actions .btn {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  color: #eaf2f9;
+  box-shadow: none;
+  font-family: var(--font-display);
+  font-weight: 600;
+}
+body[data-usertype="adult"] .app-header-actions .btn:active { transform: scale(0.97); }
+
+/* the "Practice:" scenario selector, kept legible on the dark header */
+body[data-usertype="adult"] .scenario-label { color: #9fb6c9; }
+body[data-usertype="adult"] #scenario-select {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.18);
+  color: #eaf2f9;
+}
+
+/* neutral, premium body beneath the dark header */
+body[data-usertype="adult"] #screen-chat { background: #f4f7fa; }
+
 /* ---------- 5. Gamification chips + badges ---------- */
 .gamification-bar {
   display: flex;
