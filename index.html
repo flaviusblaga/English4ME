@@ -26,26 +26,27 @@
 
   <main id="screen-login" class="screen">
     <div class="login-card">
-      <!-- Two rows on purpose: three stickers side by side measured 406px and
-           ran off a 391px phone screen. Bobo and Fizz up top, Sushi below. -->
+      <!-- Redesign: the three Socatei in one row (each ~31%, so they scale to
+           fit any width instead of overflowing), Sushi slightly larger in the
+           middle. -->
       <div class="login-mascots">
-        <div class="login-mascots-row">
-          <img class="mascot-sticker-hero" src="assets/socatei/bobo-sticker.png" alt="Bobo"
-               onerror="this.replaceWith(Object.assign(document.createElement('span'),{className:'mascot-avatar mascot-avatar--big mascot-avatar--emoji-fallback',textContent:'🦫'}))" />
-          <img class="mascot-sticker-hero" src="assets/socatei/fizz-sticker.png" alt="Fizz"
-               onerror="this.replaceWith(Object.assign(document.createElement('span'),{className:'mascot-avatar mascot-avatar--big mascot-avatar--emoji-fallback',textContent:'🐿️'}))" />
-        </div>
-        <div class="login-mascots-row">
-          <img class="mascot-sticker-hero" src="assets/socatei/sushi-sticker.png" alt="Sushi"
-               onerror="this.replaceWith(Object.assign(document.createElement('span'),{className:'mascot-avatar mascot-avatar--big mascot-avatar--emoji-fallback',textContent:'🎀'}))" />
-        </div>
+        <img class="mascot-sticker-hero" src="assets/socatei/bobo-sticker.png" alt="Bobo"
+             onerror="this.replaceWith(Object.assign(document.createElement('span'),{className:'mascot-avatar mascot-avatar--big mascot-avatar--emoji-fallback',textContent:'🦫'}))" />
+        <img class="mascot-sticker-hero mid" src="assets/socatei/sushi-sticker.png" alt="Sushi"
+             onerror="this.replaceWith(Object.assign(document.createElement('span'),{className:'mascot-avatar mascot-avatar--big mascot-avatar--emoji-fallback',textContent:'🐱'}))" />
+        <img class="mascot-sticker-hero" src="assets/socatei/fizz-sticker.png" alt="Fizz"
+             onerror="this.replaceWith(Object.assign(document.createElement('span'),{className:'mascot-avatar mascot-avatar--big mascot-avatar--emoji-fallback',textContent:'🐿️'}))" />
       </div>
-      <h1>English4ME</h1>
+      <h1 class="wordmark"><span class="wm-en">English</span><span class="wm-4">4</span><span class="wm-me">ME</span></h1>
       <p class="subtitle">Învață engleza jucându-te, cu prietenii tăi Bobo, Fizz și Sushi! 🎉</p>
-      <button id="login-btn" class="btn btn-google">🔵 Sign in with Google</button>
+      <button id="login-btn" class="btn btn-google">
+        <svg class="google-g" viewBox="0 0 24 24" aria-hidden="true"><path fill="#4285F4" d="M22 12c0-.7-.1-1.4-.2-2H12v4h5.6a4.8 4.8 0 0 1-2 3.1v2.6h3.3C20.8 18 22 15.3 22 12z"/><path fill="#34A853" d="M12 22c2.7 0 5-.9 6.6-2.4l-3.3-2.6c-.9.6-2 1-3.3 1-2.5 0-4.7-1.7-5.5-4H3.1v2.6A10 10 0 0 0 12 22z"/><path fill="#FBBC05" d="M6.5 14a6 6 0 0 1 0-3.9V7.5H3.1a10 10 0 0 0 0 9z"/><path fill="#EA4335" d="M12 6.1c1.5 0 2.8.5 3.8 1.5l2.9-2.9A10 10 0 0 0 3.1 7.5l3.4 2.6c.8-2.3 3-4 5.5-4z"/></svg>
+        Continuă cu Google
+      </button>
       <p id="login-error" class="error" hidden></p>
       <button id="install-app-btn" class="btn btn-small" hidden>📲 Instalează pe telefon</button>
       <p id="ios-install-hint" class="hint" hidden>Pe iPhone: apasă Share ⬆️ (în Safari), apoi „Add to Home Screen".</p>
+      <p class="login-invite">🔒 Acces doar cu invitație — contul tău Google trebuie adăugat de administrator.</p>
     </div>
   </main>
 

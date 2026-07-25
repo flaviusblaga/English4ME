@@ -803,62 +803,68 @@ body.mascot-theme .identity-avatar {
   align-items: center;
 }
 
-/* Stacked rows rather than one line: three stickers abreast came to 406px and
-   spilled off a 391px phone. The split is in the markup, not a wrap rule, so
-   the grouping stays the same on every screen instead of reflowing by width. */
+/* The three Socatei in ONE row, each ~31% so they scale to fit any width (no
+   overflow, no need to split rows). Sushi in the middle a touch larger. */
 .login-mascots {
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 4px;
-  margin-bottom: 8px;
-}
-
-.login-mascots-row {
-  display: flex;
   justify-content: center;
-  align-items: flex-end; /* different sticker heights, but the plaques line up */
+  align-items: flex-end;
   gap: 2px;
+  margin-bottom: 6px;
 }
 
-/* Full die-cut stickers (character + name plaque) as the login hero. Capped by
-   percentage too, so a narrow phone shrinks them instead of clipping. */
 .mascot-sticker-hero {
-  width: min(134px, 46%);
+  width: 31%;
   height: auto;
   filter: drop-shadow(0 6px 10px rgba(16, 74, 88, 0.26));
 }
-
-/* Alone on its row, Sushi would otherwise be capped at 46% of the full card. */
-.login-mascots-row:last-child:not(:only-child) .mascot-sticker-hero {
-  width: min(134px, 92%);
+.mascot-sticker-hero.mid {
+  width: 34%;
+  margin: 0 -6px;
+  z-index: 1;
 }
 
 /* If a sticker PNG fails to load, the emoji fallback swaps in as a round badge. */
 .login-mascots .mascot-avatar--emoji-fallback {
-  width: 88px;
-  height: 88px;
-  margin: 0 -8px;
+  width: 72px;
+  height: 72px;
+  margin: 0 -4px;
 }
 
-.login-card h1 {
-  font-size: 1.75rem;
-  margin: 6px 0 4px;
+/* Wordmark: English (slate) · 4 (Bobo blue) · ME (Sushi pink). */
+.login-card h1.wordmark {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 2.4rem;
+  letter-spacing: -0.01em;
+  margin: 4px 0 8px;
 }
+.wordmark .wm-en { color: #334155; }
+.wordmark .wm-4 { color: var(--primary); }
+.wordmark .wm-me { color: var(--kid-pink); }
 
 .subtitle {
   color: var(--text-muted);
-  margin: 0 0 22px;
-  font-size: 0.95rem;
+  font-weight: 600;
+  margin: 0 auto 28px;
+  max-width: 300px;
+  font-size: 0.98rem;
   line-height: 1.4;
 }
 
+/* White Google button with the coloured G mark. */
 .btn-google {
   width: 100%;
   background: var(--surface-raised);
   color: var(--text);
+  border: 1.5px solid var(--line);
   box-shadow: var(--shadow-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
 }
+.btn-google .google-g { width: 22px; height: 22px; flex-shrink: 0; }
 
 .btn-google:active {
   transform: translateY(1px) scale(0.99);
@@ -867,6 +873,16 @@ body.mascot-theme .identity-avatar {
 #install-app-btn {
   width: 100%;
   margin-top: 12px;
+}
+
+/* Access is by admin-approved Google account — no self sign-up. */
+.login-invite {
+  color: var(--text-faint);
+  font-size: 0.82rem;
+  font-weight: 600;
+  line-height: 1.4;
+  margin-top: 20px;
+  max-width: 300px;
 }
 
 /* Profile picker */
