@@ -13,9 +13,10 @@
 //
 // Bump CACHE_VERSION whenever you want installed apps to drop their old
 // offline copy on next launch.
-// v3: new app icon, Sushi redrawn as a cat, mum/dad stickers added. Installed
-// apps keep serving the old artwork until this string changes.
-const CACHE_VERSION = "socatei-v3";
+// v4: bypass the browser HTTP cache on fetch (see below) so a fresh upload
+// takes effect on the next load instead of up to 10 minutes later. Bumping this
+// also drops every stale entry from earlier versions on activate.
+const CACHE_VERSION = "socatei-v4";
 
 self.addEventListener("install", (event) => {
   // Activate this new worker immediately instead of waiting for every old
@@ -47,7 +48,14 @@ self.addEventListener("fetch", (event) => {
   event.respondWith(
     (async () => {
       try {
-        const fresh = await fetch(request);
+        // `cache: "reload"` bypasses the BROWSER's HTTP cache, so we hit the
+        // network for real. Without it, GitHub Pages' 10-minute max-age meant a
+        // just-uploaded file kept serving its old version for up to 10 minutes
+        // even though this worker is "network-first" — which broke the lesson
+        // menus after a deploy (one stale module took the whole import chain
+        // down). This is what actually delivers the "a fresh upload always
+        // wins the moment the phone is online" promise above.
+        const fresh = await fetch(request, { cache: "reload" });
         // Keep a copy of same-origin GETs for offline fallback only.
         if (fresh && fresh.ok) {
           const cache = await caches.open(CACHE_VERSION);
