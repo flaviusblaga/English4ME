@@ -332,6 +332,11 @@ body.mascot-theme .btn-primary {
 .reward-settings-row {
   margin-top: var(--sp-3);
 }
+.reward-settings-hint {
+  margin: 6px 0 0;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
 .reward-settings-row > label {
   display: block;
   margin-bottom: 4px;
@@ -1114,9 +1119,13 @@ body[data-usertype="adult"] .usage-card {
   display: grid; place-items: end center; font-size: 1.8rem;
 }
 .adult-card .av img { width: 96%; }
-/* a mascot face is square — contain it, centred, instead of the torso fill */
-.adult-card .av--face { place-items: center; }
-.adult-card .av--face img { width: auto; max-width: 94%; max-height: 94%; object-fit: contain; }
+/* a mascot is a tall die-cut sticker — show it WHOLE (character + plaque),
+   centred in a rounded tile so the round crop never clips the head or feet. */
+.adult-card .av--mascot {
+  border-radius: 18px; place-items: center;
+  background: radial-gradient(circle at 50% 30%, #f3fbff, #e3f4ff);
+}
+.adult-card .av--mascot img { width: auto; max-width: 100%; max-height: 100%; object-fit: contain; }
 .adult-card .who { flex: 1; min-width: 0; display: flex; flex-direction: column; }
 .adult-card .who strong { font-family: var(--font-display); font-weight: 800; font-size: 1.3rem; }
 .adult-card .who .sub { color: var(--text-muted); font-weight: 600; font-size: 0.88rem; }
@@ -1190,9 +1199,13 @@ body[data-usertype="adult"] .usage-card {
 /* when a teen sticker is chosen, it fills the tile (head-and-shoulders crop) */
 .teen-card .teen-av--img { align-items: end; }
 .teen-card .teen-av img { width: 116%; height: auto; object-fit: contain; }
-/* a mascot face is square — contain it, centred */
-.teen-card .teen-av--face { align-items: center; }
-.teen-card .teen-av--face img { width: auto; max-width: 90%; max-height: 90%; }
+/* a mascot is a tall die-cut sticker — show it WHOLE, centred, on a light tile
+   (the purple/teal gradient would fight the character's own colours). */
+.teen-card .teen-av--mascot {
+  align-items: center; justify-content: center;
+  background: radial-gradient(circle at 50% 30%, #f3fbff, #e6f7f2);
+}
+.teen-card .teen-av--mascot img { width: auto; max-width: 100%; max-height: 100%; object-fit: contain; }
 .teen-card .who { flex: 1; min-width: 0; display: flex; flex-direction: column; }
 .teen-card .who strong { font-family: var(--font-display); font-weight: 800; font-size: 1.25rem; }
 .teen-card .who .sub { color: var(--text-muted); font-weight: 600; font-size: 0.82rem; }

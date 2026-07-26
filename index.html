@@ -403,9 +403,26 @@
           <label for="reward-per-lesson-amount">La fiecare lecție terminată</label>
           <div class="reward-settings-pair">
             <input id="reward-per-lesson-amount" type="number" min="0" step="1" inputmode="numeric" />
-            <input id="reward-per-lesson-unit" type="text" maxlength="40" placeholder="minute de tehnologie" />
+            <input id="reward-per-lesson-unit" type="text" maxlength="40" list="reward-per-lesson-units" placeholder="alege sau scrie…" />
           </div>
+          <p class="reward-settings-hint">Apasă în căsuță pentru idei — sau scrie ce vrei tu.</p>
         </div>
+        <!-- Ready-made choices so a parent doesn't have to invent one. The input
+             still accepts free text, so any family can define its own reward. -->
+        <datalist id="reward-per-lesson-units">
+          <option value="minute de tehnologie"></option>
+          <option value="minute la telefon / tabletă"></option>
+          <option value="minute de joc video"></option>
+          <option value="minute de joacă afară"></option>
+          <option value="minute în plus până la culcare"></option>
+          <option value="puncte"></option>
+          <option value="steluțe"></option>
+          <option value="XP (experiență)"></option>
+          <option value="ștampile de colecție"></option>
+          <option value="bănuți de buzunar"></option>
+          <option value="o gustare preferată"></option>
+          <option value="alegerea desenului de seară"></option>
+        </datalist>
 
         <p class="reward-settings-subhead">Bonus la terminarea unui modul întreg</p>
         <div class="reward-settings-grid">
@@ -421,8 +438,24 @@
 
         <div class="reward-settings-row">
           <label for="reward-bonus-unit">Bonusul se măsoară în</label>
-          <input id="reward-bonus-unit" type="text" maxlength="40" placeholder="lei" />
+          <input id="reward-bonus-unit" type="text" maxlength="40" list="reward-bonus-units" placeholder="alege sau scrie…" />
+          <p class="reward-settings-hint">Nu doar bani — o ieșire, o jucărie, un privilegiu. Apasă pentru idei.</p>
         </div>
+        <!-- Bigger, rarer rewards for finishing a whole module. -->
+        <datalist id="reward-bonus-units">
+          <option value="lei"></option>
+          <option value="o ieșire aleasă de copil"></option>
+          <option value="o jucărie sau o carte"></option>
+          <option value="o zi fără corvezi"></option>
+          <option value="o activitate specială cu părintele"></option>
+          <option value="weekend de gaming prelungit"></option>
+          <option value="copilul alege meniul de weekend"></option>
+          <option value="o excursie mică"></option>
+          <option value="bani pentru pușculiță"></option>
+          <option value="un privilegiu special"></option>
+          <option value="o experiență (cinema, patinoar…)"></option>
+          <option value="puncte spre un obiectiv mare (bicicletă…)"></option>
+        </datalist>
 
         <button id="reward-settings-save" type="button" class="btn btn-primary">Salvează</button>
         <p id="reward-settings-status" class="hint" hidden></p>

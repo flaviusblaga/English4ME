@@ -210,6 +210,13 @@ function mascotFromAvatar(src) {
   return m ? m[1] : null;
 }
 
+// True when the chosen avatar is one of the mascot stickers (rather than a
+// mum/dad/teen person sticker). Mascots are tall die-cut characters and must be
+// CONTAINED whole in the small adult/teen tiles; people stickers fill/crop.
+function isMascotAvatar(src) {
+  return /(bobo|fizz|sushi)-sticker/.test(src || "");
+}
+
 function sectionLabel(kind, emoji, text) {
   const span = document.createElement("span");
   span.className = `grp-label grp-label--${kind}`;
@@ -247,8 +254,9 @@ function renderAdultCard(member, remembered) {
   const av = document.createElement("span");
   av.className = "av";
   if (avatar) {
-    // A mascot FACE is square and must be contained; the torso stickers fill.
-    if (avatar.includes("-face")) av.classList.add("av--face");
+    // A mascot is a tall die-cut sticker (character + plaque) — contain the
+    // whole thing; the mum/dad torso stickers fill the round tile as before.
+    if (isMascotAvatar(avatar)) av.classList.add("av--mascot");
     const img = document.createElement("img");
     img.src = avatar; img.alt = member.name;
     img.onerror = function () { this.replaceWith(document.createTextNode(member.emoji)); };
@@ -277,7 +285,7 @@ function renderTeenCard(member, remembered) {
   const avatar = getMemberAvatar(member);
   if (avatar) {
     av.classList.add("teen-av--img");
-    if (avatar.includes("-face")) av.classList.add("teen-av--face");
+    if (isMascotAvatar(avatar)) av.classList.add("teen-av--mascot");
     const img = document.createElement("img");
     img.src = avatar; img.alt = member.name;
     img.onerror = function () {
