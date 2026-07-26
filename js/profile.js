@@ -160,6 +160,10 @@ export const AVATARS = {
     { id: "mama", name: "Mama", img: "assets/socatei/mama-sticker.png" },
     { id: "tata", name: "Tata", img: "assets/socatei/tata-sticker.png" },
   ],
+  teen: [
+    { id: "teen-boy", name: "Băiat", img: "assets/socatei/teen-boy-sticker.png" },
+    { id: "teen-girl", name: "Fată", img: "assets/socatei/teen-girl-sticker.png" },
+  ],
 };
 
 const AVATAR_KEY_PREFIX = "engleza-familie:avatar:";

@@ -72,6 +72,7 @@ export const FAMILIES = [
       // adult can tap it to preview. Rename / set a real Google address (added
       // as a Test user) when an actual teen uses it, or delete it.
       { id: "teen-demo", name: "Teen", emoji: "🎓", kind: "teen",
+        img: "assets/socatei/teen-boy-sticker.png",
         profileId: "teen", emails: ["REPLACE-with-teen@gmail.com"] },
     ],
   },
@@ -128,6 +129,116 @@ export function lookupEmailIn(families, email) {
     }
   }
   return null;
+}
+
+// ---------------------------------------------------------------------------
+// Admin: dynamically-added families (stored in the Worker's KV, managed from
+// the in-app admin menu). The functions below are pure — they validate and
+// shape a family, and the Worker is the ONLY place that persists/reads KV and
+// enforces who may call them.
+// ---------------------------------------------------------------------------
+
+// The ONLY accounts that may open the admin menu and manage families. Checked
+// server-side on every admin request against a Google-verified email.
+export const SUPER_ADMIN_EMAILS = ["flaviusblaga@gmail.com", "andrea.bartha1@gmail.com"];
+
+export function isSuperAdmin(email) {
+  return SUPER_ADMIN_EMAILS.map((e) => e.toLowerCase()).includes(normEmail(email));
+}
+
+const KID_KINDS = ["adult", "teen", "kid"];
+const PROFILE_BY_KIND = { adult: "business-conversational", teen: "teen" }; // kid → placement decides
+
+function slugify(name) {
+  return String(name || "")
+    .toLowerCase()
+    .normalize("NFD").replace(/[̀-ͯ]/g, "") // strip diacritics
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .slice(0, 32) || "familie";
+}
+
+function looksLikeEmail(s) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(s || "").trim());
+}
+
+// Turns raw admin input into a clean family object, or returns an error. This
+// is the security-critical gate: it rejects an email that already belongs to
+// ANOTHER family, so a new family can never be used to reach an existing one's
+// data. `existingFamilies` is the full registry EXCEPT the one being edited.
+//
+// input: { id?, name, progressMirror?, driveReport?, members: [{ kind, name?, emails: [] }] }
+export function normalizeFamily(input, existingFamilies) {
+  if (!input || typeof input !== "object") return { ok: false, error: "Date lipsă." };
+
+  const name = String(input.name || "").trim().slice(0, 60);
+  if (!name) return { ok: false, error: "Familia are nevoie de un nume." };
+
+  // A stable id: keep the given one (edit), else derive a unique slug.
+  const usedIds = new Set((existingFamilies || []).map((f) => f.id));
+  let id = String(input.id || "").trim();
+  if (!id) {
+    const base = slugify(name);
+    id = base;
+    let n = 2;
+    while (usedIds.has(id)) id = `${base}-${n++}`;
+  }
+
+  // Every email already claimed by another family — collision is forbidden.
+  const taken = new Map(); // normEmail -> familyId
+  for (const fam of existingFamilies || []) {
+    for (const m of fam.members || []) {
+      for (const e of m.emails || []) taken.set(normEmail(e), fam.id);
+    }
+  }
+
+  const rawMembers = Array.isArray(input.members) ? input.members : [];
+  const members = [];
+  const seenInThisFamily = new Set();
+  const counters = { adult: 0, teen: 0, kid: 0 };
+  const defaultName = { adult: "Părinte", teen: "Adolescent", kid: "Copil" };
+
+  for (const rm of rawMembers) {
+    const kind = KID_KINDS.includes(rm && rm.kind) ? rm.kind : null;
+    if (!kind) continue;
+
+    const emails = [];
+    for (const e of Array.isArray(rm.emails) ? rm.emails : []) {
+      const ne = normEmail(e);
+      if (!ne) continue;
+      if (!looksLikeEmail(ne)) return { ok: false, error: `Adresă invalidă: ${e}` };
+      if (taken.has(ne)) return { ok: false, error: `Adresa ${ne} e deja în familia „${taken.get(ne)}".` };
+      if (seenInThisFamily.has(ne)) continue; // dedupe within the family
+      seenInThisFamily.add(ne);
+      emails.push(ne);
+    }
+    if (!emails.length) continue; // a member with no address is dropped
+
+    counters[kind] += 1;
+    const memberName = String(rm.name || "").trim().slice(0, 40) || `${defaultName[kind]} ${counters[kind]}`;
+    const member = {
+      id: `${id}-${kind}-${counters[kind]}`,
+      name: memberName,
+      kind,
+      emails,
+    };
+    if (PROFILE_BY_KIND[kind]) member.profileId = PROFILE_BY_KIND[kind];
+    if (kind === "adult") member.role = "admin";
+    members.push(member);
+  }
+
+  if (!members.length) return { ok: false, error: "Adaugă cel puțin un membru cu o adresă de email." };
+
+  return {
+    ok: true,
+    family: {
+      id,
+      name,
+      progressMirror: input.progressMirror === true,
+      driveReport: input.driveReport !== false, // default on for invited families
+      members,
+    },
+  };
 }
 
 // A family's reward scheme, with every field defaulted so a partial override

@@ -1140,7 +1140,11 @@ body[data-usertype="adult"] .usage-card {
   font-family: var(--font-display); font-weight: 800; font-size: 1.6rem;
   background: linear-gradient(135deg, #7c5cff, #14b8a6);
   box-shadow: 0 6px 16px rgba(124, 92, 255, 0.3);
+  overflow: hidden;
 }
+/* when a teen sticker is chosen, it fills the tile (head-and-shoulders crop) */
+.teen-card .teen-av--img { align-items: end; }
+.teen-card .teen-av img { width: 116%; height: auto; object-fit: contain; }
 .teen-card .who { flex: 1; min-width: 0; display: flex; flex-direction: column; }
 .teen-card .who strong { font-family: var(--font-display); font-weight: 800; font-size: 1.25rem; }
 .teen-card .who .sub { color: var(--text-muted); font-weight: 600; font-size: 0.82rem; }

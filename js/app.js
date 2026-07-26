@@ -256,7 +256,19 @@ function renderTeenCard(member, remembered) {
 
   const av = document.createElement("span");
   av.className = "teen-av";
-  av.textContent = (member.name[0] || "🎓").toUpperCase();
+  const avatar = getMemberAvatar(member);
+  if (avatar) {
+    av.classList.add("teen-av--img");
+    const img = document.createElement("img");
+    img.src = avatar; img.alt = member.name;
+    img.onerror = function () {
+      this.parentElement.classList.remove("teen-av--img");
+      this.replaceWith(document.createTextNode((member.name[0] || "🎓").toUpperCase()));
+    };
+    av.appendChild(img);
+  } else {
+    av.textContent = (member.name[0] || "🎓").toUpperCase();
+  }
 
   const who = document.createElement("span");
   who.className = "who";
