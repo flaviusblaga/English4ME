@@ -186,7 +186,10 @@ function renderRewards(rewards) {
 
   const progressLine = document.createElement("p");
   progressLine.className = "rewards-row";
-  progressLine.textContent = `📚 ${rewards.lessonsCompleted} / ${rewards.totalLessons} lecții terminate la nivelul ${rewards.tier}`;
+  const moduleName = {
+    beginner: "Playroom", intermediate: "Adventure", advanced: "Storytime", expert: "Mastery Cup", teen: "Teen",
+  }[rewards.tier] || rewards.tier;
+  progressLine.textContent = `📚 ${rewards.lessonsCompleted} / ${rewards.totalLessons} lecții terminate — ${moduleName}`;
   card.appendChild(progressLine);
 
   const screenTimeLine = document.createElement("p");

@@ -128,7 +128,7 @@ async function renderProfilePicker() {
   list.innerHTML = "";
   const remembered = getRememberedProfileId(); // now stores the last MEMBER id
 
-  const levelLabel = { "kids-primar": "Beginner", "kids-intermediate": "Intermediate", "kids-advanced": "Advanced", "kids-expert": "Expert" };
+  const levelLabel = { "kids-primar": "Playroom", "kids-intermediate": "Adventure", "kids-advanced": "Storytime", "kids-expert": "Mastery Cup", "teen": "Teen 14-18" };
 
   // The static registry is the author's own household (works offline). A family
   // added from the admin menu lives only in KV, so if the static lookup finds
@@ -247,6 +247,8 @@ function renderAdultCard(member, remembered) {
   const av = document.createElement("span");
   av.className = "av";
   if (avatar) {
+    // A mascot FACE is square and must be contained; the torso stickers fill.
+    if (avatar.includes("-face")) av.classList.add("av--face");
     const img = document.createElement("img");
     img.src = avatar; img.alt = member.name;
     img.onerror = function () { this.replaceWith(document.createTextNode(member.emoji)); };
@@ -275,6 +277,7 @@ function renderTeenCard(member, remembered) {
   const avatar = getMemberAvatar(member);
   if (avatar) {
     av.classList.add("teen-av--img");
+    if (avatar.includes("-face")) av.classList.add("teen-av--face");
     const img = document.createElement("img");
     img.src = avatar; img.alt = member.name;
     img.onerror = function () {
@@ -619,7 +622,7 @@ function retakePlacement() {
 // The four kid levels, always all selectable. The test result only decides
 // which one wears the "Recomandat" badge.
 const KID_LEVELS = ["kids-primar", "kids-intermediate", "kids-advanced", "kids-expert"];
-const LEVEL_LABEL = { "kids-primar": "Beginner", "kids-intermediate": "Intermediate", "kids-advanced": "Advanced", "kids-expert": "Expert" };
+const LEVEL_LABEL = { "kids-primar": "Playroom", "kids-intermediate": "Adventure", "kids-advanced": "Storytime", "kids-expert": "Mastery Cup", "teen": "Teen 14-18" };
 
 // The four levels, re-skinned as adventure "modules". Each maps 1:1 onto a
 // profile id — same content underneath, playful framing on top. `mascot` is a

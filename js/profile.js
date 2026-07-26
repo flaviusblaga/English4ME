@@ -150,19 +150,31 @@ export function parentEmailsForEmail(email) {
 // as the "Talk to:" mascot preference in chat.js — a child can be drawn as
 // Sushi while practising with all three, and conflating the two would take a
 // choice away rather than add one.
+// The mascots as FULL stickers (for the big kid tiles) and as FACES (which fit
+// the round/rounded adult & teen avatar tiles). Everyone may pick a mascot;
+// kids get the full sticker, grown-ups and teens get the face crop.
+const MASCOTS_FULL = [
+  { id: "bobo", name: "Bobo", img: "assets/socatei/bobo-sticker.png" },
+  { id: "fizz", name: "Fizz", img: "assets/socatei/fizz-sticker.png" },
+  { id: "sushi", name: "Sushi", img: "assets/socatei/sushi-sticker.png" },
+];
+const MASCOTS_FACE = [
+  { id: "bobo", name: "Bobo", img: "assets/socatei/bobo-face.png" },
+  { id: "fizz", name: "Fizz", img: "assets/socatei/fizz-face.png" },
+  { id: "sushi", name: "Sushi", img: "assets/socatei/sushi-face.png" },
+];
+
 export const AVATARS = {
-  kid: [
-    { id: "bobo", name: "Bobo", img: "assets/socatei/bobo-sticker.png" },
-    { id: "fizz", name: "Fizz", img: "assets/socatei/fizz-sticker.png" },
-    { id: "sushi", name: "Sushi", img: "assets/socatei/sushi-sticker.png" },
-  ],
+  kid: [...MASCOTS_FULL],
   adult: [
     { id: "mama", name: "Mama", img: "assets/socatei/mama-sticker.png" },
     { id: "tata", name: "Tata", img: "assets/socatei/tata-sticker.png" },
+    ...MASCOTS_FACE,
   ],
   teen: [
     { id: "teen-boy", name: "Băiat", img: "assets/socatei/teen-boy-sticker.png" },
     { id: "teen-girl", name: "Fată", img: "assets/socatei/teen-girl-sticker.png" },
+    ...MASCOTS_FACE,
   ],
 };
 
