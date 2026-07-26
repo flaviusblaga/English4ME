@@ -9,14 +9,37 @@ function el(id) {
 }
 
 export function initParentView() {
-  const emailInput = el("parent-view-email-input");
-  const remembered = localStorage.getItem(LAST_CHILD_EMAIL_KEY);
-  if (remembered) emailInput.value = remembered;
-
   el("parent-view-load-btn").addEventListener("click", handleLoad);
-
   el("reward-settings-save").addEventListener("click", handleSaveRewards);
   fillRewardForm();
+}
+
+// Fills the child dropdown from the signed-in adult's own family. Called by
+// app.js every time the parent view opens, so it works for any family in the
+// registry — no more typing an email by hand. `children` is [{ name, email }].
+export function setParentChildren(children) {
+  const select = el("parent-view-child-select");
+  if (!select) return;
+  select.innerHTML = "";
+
+  if (!children.length) {
+    const opt = document.createElement("option");
+    opt.value = "";
+    opt.textContent = "(niciun copil în familie)";
+    select.appendChild(opt);
+    return;
+  }
+
+  for (const child of children) {
+    const opt = document.createElement("option");
+    opt.value = child.email;
+    opt.textContent = child.name;
+    select.appendChild(opt);
+  }
+
+  // Re-select whoever was viewed last, if they're still in the list.
+  const last = localStorage.getItem(LAST_CHILD_EMAIL_KEY);
+  if (last && children.some((c) => c.email === last)) select.value = last;
 }
 
 const BONUS_TIERS = ["beginner", "intermediate", "advanced", "expert"];
@@ -75,13 +98,13 @@ async function handleSaveRewards() {
 }
 
 async function handleLoad() {
-  const email = el("parent-view-email-input").value.trim();
+  const email = el("parent-view-child-select").value;
   const profileId = el("parent-view-profile-select").value;
   const status = el("parent-view-status");
   const results = el("parent-view-results");
 
   if (!email) {
-    status.textContent = "Enter the child's email first.";
+    status.textContent = "Selectează un copil din listă.";
     status.hidden = false;
     results.hidden = true;
     return;

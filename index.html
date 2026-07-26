@@ -121,6 +121,16 @@
           <button id="settings-btn" class="btn btn-small btn-icon" aria-label="Settings" aria-pressed="false">⚙️</button>
         </div>
       </div>
+      <!-- Adult dashboard usage card. Shown only for the Business profile (CSS,
+           via body[data-usertype="adult"]); populated by renderBudgetIndicator. -->
+      <div id="usage-card" class="usage-card">
+        <div class="usage-main">
+          <span class="usage-label">Usage this month</span>
+          <span class="usage-val"><b id="usage-spent">$0.00</b> <small id="usage-limit">/ $10.00</small></span>
+          <div class="usage-bar"><i id="usage-fill"></i></div>
+        </div>
+        <div class="usage-ring" id="usage-ring"><b id="usage-pct">0%</b></div>
+      </div>
       <div class="app-header-actions">
         <div id="scenario-select-wrap" class="chat-header-center" hidden>
           <label for="scenario-select" class="scenario-label">Practice:</label>
@@ -406,15 +416,16 @@
       </details>
 
       <div class="parent-view-lookup">
-        <label for="parent-view-email-input">Child's email:</label>
-        <input id="parent-view-email-input" type="email" placeholder="child@gmail.com" />
+        <label for="parent-view-child-select">Copilul:</label>
+        <select id="parent-view-child-select"></select>
+        <label for="parent-view-profile-select">Nivelul:</label>
         <select id="parent-view-profile-select">
           <option value="kids-primar">🌱 Beginner</option>
           <option value="kids-intermediate">🌿 Intermediate</option>
           <option value="kids-advanced">🌳 Advanced</option>
           <option value="kids-expert">🏆 Expert</option>
         </select>
-        <button id="parent-view-load-btn" class="btn btn-primary">Load</button>
+        <button id="parent-view-load-btn" class="btn btn-primary">Vezi progresul</button>
       </div>
 
       <p id="parent-view-status" class="hint" hidden></p>

@@ -16,7 +16,7 @@ import {
 } from "./profile.js";
 import { getRememberedProfileId, rememberProfileId } from "./profile-picker.js";
 import { loadFamilyRewards } from "./rewards.js";
-import { initParentView } from "./parent-view.js";
+import { initParentView, setParentChildren } from "./parent-view.js";
 import { initPwa } from "./pwa.js";
 import { initPlacement } from "./placement.js";
 
@@ -78,6 +78,19 @@ function updateAppNav(screenName) {
 function openChat(lessonWordList) {
   initChat({ ...currentSession, lessonWordList, onBackToLessons: openLessons });
   showScreen("chat");
+}
+
+// Fills the child dropdown from the signed-in adult's OWN family (derived from
+// the registry, so it works for every family without hardcoding), then shows
+// the parent view. A child has several emails; the first is their primary.
+function openParentView() {
+  const family = currentUser ? membersForEmail(currentUser.email) : [];
+  const kids = family
+    .filter((m) => m.kind === "kid")
+    .map((m) => ({ name: m.name, email: (m.emails || [])[0] }))
+    .filter((c) => c.email);
+  setParentChildren(kids);
+  showScreen("parent-view");
 }
 
 function openLessons() {
@@ -535,9 +548,7 @@ window.addEventListener("DOMContentLoaded", async () => {
     if (event.target === el("avatar-picker")) el("avatar-picker").hidden = true;
   });
   el("lesson-logout-btn").addEventListener("click", handleLogout);
-  el("view-child-progress-btn").addEventListener("click", () => {
-    showScreen("parent-view");
-  });
+  el("view-child-progress-btn").addEventListener("click", openParentView);
   el("reading-btn").addEventListener("click", openReading);
   el("home-btn").addEventListener("click", goHome);
   el("lesson-home-btn").addEventListener("click", goHome);
@@ -548,7 +559,7 @@ window.addEventListener("DOMContentLoaded", async () => {
   el("nav-home").addEventListener("click", openLessons);
   el("nav-chat").addEventListener("click", () => openChat(null));
   el("nav-reading").addEventListener("click", openReading);
-  el("nav-parent").addEventListener("click", () => showScreen("parent-view"));
+  el("nav-parent").addEventListener("click", openParentView);
   wireSettingsToggle("settings-btn", "settings-panel");
   wireSettingsToggle("lesson-settings-btn", "lesson-settings-panel");
   el("parent-view-back-btn").addEventListener("click", () => {

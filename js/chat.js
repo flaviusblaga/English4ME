@@ -392,6 +392,18 @@ function appendSystemNotice(text) {
 function renderBudgetIndicator() {
   const { estimatedCostUsd, budgetUsd } = session.state.usageSnapshot;
   el("budget-indicator").textContent = `Usage this month: $${estimatedCostUsd.toFixed(2)} / $${budgetUsd.toFixed(2)}`;
+
+  // The adult dashboard's usage card (same numbers, richer presentation). The
+  // card is CSS-hidden for kids, so populating it is harmless there.
+  const card = el("usage-card");
+  if (card) {
+    const pct = budgetUsd > 0 ? Math.min(100, Math.round((estimatedCostUsd / budgetUsd) * 100)) : 0;
+    el("usage-spent").textContent = `$${estimatedCostUsd.toFixed(2)}`;
+    el("usage-limit").textContent = `/ $${budgetUsd.toFixed(2)}`;
+    el("usage-pct").textContent = `${pct}%`;
+    el("usage-fill").style.width = `${pct}%`;
+    el("usage-ring").style.setProperty("--pct", pct);
+  }
 }
 
 function renderGamificationBar() {
