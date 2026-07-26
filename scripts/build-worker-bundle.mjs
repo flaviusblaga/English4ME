@@ -28,6 +28,7 @@ const MODULES = [
   "prompts/kids-primar.js",
   "prompts/kids-advanced.js",
   "prompts/kids-expert.js",
+  "prompts/kids-teen.js",
   "prompts/scenarios.js",
   "documents.js",
   "claude.js",
