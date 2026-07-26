@@ -13,7 +13,9 @@ import {
   getMemberAvatar,
   setMemberAvatar,
   avatarOptionsFor,
+  isSuperAdmin,
 } from "./profile.js";
+import { fetchMyFamily, adminListFamilies, adminSaveFamily, adminDeleteFamily } from "./worker-client.js";
 import { getRememberedProfileId, rememberProfileId } from "./profile-picker.js";
 import { loadFamilyRewards } from "./rewards.js";
 import { initParentView, setParentChildren } from "./parent-view.js";
@@ -23,6 +25,7 @@ import { initPlacement } from "./placement.js";
 let currentUser = null; // { email, name } — set after sign-in, used once a profile is picked
 let currentSession = null; // { accessToken, userEmail, displayName, fileId, state, profile } — reused across lesson<->chat navigation
 let currentMember = null; // which family member is active — lets "Levels" return to this kid's level picker
+let currentFamilyMembers = []; // members shown in the picker (static OR admin-added via KV)
 
 function el(id) {
   return document.getElementById(id);
@@ -84,8 +87,9 @@ function openChat(lessonWordList) {
 // the registry, so it works for every family without hardcoding), then shows
 // the parent view. A child has several emails; the first is their primary.
 function openParentView() {
-  const family = currentUser ? membersForEmail(currentUser.email) : [];
-  const kids = family
+  // currentFamilyMembers already holds this adult's family (static or KV),
+  // resolved by renderProfilePicker — so the child dropdown works for both.
+  const kids = currentFamilyMembers
     .filter((m) => m.kind === "kid")
     .map((m) => ({ name: m.name, email: (m.emails || [])[0] }))
     .filter((c) => c.email);
@@ -109,8 +113,8 @@ async function handleLogin() {
 
   try {
     currentUser = await signIn();
-    renderProfilePicker();
     showScreen("profile-picker");
+    await renderProfilePicker();
   } catch (err) {
     el("login-error").textContent = `Sign-in failed: ${err.message}`;
     el("login-error").hidden = false;
@@ -119,17 +123,29 @@ async function handleLogin() {
   }
 }
 
-function renderProfilePicker() {
+async function renderProfilePicker() {
   const list = el("profile-picker-list");
   list.innerHTML = "";
   const remembered = getRememberedProfileId(); // now stores the last MEMBER id
 
   const levelLabel = { "kids-primar": "Beginner", "kids-intermediate": "Intermediate", "kids-advanced": "Advanced", "kids-expert": "Expert" };
 
-  // Adults see their own family; a kid signed in with their own Google account
-  // sees only their own tile — never the grown-ups' Business profile. An
-  // address that belongs to no family sees no tiles at all.
-  const visibleMembers = membersForEmail(currentUser ? currentUser.email : null);
+  // The static registry is the author's own household (works offline). A family
+  // added from the admin menu lives only in KV, so if the static lookup finds
+  // nothing, ask the Worker for the caller's own family.
+  let visibleMembers = membersForEmail(currentUser ? currentUser.email : null);
+  if (visibleMembers.length === 0 && currentUser) {
+    try {
+      const mine = await fetchMyFamily();
+      visibleMembers = mine.members || [];
+    } catch {
+      /* Worker unreachable — fall through to the empty-state notice below */
+    }
+  }
+  currentFamilyMembers = visibleMembers;
+
+  // Only the super-admin gets the "manage families" entry point.
+  renderAdminEntry();
 
   if (visibleMembers.length === 0) {
     // The Worker refuses this account too, so this is an explanation rather
@@ -243,7 +259,7 @@ function renderAdultCard(member, remembered) {
   const go = document.createElement("span");
   go.className = "go"; go.innerHTML = PICKER_CHEVRON;
   card.append(av, who, go);
-  card.addEventListener("click", () => handleMemberPicked(member.id));
+  card.addEventListener("click", () => handleMemberPicked(member));
   return pickerWrap(card, member);
 }
 
@@ -280,7 +296,7 @@ function renderTeenCard(member, remembered) {
   go.innerHTML = PICKER_CHEVRON;
 
   card.append(av, who, go);
-  card.addEventListener("click", () => handleMemberPicked(member.id));
+  card.addEventListener("click", () => handleMemberPicked(member));
   return pickerWrap(card, member);
 }
 
@@ -318,7 +334,7 @@ function renderKidCard(member, remembered, levelLabel) {
     card.appendChild(badge);
   }
   card.append(lvl, go);
-  card.addEventListener("click", () => handleMemberPicked(member.id));
+  card.addEventListener("click", () => handleMemberPicked(member));
   return pickerWrap(card, member);
 }
 
@@ -357,14 +373,218 @@ function openAvatarPicker(member) {
   overlay.hidden = false;
 }
 
+// ---- Super-admin family manager ----------------------------------------
+// The entry point shows only for a super-admin; the Worker re-checks on every
+// call, so this is convenience, not security.
+function renderAdminEntry() {
+  const btn = el("admin-entry-btn");
+  if (!btn) return;
+  btn.hidden = !(currentUser && isSuperAdmin(currentUser.email));
+}
+
+function closeAdminMenu() {
+  el("admin-panel").hidden = true;
+}
+
+async function openAdminMenu() {
+  el("admin-panel").hidden = false;
+  await renderFamilyList();
+}
+
+async function renderFamilyList() {
+  const body = el("admin-panel-body");
+  el("admin-panel-title").textContent = "Familii adăugate";
+  body.innerHTML = '<p class="hint">Se încarcă…</p>';
+
+  let families;
+  try {
+    families = (await adminListFamilies()).families || [];
+  } catch (err) {
+    body.innerHTML = "";
+    const p = document.createElement("p");
+    p.className = "hint";
+    p.textContent = err.code === "forbidden" ? "Doar administratorul poate gestiona familii." : `Eroare: ${err.message}`;
+    body.appendChild(p);
+    return;
+  }
+
+  body.innerHTML = "";
+  const add = document.createElement("button");
+  add.type = "button";
+  add.className = "btn btn-primary admin-add-btn";
+  add.textContent = "➕ Adaugă o familie";
+  add.addEventListener("click", () => openFamilyForm(null));
+  body.appendChild(add);
+
+  if (!families.length) {
+    const p = document.createElement("p");
+    p.className = "hint";
+    p.textContent = "Nicio familie adăugată încă. (Familia ta principală e în cod, nu apare aici.)";
+    body.appendChild(p);
+  }
+
+  for (const fam of families) {
+    const counts = { adult: 0, teen: 0, kid: 0 };
+    for (const m of fam.members) counts[m.kind] = (counts[m.kind] || 0) + 1;
+
+    const row = document.createElement("div");
+    row.className = "admin-fam-row";
+    const info = document.createElement("div");
+    info.className = "admin-fam-info";
+    const strong = document.createElement("strong");
+    strong.textContent = fam.name;
+    const small = document.createElement("small");
+    small.textContent = `${counts.adult} adulți · ${counts.teen} adolescenți · ${counts.kid} copii`;
+    info.append(strong, small);
+
+    const edit = document.createElement("button");
+    edit.type = "button"; edit.className = "btn btn-small";
+    edit.textContent = "Editează";
+    edit.addEventListener("click", () => openFamilyForm(fam));
+
+    const del = document.createElement("button");
+    del.type = "button"; del.className = "btn btn-small admin-del-btn";
+    del.textContent = "🗑";
+    del.setAttribute("aria-label", `Șterge ${fam.name}`);
+    del.addEventListener("click", () => confirmDeleteFamily(fam));
+
+    row.append(info, edit, del);
+    body.appendChild(row);
+  }
+}
+
+// A member line is "email" or "Nume, email" — the name is optional.
+function membersToLines(members, kind) {
+  return members
+    .filter((m) => m.kind === kind)
+    .map((m) => {
+      const email = (m.emails || []).join(", ");
+      const auto = new RegExp("^(Părinte|Adolescent|Copil) \\d+$").test(m.name || "");
+      return m.name && !auto ? `${m.name}, ${email}` : email;
+    })
+    .join("\n");
+}
+
+function parseCategory(text, kind) {
+  return String(text || "")
+    .split("\n")
+    .map((l) => l.trim())
+    .filter(Boolean)
+    .map((line) => {
+      const parts = line.split(",").map((s) => s.trim());
+      if (parts.length >= 2 && parts[parts.length - 1].includes("@")) {
+        return { kind, name: parts.slice(0, -1).join(", "), emails: [parts[parts.length - 1]] };
+      }
+      return { kind, emails: [parts[parts.length - 1]] };
+    });
+}
+
+function openFamilyForm(fam) {
+  const body = el("admin-panel-body");
+  el("admin-panel-title").textContent = fam ? "Editează familia" : "Familie nouă";
+  body.innerHTML = "";
+
+  const cats = [
+    ["adult", "👥 Adulți / părinți", "un email pe linie (sau: Nume, email)"],
+    ["teen", "🎓 Adolescenți (14-18)", "un email pe linie"],
+    ["kid", "🧒 Copii", "un email pe linie"],
+  ];
+
+  const nameRow = fieldRow("Numele familiei", `<input id="af-name" type="text" maxlength="60" placeholder="ex: Familia Popescu" />`);
+  body.appendChild(nameRow);
+  el("af-name").value = fam ? fam.name : "";
+
+  for (const [kind, label, hint] of cats) {
+    const row = fieldRow(label, `<textarea id="af-${kind}" rows="3" placeholder="${hint}"></textarea>`);
+    body.appendChild(row);
+    if (fam) el(`af-${kind}`).value = membersToLines(fam.members, kind);
+  }
+
+  const opts = document.createElement("div");
+  opts.className = "admin-toggles";
+  opts.innerHTML = `
+    <label><input type="checkbox" id="af-drive" /> Raport de progres în Google Drive-ul copilului</label>
+    <label><input type="checkbox" id="af-mirror" /> Salvează conversațiile pe serverul meu (necesită acordul familiei)</label>`;
+  body.appendChild(opts);
+  el("af-drive").checked = fam ? fam.driveReport !== false : true;
+  el("af-mirror").checked = fam ? fam.progressMirror === true : false;
+
+  const status = document.createElement("p");
+  status.id = "af-status"; status.className = "hint"; status.hidden = true;
+  body.appendChild(status);
+
+  const actions = document.createElement("div");
+  actions.className = "admin-form-actions";
+  const save = document.createElement("button");
+  save.type = "button"; save.className = "btn btn-primary";
+  save.textContent = "Salvează";
+  save.addEventListener("click", () => saveFamilyForm(fam, save));
+  const back = document.createElement("button");
+  back.type = "button"; back.className = "btn btn-small";
+  back.textContent = "← Înapoi";
+  back.addEventListener("click", renderFamilyList);
+  actions.append(back, save);
+  body.appendChild(actions);
+}
+
+function fieldRow(labelText, innerHtml) {
+  const row = document.createElement("div");
+  row.className = "admin-field";
+  const label = document.createElement("label");
+  label.textContent = labelText;
+  row.appendChild(label);
+  const holder = document.createElement("div");
+  holder.innerHTML = innerHtml;
+  row.appendChild(holder.firstElementChild);
+  return row;
+}
+
+async function saveFamilyForm(fam, button) {
+  const status = el("af-status");
+  const members = [
+    ...parseCategory(el("af-adult").value, "adult"),
+    ...parseCategory(el("af-teen").value, "teen"),
+    ...parseCategory(el("af-kid").value, "kid"),
+  ];
+  const payload = {
+    id: fam ? fam.id : undefined,
+    name: el("af-name").value,
+    driveReport: el("af-drive").checked,
+    progressMirror: el("af-mirror").checked,
+    members,
+  };
+
+  button.disabled = true;
+  status.hidden = false;
+  status.textContent = "Se salvează…";
+  try {
+    await adminSaveFamily(payload);
+    await renderFamilyList();
+  } catch (err) {
+    status.textContent = err.message || "Nu s-a putut salva.";
+    button.disabled = false;
+  }
+}
+
+async function confirmDeleteFamily(fam) {
+  if (!confirm(`Ștergi familia „${fam.name}"? Membrii ei nu vor mai putea intra în aplicație.`)) return;
+  try {
+    await adminDeleteFamily(fam.id);
+    await renderFamilyList();
+  } catch (err) {
+    alert(`Nu s-a putut șterge: ${err.message}`);
+  }
+}
+
 // A member tap: adults go straight to their Business profile; a kid takes the
 // placement test the first time (which only RECOMMENDS a level), then always
 // lands on the level picker where EVERY level is open — the recommendation is
 // just highlighted, never a lock.
-function handleMemberPicked(memberId) {
-  const member = getMember(memberId);
+function handleMemberPicked(member) {
+  // `member` is the object the card closed over (works for static AND
+  // admin-added KV members, which getMember could not resolve).
   currentMember = member;
-  rememberProfileId(memberId);
+  rememberProfileId(member.id);
 
   // Adults and teens map to one fixed profile — straight in, no level picker.
   if (member.kind === "adult" || member.kind === "teen") {
@@ -590,6 +810,11 @@ window.addEventListener("DOMContentLoaded", async () => {
   el("logout-btn").addEventListener("click", handleLogout);
   el("avatar-picker-close").addEventListener("click", () => {
     el("avatar-picker").hidden = true;
+  });
+  el("admin-entry-btn").addEventListener("click", openAdminMenu);
+  el("admin-panel-close").addEventListener("click", closeAdminMenu);
+  el("admin-panel").addEventListener("click", (event) => {
+    if (event.target === el("admin-panel")) closeAdminMenu();
   });
   // Tapping the dimmed area closes it too — the panel itself must not, or
   // every tap inside the chooser would dismiss it.

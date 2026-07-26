@@ -82,7 +82,7 @@ export function getProfile(profileId) {
 // too — one file to edit when a family joins. What THIS file adds is the
 // browser-side reading of that data; every access decision is re-made
 // server-side against a Google-verified email.
-export { FAMILIES, DEFAULT_REWARDS, rewardsFor } from "./families.data.js";
+export { FAMILIES, DEFAULT_REWARDS, rewardsFor, isSuperAdmin, normalizeFamily } from "./families.data.js";
 import { FAMILIES, lookupEmailIn } from "./families.data.js";
 
 // Flat view of everyone, for lookups that don't care about grouping.

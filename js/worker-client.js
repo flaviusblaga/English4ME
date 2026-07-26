@@ -89,6 +89,40 @@ export async function saveFamilyRewards(rewards) {
   return response.json();
 }
 
+// The signed-in account's OWN family, from the combined registry (static +
+// admin-added). Used to render the picker for families that live only in KV.
+export async function fetchMyFamily() {
+  const response = await fetch(`${CONFIG.WORKER_URL}/me/family`, { headers: authHeaders() });
+  if (!response.ok) throw await failFrom(response);
+  return response.json();
+}
+
+// --- Super-admin family management (Worker enforces the super-admin gate) ---
+export async function adminListFamilies() {
+  const response = await fetch(`${CONFIG.WORKER_URL}/admin/families`, { headers: authHeaders() });
+  if (!response.ok) throw await failFrom(response);
+  return response.json();
+}
+
+export async function adminSaveFamily(family) {
+  const response = await fetch(`${CONFIG.WORKER_URL}/admin/families`, {
+    method: "POST",
+    headers: authHeaders({ "content-type": "application/json" }),
+    body: JSON.stringify({ family }),
+  });
+  if (!response.ok) throw await failFrom(response);
+  return response.json();
+}
+
+export async function adminDeleteFamily(id) {
+  const response = await fetch(`${CONFIG.WORKER_URL}/admin/families?id=${encodeURIComponent(id)}`, {
+    method: "DELETE",
+    headers: authHeaders(),
+  });
+  if (!response.ok) throw await failFrom(response);
+  return response.json();
+}
+
 // `userEmail` here is the CHILD being asked about, not the caller. The Worker
 // checks that the signed-in adult is in the same family before answering.
 export async function fetchChildProgress({ userEmail, profileId }) {

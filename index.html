@@ -55,6 +55,8 @@
       <h1>Cine învață azi? 👋</h1>
       <p class="profile-picker-sub">Alege profilul tău</p>
       <div id="profile-picker-list" class="profile-picker-list"></div>
+      <!-- Only the super-admin (checked server-side too) sees this. -->
+      <button id="admin-entry-btn" type="button" class="btn btn-small admin-entry-btn" hidden>⚙️ Gestionează familiile</button>
     </div>
 
     <!-- Avatar chooser. Lives inside the picker screen so it disappears with
@@ -64,6 +66,17 @@
         <h2 id="avatar-picker-title">Alege poza</h2>
         <div id="avatar-picker-grid" class="avatar-picker-grid"></div>
         <button id="avatar-picker-close" type="button" class="btn btn-small">Închide</button>
+      </div>
+    </div>
+
+    <!-- Super-admin family manager. Contents built in js/app.js. -->
+    <div id="admin-panel" class="admin-panel" hidden>
+      <div class="admin-panel-box">
+        <div class="admin-panel-head">
+          <h2 id="admin-panel-title">Familii</h2>
+          <button id="admin-panel-close" type="button" class="btn btn-small">Închide</button>
+        </div>
+        <div id="admin-panel-body"></div>
       </div>
     </div>
   </main>
