@@ -41,6 +41,18 @@ export const PROFILES = [
     features: { scenarios: false, documents: false, gamification: true, parentVisible: true, lessons: true, chatFirst: true, mascots: false, lessonsAdvanced: true },
   },
   {
+    id: "teen",
+    displayName: "English4ME — Teen (14-18)",
+    level: "teen",
+    contentTier: "teen",
+    emoji: "🎓",
+    description: "Engleză pentru 14-18 ani: gramatică avansată, idiomuri și conversație reală despre școală, viitor și lumea din jur.",
+    // Combines the Advanced+Expert lessons with a mature conversation partner —
+    // no mascots. chatFirst is OFF so the lesson map is the landing view; chat
+    // is one tab away.
+    features: { scenarios: false, documents: false, gamification: true, parentVisible: true, lessons: true, mascots: false, lessonsTeen: true, reading: true },
+  },
+  {
     id: "kids-expert",
     displayName: "English4ME — Expert",
     level: "expert",

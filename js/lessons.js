@@ -124,6 +124,16 @@ const TIER_CONFIG = {
     masteryField: "itemsEverCorrect",
     maxScore: () => EXERCISES_PER_LESSON,
   },
+  // Teen (14-18): Advanced + Expert combined into one 17-lesson grammar tier.
+  teen: {
+    lessonSet: getStructuredLessons("teen"),
+    getLessonFn: (id) => getStructuredLesson("teen", id),
+    buildQueue: buildFiftyGrammarQueue,
+    stemLines: GRAMMAR_QUESTION_STEM_LINES,
+    stateKey: "lessonsTeen",
+    masteryField: "itemsEverCorrect",
+    maxScore: () => EXERCISES_PER_LESSON,
+  },
 };
 
 let session = null; // { accessToken, userEmail, displayName, fileId, state, profile }

@@ -147,6 +147,7 @@ function renderProfilePicker() {
   // kids in a big colourful grid below. A kid signed in with their own account
   // only ever has their own tile, so a section renders only when it has members.
   const adults = visibleMembers.filter((m) => m.kind === "adult");
+  const teens = visibleMembers.filter((m) => m.kind === "teen");
   const kids = visibleMembers.filter((m) => m.kind === "kid");
 
   if (adults.length) {
@@ -156,6 +157,17 @@ function renderProfilePicker() {
     const wrap = document.createElement("div");
     wrap.className = "adult-wrap";
     for (const member of adults) wrap.appendChild(renderAdultCard(member, remembered));
+    sec.appendChild(wrap);
+    list.appendChild(sec);
+  }
+
+  if (teens.length) {
+    const sec = document.createElement("div");
+    sec.className = "picker-section";
+    sec.appendChild(sectionLabel("teens", "🎓", "Adolescenți"));
+    const wrap = document.createElement("div");
+    wrap.className = "teen-wrap";
+    for (const member of teens) wrap.appendChild(renderTeenCard(member, remembered));
     sec.appendChild(wrap);
     list.appendChild(sec);
   }
@@ -230,6 +242,31 @@ function renderAdultCard(member, remembered) {
   who.querySelector("strong").textContent = member.name;
   const go = document.createElement("span");
   go.className = "go"; go.innerHTML = PICKER_CHEVRON;
+  card.append(av, who, go);
+  card.addEventListener("click", () => handleMemberPicked(member.id));
+  return pickerWrap(card, member);
+}
+
+// Teens (14-18): a modern, mascot-free card — an initial in a gradient tile,
+// name, and "Teen · 14-18". Uses the teen accent palette via .teen-card.
+function renderTeenCard(member, remembered) {
+  const card = document.createElement("button");
+  card.type = "button";
+  card.className = "teen-card" + (member.id === remembered ? " is-remembered" : "");
+
+  const av = document.createElement("span");
+  av.className = "teen-av";
+  av.textContent = (member.name[0] || "🎓").toUpperCase();
+
+  const who = document.createElement("span");
+  who.className = "who";
+  who.innerHTML = `<strong></strong><span class="sub">Teen · 14-18</span>`;
+  who.querySelector("strong").textContent = member.name;
+
+  const go = document.createElement("span");
+  go.className = "teen-go";
+  go.innerHTML = PICKER_CHEVRON;
+
   card.append(av, who, go);
   card.addEventListener("click", () => handleMemberPicked(member.id));
   return pickerWrap(card, member);
@@ -317,7 +354,8 @@ function handleMemberPicked(memberId) {
   currentMember = member;
   rememberProfileId(memberId);
 
-  if (member.kind === "adult") {
+  // Adults and teens map to one fixed profile — straight in, no level picker.
+  if (member.kind === "adult" || member.kind === "teen") {
     loadSession(getProfile(member.profileId), member.name);
     return;
   }
@@ -437,11 +475,10 @@ async function loadSession(profile, displayName) {
   });
 
   document.body.className = `profile-${profile.id}${profile.features.mascots ? " mascot-theme" : ""}`;
-  // Drives the whole visual theme: kids (contentTier set) get the playful world,
-  // the adult Business profile gets the premium dashboard. Scoped in CSS to
-  // [data-usertype="adult"] so it never touches the kids' shared chat screen.
-  const isAdult = !profile.contentTier;
-  document.body.dataset.usertype = isAdult ? "adult" : "child";
+  // Drives the whole visual theme, scoped in CSS to [data-usertype="…"]:
+  //   adult → premium dark dashboard · teen → modern purple/teal · child → playful.
+  const isAdult = profile.id === "business-conversational";
+  document.body.dataset.usertype = isAdult ? "adult" : profile.contentTier === "teen" ? "teen" : "child";
 
   el("current-user-name").textContent = displayName;
   el("current-profile-name").textContent = profile.displayName;

@@ -84,6 +84,13 @@ function applyFeatureDefaults(state, features) {
     };
   }
 
+  if (features && features.lessonsTeen && !state.lessonsTeen) {
+    state.lessonsTeen = {
+      lastLessonId: null,
+      completed: {}, // lessonId -> { bestScore, attempts, lastCompletedAt, itemsEverCorrect: [] }
+    };
+  }
+
   return state;
 }
 

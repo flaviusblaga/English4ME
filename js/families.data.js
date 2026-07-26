@@ -67,6 +67,12 @@ export const FAMILIES = [
       { id: "rares",   name: "Rareș",   emoji: "🐿️", kind: "kid",
         img: "assets/socatei/fizz-sticker.png",
         emails: ["blagararesoctavian@gmail.com", "raresoblaga@gmail.com"] },
+
+      // Teen (14-18) demo tile so the section is testable now — a signed-in
+      // adult can tap it to preview. Rename / set a real Google address (added
+      // as a Test user) when an actual teen uses it, or delete it.
+      { id: "teen-demo", name: "Teen", emoji: "🎓", kind: "teen",
+        profileId: "teen", emails: ["REPLACE-with-teen@gmail.com"] },
     ],
   },
 

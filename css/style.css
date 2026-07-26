@@ -1121,6 +1121,48 @@ body[data-usertype="adult"] .usage-card {
   display: grid; place-items: center; margin: 10px auto 0; box-shadow: 0 6px 14px var(--kc-soft);
 }
 
+/* ---- Teen (14-18) picker cards — modern, no mascots ---- */
+.grp-label--teens { color: #6d4bd8; background: #ece7ff; }
+.teen-wrap { display: flex; flex-direction: column; gap: 12px; }
+.picker-cardwrap > .teen-card { flex: 1; }
+.teen-card {
+  display: flex; align-items: center; gap: 14px;
+  background: var(--surface-raised); border: 1px solid #e6e1fb;
+  border-radius: var(--r-xl); padding: 12px 16px; cursor: pointer;
+  box-shadow: var(--shadow-sm); text-align: left; font: inherit; color: var(--text);
+  transition: transform 120ms var(--ease-out);
+}
+.teen-card:active { transform: scale(0.98); }
+.teen-card.is-remembered { box-shadow: 0 0 0 2px #7c5cff, var(--shadow-sm); }
+.teen-card .teen-av {
+  width: 64px; height: 64px; border-radius: 18px; flex-shrink: 0;
+  display: grid; place-items: center; color: #fff;
+  font-family: var(--font-display); font-weight: 800; font-size: 1.6rem;
+  background: linear-gradient(135deg, #7c5cff, #14b8a6);
+  box-shadow: 0 6px 16px rgba(124, 92, 255, 0.3);
+}
+.teen-card .who { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.teen-card .who strong { font-family: var(--font-display); font-weight: 800; font-size: 1.25rem; }
+.teen-card .who .sub { color: var(--text-muted); font-weight: 600; font-size: 0.82rem; }
+.teen-card .teen-go {
+  width: 42px; height: 42px; border-radius: 50%; background: #ece7ff;
+  display: grid; place-items: center; color: #6d4bd8; flex-shrink: 0;
+}
+
+/* ===================== Teen theme (data-usertype="teen") =====================
+   A modern purple/teal palette layered over the shared screens — mascot-free,
+   cleaner than the kids' world, lighter than the adult dashboard. */
+body[data-usertype="teen"] {
+  --primary: #7c5cff; --primary-dark: #5f3fe0; --primary-soft: #ece7ff; --primary-tint: #f5f3ff;
+  --accent: #14b8a6;
+  --success: #14b8a6; --success-soft: #d3f5f0; --success-text: #0d7d72;
+  --surface: #f6f5ff; --backdrop: #e9e6fb;
+  --kid-purple: #7c5cff;  /* the map's "current" accent */
+  --kid-teal: #14b8a6;
+}
+body[data-usertype="teen"] .app-header { border-bottom: 3px solid var(--primary); }
+body[data-usertype="teen"] .identity-avatar { border-radius: 14px; background: linear-gradient(135deg, #7c5cff, #14b8a6); }
+
 /* ===================== Module cards (level picker) ===================== */
 .module-list { display: flex; flex-direction: column; gap: 14px; }
 .mod-card {

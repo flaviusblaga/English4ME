@@ -25,7 +25,14 @@ const TIER_SPECS = {
     buckets: ["lessonsExpert", "reading"],
     total: () => totalLessons("expert") + READING_PASSAGES.length,
   },
+  teen: {
+    buckets: ["lessonsTeen", "reading"],
+    total: () => totalLessons("teen") + READING_PASSAGES.length,
+  },
 };
+
+// The module-bonus map is keyed by tier; the teen tier reuses the expert bonus.
+const BONUS_TIER_ALIAS = { teen: "expert" };
 
 // The scheme in force for this session. Starts as the coded default so the
 // very first render (before the Worker answers) shows sane numbers rather than
@@ -79,7 +86,7 @@ export function computeRewards(state, contentTier) {
     earnedAmount: lessonsCompleted * scheme.perLesson.amount,
 
     // The module bonus for THIS tier.
-    bonusAmount: scheme.moduleBonus[contentTier] || 0,
+    bonusAmount: scheme.moduleBonus[BONUS_TIER_ALIAS[contentTier] || contentTier] || 0,
     bonusUnit: scheme.moduleBonus.unit,
   };
 }

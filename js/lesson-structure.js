@@ -37,12 +37,17 @@ import { ADVANCED_EXTRA2, EXPERT_EXTRA2 } from "./grammar-extra2.js";
 
 export const EXERCISES_PER_LESSON = 50;
 
+const ADVANCED_ALL = [...ADVANCED_LESSONS, ...ADVANCED_EXTRA, ...ADVANCED_EXTRA2];
+const EXPERT_ALL = [...EXPERT_LESSONS, ...EXPERT_EXTRA, ...EXPERT_EXTRA2];
+
 // Full banks per tier: the original themes plus the Advanced/Expert additions.
+// The TEEN tier (14-18) is Advanced + Expert combined — the full grammar bank.
 const BANKS = {
   beginner: LESSONS,
   intermediate: SENTENCE_LESSONS,
-  advanced: [...ADVANCED_LESSONS, ...ADVANCED_EXTRA, ...ADVANCED_EXTRA2],
-  expert: [...EXPERT_LESSONS, ...EXPERT_EXTRA, ...EXPERT_EXTRA2],
+  advanced: ADVANCED_ALL,
+  expert: EXPERT_ALL,
+  teen: [...ADVANCED_ALL, ...EXPERT_ALL],
 };
 
 // Which field holds a theme's items, per tier.
@@ -51,6 +56,7 @@ const ITEMS_FIELD = {
   intermediate: "sentences",
   advanced: "questions",
   expert: "questions",
+  teen: "questions",
 };
 
 // Exercise types in the order a lesson cycles through them. Each pass drills
@@ -65,6 +71,7 @@ const CYCLE_TYPES = {
   // asking the same question over and over.
   advanced: ["grammar-mcq", "grammar-fix", "grammar-why", "grammar-recall"],
   expert: ["grammar-mcq", "grammar-fix", "grammar-why", "grammar-recall"],
+  teen: ["grammar-mcq", "grammar-fix", "grammar-why", "grammar-recall"],
 };
 
 // ---------------------------------------------------------------------------
@@ -240,6 +247,51 @@ export const TIER_CATEGORIES = {
     },
   ],
 };
+
+// ---------------------------------------------------------------------------
+// TEEN tier (14-18): Advanced + Expert combined, generated rather than
+// hand-written. The 68 grammar themes are bundled 4-per-lesson into 17 lessons
+// (matching the other tiers' length), grouped into five named categories. Doing
+// it programmatically guarantees every theme appears exactly once.
+// ---------------------------------------------------------------------------
+function buildTeenCategories() {
+  const themeIds = BANKS.teen.map((t) => t.id);
+  const byId = new Map(BANKS.teen.map((t) => [t.id, t]));
+  const PER_LESSON = 4;
+
+  // 17 lessons of 4 themes each.
+  const lessons = [];
+  for (let i = 0; i < themeIds.length; i += PER_LESSON) {
+    const themes = themeIds.slice(i, i + PER_LESSON);
+    const lead = byId.get(themes[0]);
+    lessons.push({
+      id: `teen-l${lessons.length + 1}`,
+      label: lead.label,        // named after its lead theme
+      emoji: lead.emoji || "🎓",
+      themes,
+    });
+  }
+
+  // Group the lessons into five progression stages.
+  const STAGES = [
+    { id: "teen-tenses",  label: "Timpuri și structuri",  emoji: "⏳", take: 4 },
+    { id: "teen-precision", label: "Precizie și nuanță",  emoji: "🎯", take: 4 },
+    { id: "teen-vocab",   label: "Vocabular avansat",     emoji: "📚", take: 3 },
+    { id: "teen-idioms",  label: "Expresii și idiomuri",  emoji: "💬", take: 3 },
+    { id: "teen-style",   label: "Stil și capcane",       emoji: "✍️", take: 99 }, // the rest
+  ];
+
+  const categories = [];
+  let cursor = 0;
+  for (const stage of STAGES) {
+    const slice = lessons.slice(cursor, cursor + stage.take);
+    cursor += slice.length;
+    if (slice.length) categories.push({ id: stage.id, label: stage.label, emoji: stage.emoji, lessons: slice });
+  }
+  return categories;
+}
+
+TIER_CATEGORIES.teen = buildTeenCategories();
 
 // ---------------------------------------------------------------------------
 // Lookups
