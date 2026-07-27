@@ -21,6 +21,7 @@ import { loadFamilyRewards } from "./rewards.js";
 import { initParentView, setParentChildren } from "./parent-view.js";
 import { initPwa } from "./pwa.js";
 import { initPlacement } from "./placement.js";
+import { iconSvg, hydrateIcons } from "./icons.js";
 
 let currentUser = null; // { email, name } — set after sign-in, used once a profile is picked
 let currentSession = null; // { accessToken, userEmail, displayName, fileId, state, profile } — reused across lesson<->chat navigation
@@ -169,7 +170,7 @@ async function renderProfilePicker() {
   if (adults.length) {
     const sec = document.createElement("div");
     sec.className = "picker-section";
-    sec.appendChild(sectionLabel("adults", "👥", "Adulți"));
+    sec.appendChild(sectionLabel("adults", iconSvg("users"), "Adulți"));
     const wrap = document.createElement("div");
     wrap.className = "adult-wrap";
     for (const member of adults) wrap.appendChild(renderAdultCard(member, remembered));
@@ -180,7 +181,7 @@ async function renderProfilePicker() {
   if (teens.length) {
     const sec = document.createElement("div");
     sec.className = "picker-section";
-    sec.appendChild(sectionLabel("teens", "🎓", "Adolescenți"));
+    sec.appendChild(sectionLabel("teens", iconSvg("graduation-cap"), "Adolescenți"));
     const wrap = document.createElement("div");
     wrap.className = "teen-wrap";
     for (const member of teens) wrap.appendChild(renderTeenCard(member, remembered));
@@ -191,7 +192,7 @@ async function renderProfilePicker() {
   if (kids.length) {
     const sec = document.createElement("div");
     sec.className = "picker-section";
-    sec.appendChild(sectionLabel("kids", "🧒", "Copii"));
+    sec.appendChild(sectionLabel("kids", iconSvg("smile"), "Copii"));
     const grid = document.createElement("div");
     grid.className = "kids-grid";
     for (const member of kids) grid.appendChild(renderKidCard(member, remembered, levelLabel));
@@ -234,7 +235,7 @@ function pickerWrap(card, member) {
     const edit = document.createElement("button");
     edit.type = "button";
     edit.className = "profile-avatar-edit";
-    edit.textContent = "🎭";
+    edit.innerHTML = iconSvg("pencil");
     edit.title = `Schimbă poza lui ${member.name}`;
     edit.setAttribute("aria-label", `Schimbă poza lui ${member.name}`);
     edit.addEventListener("click", (event) => {
@@ -423,7 +424,7 @@ async function renderFamilyList() {
   const add = document.createElement("button");
   add.type = "button";
   add.className = "btn btn-primary admin-add-btn";
-  add.textContent = "➕ Adaugă o familie";
+  add.innerHTML = `${iconSvg("plus")} Adaugă o familie`;
   add.addEventListener("click", () => openFamilyForm(null));
   body.appendChild(add);
 
@@ -455,7 +456,7 @@ async function renderFamilyList() {
 
     const del = document.createElement("button");
     del.type = "button"; del.className = "btn btn-small admin-del-btn";
-    del.textContent = "🗑";
+    del.innerHTML = iconSvg("trash-2");
     del.setAttribute("aria-label", `Șterge ${fam.name}`);
     del.addEventListener("click", () => confirmDeleteFamily(fam));
 
@@ -496,9 +497,9 @@ function openFamilyForm(fam) {
   body.innerHTML = "";
 
   const cats = [
-    ["adult", "👥 Adulți / părinți", "un email pe linie (sau: Nume, email)"],
-    ["teen", "🎓 Adolescenți (14-18)", "un email pe linie"],
-    ["kid", "🧒 Copii", "un email pe linie"],
+    ["adult", `${iconSvg("users")} Adulți / părinți`, "un email pe linie (sau: Nume, email)"],
+    ["teen", `${iconSvg("graduation-cap")} Adolescenți (14-18)`, "un email pe linie"],
+    ["kid", `${iconSvg("smile")} Copii`, "un email pe linie"],
   ];
 
   const nameRow = fieldRow("Numele familiei", `<input id="af-name" type="text" maxlength="60" placeholder="ex: Familia Popescu" />`);
@@ -532,17 +533,18 @@ function openFamilyForm(fam) {
   save.addEventListener("click", () => saveFamilyForm(fam, save));
   const back = document.createElement("button");
   back.type = "button"; back.className = "btn btn-small";
-  back.textContent = "← Înapoi";
+  back.innerHTML = `${iconSvg("arrow-left")} Înapoi`;
   back.addEventListener("click", renderFamilyList);
   actions.append(back, save);
   body.appendChild(actions);
 }
 
-function fieldRow(labelText, innerHtml) {
+function fieldRow(labelHtml, innerHtml) {
   const row = document.createElement("div");
   row.className = "admin-field";
   const label = document.createElement("label");
-  label.textContent = labelText;
+  // labelHtml is a trusted constant (may include an inline icon SVG).
+  label.innerHTML = labelHtml;
   row.appendChild(label);
   const holder = document.createElement("div");
   holder.innerHTML = innerHtml;
@@ -679,7 +681,7 @@ function showLevelPicker(member, recommendedProfileId) {
     if (levelId === recommendedProfileId) {
       const badge = document.createElement("span");
       badge.className = "mod-reco";
-      badge.textContent = "⭐ Recomandat";
+      badge.innerHTML = `${iconSvg("star")} Recomandat`;
       h.appendChild(badge);
     }
     const p = document.createElement("span");
@@ -817,6 +819,7 @@ function restoreOrShowLogin() {
 }
 
 window.addEventListener("DOMContentLoaded", async () => {
+  hydrateIcons(); // swap every data-icon placeholder in the static markup for its SVG
   el("login-btn").addEventListener("click", handleLogin);
   el("logout-btn").addEventListener("click", handleLogout);
   el("avatar-picker-close").addEventListener("click", () => {

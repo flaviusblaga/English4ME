@@ -4,6 +4,7 @@ import { SCENARIOS } from "./scenarios-client.js";
 import { initDocumentsUi, refreshDocumentsSummary } from "./documents-ui.js";
 import { BADGES, updateGamificationAfterTurn } from "./gamification.js";
 import { gamificationWithRewards } from "./rewards.js";
+import { iconSvg } from "./icons.js";
 import {
   isSpeechRecognitionSupported,
   isSpeechSynthesisSupported,
@@ -148,7 +149,9 @@ export function initChat({ accessToken, userEmail, displayName, fileId, state, p
   el("back-to-lessons-btn").hidden = !profile.features.lessons;
   // Chat-first tiers frame the same button as the way INTO exercises rather
   // than the way back to a lesson menu they started from.
-  el("back-to-lessons-btn").textContent = profile.features.chatFirst ? "🎓 Exercises" : "📚 Lessons";
+  el("back-to-lessons-btn").innerHTML = profile.features.chatFirst
+    ? `${iconSvg("notebook-pen")} Exercises`
+    : `${iconSvg("notebook-pen")} Lessons`;
   el("back-to-lessons-btn").onclick = () => {
     if (onBackToLessons) onBackToLessons();
   };
@@ -294,7 +297,7 @@ function initVoiceUi() {
 
 function updateTtsButtonLabel() {
   const muted = isTtsMuted();
-  el("tts-mute-btn").textContent = muted ? "🔇 Voice off" : "🔊 Voice on";
+  el("tts-mute-btn").innerHTML = muted ? `${iconSvg("volume-x")} Voice off` : `${iconSvg("volume-2")} Voice on`;
   el("tts-mute-btn").setAttribute("aria-pressed", String(muted));
 }
 
@@ -408,8 +411,8 @@ function renderBudgetIndicator() {
 
 function renderGamificationBar() {
   const g = session.state.gamification;
-  el("gamification-points").textContent = `⭐ ${g.points}`;
-  el("gamification-streak").textContent = `🔥 ${g.currentStreak}`;
+  el("gamification-points").innerHTML = `${iconSvg("star")} ${g.points}`;
+  el("gamification-streak").innerHTML = `${iconSvg("flame")} ${g.currentStreak}`;
 }
 
 function renderBadgesPanel() {

@@ -1,6 +1,7 @@
 import { fetchChildProgress, fetchFamilyRewards, saveFamilyRewards } from "./worker-client.js";
 import { BADGES } from "./gamification.js";
 import { setActiveRewards } from "./rewards.js";
+import { iconSvg } from "./icons.js";
 
 const LAST_CHILD_EMAIL_KEY = "engleza-familie:lastChildEmail";
 
@@ -86,7 +87,7 @@ async function handleSaveRewards() {
     // Apply to this session too, so the parent sees the new wording without
     // signing out and back in.
     setActiveRewards(result.rewards);
-    status.textContent = "✅ Salvat. Copiii vor vedea noile recompense la următoarea deschidere.";
+    status.innerHTML = `${iconSvg("circle-check")} Salvat. Copiii vor vedea noile recompense la următoarea deschidere.`;
   } catch (err) {
     status.textContent =
       err.code === "forbidden"
@@ -132,7 +133,9 @@ async function handleLoad() {
 }
 
 function renderRecord(record) {
-  el("parent-view-name").textContent = `👀 Progresul lui ${record.displayName || record.userEmail}`;
+  const nameEl = el("parent-view-name");
+  nameEl.innerHTML = iconSvg("eye");
+  nameEl.append(` Progresul lui ${record.displayName || record.userEmail}`);
   el("parent-view-points").textContent = record.gamification ? record.gamification.points : 0;
   el("parent-view-streak").textContent = record.gamification ? record.gamification.currentStreak : 0;
   el("parent-view-turns").textContent = record.progress ? record.progress.totalTurns : 0;
@@ -181,7 +184,8 @@ function renderRewards(rewards) {
 
   const heading = document.createElement("p");
   heading.className = "rewards-card-heading";
-  heading.textContent = "🏆 Recompense de onorat";
+  heading.innerHTML = iconSvg("trophy");
+  heading.append(" Recompense de onorat");
   card.appendChild(heading);
 
   const progressLine = document.createElement("p");
@@ -189,21 +193,25 @@ function renderRewards(rewards) {
   const moduleName = {
     beginner: "Playroom", intermediate: "Adventure", advanced: "Storytime", expert: "Mastery Cup", teen: "Teen",
   }[rewards.tier] || rewards.tier;
-  progressLine.textContent = `📚 ${rewards.lessonsCompleted} / ${rewards.totalLessons} lecții terminate — ${moduleName}`;
+  progressLine.innerHTML = iconSvg("book-open");
+  progressLine.append(` ${rewards.lessonsCompleted} / ${rewards.totalLessons} lecții terminate — ${moduleName}`);
   card.appendChild(progressLine);
 
   const screenTimeLine = document.createElement("p");
   screenTimeLine.className = "rewards-row";
-  screenTimeLine.textContent = `⏱ Câștigat: ${rewards.earnedAmount} ${rewards.perLessonUnit} (${rewards.perLessonAmount} / lecție)`;
+  screenTimeLine.innerHTML = iconSvg("timer");
+  screenTimeLine.append(` Câștigat: ${rewards.earnedAmount} ${rewards.perLessonUnit} (${rewards.perLessonAmount} / lecție)`);
   card.appendChild(screenTimeLine);
 
   const bonusLine = document.createElement("p");
   bonusLine.className = "rewards-row rewards-row--bonus";
   if (rewards.bonusEarned) {
     bonusLine.classList.add("rewards-row--earned");
-    bonusLine.textContent = `🎁 BONUS DE ONORAT: ${rewards.bonusAmount} ${rewards.bonusUnit} — modulul e terminat integral!`;
+    bonusLine.innerHTML = iconSvg("gift");
+    bonusLine.append(` BONUS DE ONORAT: ${rewards.bonusAmount} ${rewards.bonusUnit} — modulul e terminat integral!`);
   } else {
-    bonusLine.textContent = `🎁 Bonus la modul complet: ${rewards.bonusAmount} ${rewards.bonusUnit} (mai are ${rewards.totalLessons - rewards.lessonsCompleted} lecții)`;
+    bonusLine.innerHTML = iconSvg("gift");
+    bonusLine.append(` Bonus la modul complet: ${rewards.bonusAmount} ${rewards.bonusUnit} (mai are ${rewards.totalLessons - rewards.lessonsCompleted} lecții)`);
   }
   card.appendChild(bonusLine);
 

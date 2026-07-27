@@ -32,6 +32,7 @@ import {
   setMascotPreference,
 } from "./chat.js";
 import { speak, recognizeOnce, isSpeechInputAvailable } from "./voice.js";
+import { iconSvg } from "./icons.js";
 import {
   LESSONS,
   getLesson,
@@ -308,9 +309,9 @@ export function initLessons({ accessToken, userEmail, displayName, fileId, state
   el("lesson-user-name").textContent = displayName;
   el("lesson-profile-tag").textContent = profile.displayName;
   el("lesson-header-avatar").textContent = (displayName[0] || "?").toUpperCase();
-  el("lesson-just-chat-btn").textContent = profile.features.mascots
-    ? "💬 Chat with the Socatei"
-    : "💬 Back to chat";
+  el("lesson-just-chat-btn").innerHTML = profile.features.mascots
+    ? `${iconSvg("message-circle")} Chat with the Socatei`
+    : `${iconSvg("message-circle")} Back to chat`;
   el("lesson-just-chat-btn").onclick = () => {
     if (onJustChatCallback) onJustChatCallback(null);
   };
@@ -343,8 +344,8 @@ export function initLessons({ accessToken, userEmail, displayName, fileId, state
 
 function renderGamificationBar() {
   const g = session.state.gamification;
-  el("lesson-gamification-points").textContent = `⭐ ${g.points}`;
-  el("lesson-gamification-streak").textContent = `🔥 ${g.currentStreak}`;
+  el("lesson-gamification-points").innerHTML = `${iconSvg("star")} ${g.points}`;
+  el("lesson-gamification-streak").innerHTML = `${iconSvg("flame")} ${g.currentStreak}`;
 }
 
 // The bottom tab bar shows on the adventure-path home, but hides during an
@@ -392,10 +393,10 @@ function renderStreakCard() {
   const streak = g.currentStreak || 0;
   card.innerHTML =
     `<div class="streak-head">` +
-    `<span class="streak-flame">🔥</span>` +
+    `<span class="streak-flame">${iconSvg("flame")}</span>` +
     `<div class="streak-headtext">` +
     `<div class="streak-count">${streak} ${streak === 1 ? "zi" : "zile"} la rând!</div>` +
-    `<div class="streak-sub">📅 ${g.totalActiveDays || 0} zile în total · 🏆 record ${g.longestStreak || 0}</div>` +
+    `<div class="streak-sub">${iconSvg("calendar")} ${g.totalActiveDays || 0} zile în total · ${iconSvg("trophy")} record ${g.longestStreak || 0}</div>` +
     `</div></div>` +
     `<div class="streak-week">${strip}</div>`;
   card.hidden = false;
@@ -423,7 +424,7 @@ function renderDailyCard() {
 
   const title = document.createElement("p");
   title.className = "daily-card-title";
-  title.textContent = "🎯 Practica de azi";
+  title.innerHTML = `${iconSvg("target")} Practica de azi`;
   card.appendChild(title);
 
   const line = document.createElement("p");
@@ -435,7 +436,7 @@ function renderDailyCard() {
 
   const progress = document.createElement("p");
   progress.className = "daily-card-progress";
-  progress.textContent = `🌟 ${stats.mastered} știute · 📚 ${stats.learning} în lucru · din ${stats.total}`;
+  progress.innerHTML = `${iconSvg("star")} ${stats.mastered} știute · ${iconSvg("book-open")} ${stats.learning} în lucru · din ${stats.total}`;
   card.appendChild(progress);
 
   if (sessionSize) {
@@ -543,7 +544,8 @@ function showMenu() {
 
       const stars = document.createElement("span");
       stars.className = "lesson-node-stars";
-      stars.textContent = record ? ("⭐".repeat(starsForScore(record.bestScore, maxScore)) || "·") : "";
+      const starCount = record ? starsForScore(record.bestScore, maxScore) : 0;
+      stars.innerHTML = record ? (iconSvg("star").repeat(starCount) || "·") : "";
       node.appendChild(stars);
 
       node.addEventListener("click", () => startLesson(lesson.id));
@@ -568,7 +570,7 @@ function renderRewardsCard() {
 
   const heading = document.createElement("p");
   heading.className = "rewards-card-heading";
-  heading.textContent = "🏆 My rewards · Recompensele mele";
+  heading.innerHTML = `${iconSvg("trophy")} My rewards · Recompensele mele`;
   card.appendChild(heading);
 
   const track = document.createElement("div");
@@ -581,21 +583,24 @@ function renderRewardsCard() {
 
   const progressLine = document.createElement("p");
   progressLine.className = "rewards-row";
-  progressLine.textContent = `📚 ${rewards.lessonsCompleted} / ${rewards.totalLessons} lessons done · lecții terminate`;
+  progressLine.innerHTML = `${iconSvg("book-open")} ${rewards.lessonsCompleted} / ${rewards.totalLessons} lessons done · lecții terminate`;
   card.appendChild(progressLine);
 
   const screenTimeLine = document.createElement("p");
   screenTimeLine.className = "rewards-row";
-  screenTimeLine.textContent = `⏱ +${perLessonPhrase(rewards)} pe lecție · Ai strâns: ${earnedPhrase(rewards)}`;
+  screenTimeLine.innerHTML = iconSvg("timer");
+  screenTimeLine.append(` +${perLessonPhrase(rewards)} pe lecție · Ai strâns: ${earnedPhrase(rewards)}`);
   card.appendChild(screenTimeLine);
 
   const bonusLine = document.createElement("p");
   bonusLine.className = "rewards-row rewards-row--bonus";
   if (rewards.bonusEarned) {
     bonusLine.classList.add("rewards-row--earned");
-    bonusLine.textContent = `🎁 BONUS: ${bonusPhrase(rewards)}! · Bonus deblocat — spune-le părinților!`;
+    bonusLine.innerHTML = iconSvg("gift");
+    bonusLine.append(` BONUS: ${bonusPhrase(rewards)}! · Bonus deblocat — spune-le părinților!`);
   } else {
-    bonusLine.textContent = `🎁 Termină toate cele ${rewards.totalLessons} → bonus de ${bonusPhrase(rewards)}`;
+    bonusLine.innerHTML = iconSvg("gift");
+    bonusLine.append(` Termină toate cele ${rewards.totalLessons} → bonus de ${bonusPhrase(rewards)}`);
   }
   card.appendChild(bonusLine);
 
@@ -775,7 +780,7 @@ function renderQuestion() {
     canReplayNow = true;
   } else if (question.type === "listen") {
     // Listening drill: the WORD is the audio, never shown as text.
-    stem.textContent = "🔊";
+    stem.innerHTML = iconSvg("volume-2");
     spokenTarget = question.word.en;
     canReplayNow = true;
   } else if (question.type === "en-ro") {
@@ -785,7 +790,7 @@ function renderQuestion() {
     spokenTarget = question.word.en;
     canReplayNow = true;
   } else if (question.type === "listen-sentence") {
-    stem.textContent = "🔊";
+    stem.innerHTML = iconSvg("volume-2");
     spokenTarget = question.sentence.en;
     canReplayNow = true;
   } else if (question.type === "translation") {
@@ -947,15 +952,15 @@ function renderSayExercise(question, target) {
   if (!supported) {
     // No speech recognition on this browser: fall back to an honest self-check
     // rather than pretending to grade something we cannot hear.
-    micBtn.textContent = "✅";
-    status.textContent = "Spune cuvântul cu voce tare, apoi apasă ✅";
+    micBtn.innerHTML = iconSvg("circle-check");
+    status.textContent = "Spune cuvântul cu voce tare, apoi apasă butonul verde";
     micBtn.onclick = () => {
       sayArea.hidden = true;
       finalizeAnswer(question, true);
     };
   } else {
-    micBtn.textContent = "🎤";
-    status.textContent = "Apasă microfonul și spune-l! 🎤";
+    micBtn.innerHTML = iconSvg("mic");
+    status.textContent = "Apasă microfonul și spune-l!";
     micBtn.onclick = async () => {
       micBtn.disabled = true;
       micBtn.classList.add("mic-btn--listening");
@@ -1066,7 +1071,7 @@ function finalizeAnswer(question, wasCorrect) {
 
   const isLast = currentIndex === currentQueue.length - 1;
   const nextBtn = el("lesson-next-btn");
-  nextBtn.textContent = isLast ? "See my results! →" : "Next →";
+  nextBtn.innerHTML = isLast ? `See my results! ${iconSvg("arrow-right")}` : `Next ${iconSvg("arrow-right")}`;
   nextBtn.hidden = false;
   nextBtn.onclick = isLast ? finishLesson : advanceToNextQuestion;
 
@@ -1221,9 +1226,9 @@ function showComplete(score, total, newlyUnlocked, rewardInfo = {}) {
 
   if (session.profile.features.mascots) launchConfetti();
 
-  el("lesson-chat-about-it-btn").textContent = session.profile.features.mascots
-    ? "💬 Chat about it with the Socatei"
-    : "💬 Chat about what you practiced";
+  el("lesson-chat-about-it-btn").innerHTML = session.profile.features.mascots
+    ? `${iconSvg("message-circle")} Chat about it with the Socatei`
+    : `${iconSvg("message-circle")} Chat about what you practiced`;
   el("lesson-chat-about-it-btn").onclick = () => {
     if (onChatAboutItCallback) {
       // What "today's words" means per tier: the word bank, the sentence
@@ -1251,20 +1256,23 @@ function renderCompleteRewards({ rewards, isFirstCompletion, bonusJustEarned }) 
 
   const timeLine = document.createElement("p");
   timeLine.className = "rewards-row";
-  timeLine.textContent = isFirstCompletion
-    ? `⏱ Ai câștigat +${perLessonPhrase(rewards)}! (total: ${earnedPhrase(rewards)})`
-    : `⏱ Lecția era deja numărată — ai strâns până acum ${earnedPhrase(rewards)}`;
+  timeLine.innerHTML = iconSvg("timer");
+  timeLine.append(isFirstCompletion
+    ? ` Ai câștigat +${perLessonPhrase(rewards)}! (total: ${earnedPhrase(rewards)})`
+    : ` Lecția era deja numărată — ai strâns până acum ${earnedPhrase(rewards)}`);
   box.appendChild(timeLine);
 
   if (bonusJustEarned) {
     const bonusLine = document.createElement("p");
     bonusLine.className = "rewards-row rewards-row--bonus rewards-row--earned";
-    bonusLine.textContent = `🎁 MODUL COMPLET! Bonus: ${bonusPhrase(rewards)} · Spune-le părinților!`;
+    bonusLine.innerHTML = iconSvg("gift");
+    bonusLine.append(` MODUL COMPLET! Bonus: ${bonusPhrase(rewards)} · Spune-le părinților!`);
     box.appendChild(bonusLine);
   } else {
     const towardLine = document.createElement("p");
     towardLine.className = "rewards-row";
-    towardLine.textContent = `📚 ${rewards.lessonsCompleted} / ${rewards.totalLessons} lecții spre bonusul de ${bonusPhrase(rewards)}`;
+    towardLine.innerHTML = iconSvg("book-open");
+    towardLine.append(` ${rewards.lessonsCompleted} / ${rewards.totalLessons} lecții spre bonusul de ${bonusPhrase(rewards)}`);
     box.appendChild(towardLine);
   }
 
@@ -1374,17 +1382,17 @@ function buildRecapText(score, total) {
 function wireSaveRecapButton(score, total) {
   const btn = el("lesson-save-recap-btn");
   btn.disabled = false;
-  btn.textContent = "💾 Save recap to Drive · Salvează pe Drive";
+  btn.innerHTML = `${iconSvg("save")} Save recap to Drive · Salvează pe Drive`;
   btn.onclick = async () => {
     btn.disabled = true;
-    btn.textContent = "💾 Saving… · Se salvează…";
+    btn.innerHTML = `${iconSvg("save")} Saving… · Se salvează…`;
     const title = `Engleza Familie — ${session.displayName} — ${currentLesson.label} — ${todayLocalDateString()}`;
     try {
       await saveRecapToDrive(session.accessToken, title, buildRecapText(score, total));
-      btn.textContent = "✅ Saved to Drive! · Salvat!";
+      btn.innerHTML = `${iconSvg("circle-check")} Saved to Drive! · Salvat!`;
     } catch (err) {
       btn.disabled = false;
-      btn.textContent = "💾 Try again · Încearcă din nou";
+      btn.innerHTML = `${iconSvg("save")} Try again · Încearcă din nou`;
       const scopeHint =
         err.status === 403
           ? " Sign out and sign in again to allow the new Drive permission. · Ieși din cont și loghează-te din nou ca să aprobi noua permisiune Drive."
@@ -1406,7 +1414,7 @@ function renderLessonSummary() {
 
   const heading = document.createElement("h3");
   heading.className = "lesson-summary-heading";
-  heading.textContent = usesMascots ? "📋 Lesson recap · Ce ai învățat azi" : "📋 Lesson recap";
+  heading.innerHTML = usesMascots ? `${iconSvg("clipboard-list")} Lesson recap · Ce ai învățat azi` : `${iconSvg("clipboard-list")} Lesson recap`;
   summary.appendChild(heading);
 
   // Show the EXERCISE score here too, so it never seems to disagree with the
@@ -1428,7 +1436,7 @@ function renderLessonSummary() {
     group.className = `lesson-summary-group ${cssClass}`;
     const title = document.createElement("p");
     title.className = "lesson-summary-title";
-    title.textContent = titleText;
+    title.innerHTML = titleText; // trusted: literal strings with an inline icon
     group.appendChild(title);
     for (const entry of entries) {
       const row = document.createElement("p");
@@ -1446,7 +1454,7 @@ function renderLessonSummary() {
   }
 
   addGroup(
-    usesMascots ? "✅ You knew these! · Le-ai știut!" : "✅ You got these right",
+    usesMascots ? `${iconSvg("circle-check")} You knew these! · Le-ai știut!` : `${iconSvg("circle-check")} You got these right`,
     "lesson-summary-group--knew",
     knew,
     false
@@ -1454,7 +1462,7 @@ function renderLessonSummary() {
   const practiceWord = practice.length === 1 ? "word" : "words";
   const practiceCuv = practice.length === 1 ? "cuvânt" : "cuvinte";
   addGroup(
-    usesMascots ? `🔁 Practice these words · ${practice.length} ${practiceCuv} de reluat` : "🔁 Words worth another look",
+    usesMascots ? `${iconSvg("rotate-cw")} Practice these words · ${practice.length} ${practiceCuv} de reluat` : `${iconSvg("rotate-cw")} Words worth another look`,
     "lesson-summary-group--practice",
     practice,
     true

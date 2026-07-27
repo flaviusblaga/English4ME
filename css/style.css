@@ -129,11 +129,42 @@ h1, h2, h3, h4 {
   border-radius: var(--r-lg);
   padding: 0.85rem 1.3rem;
   font-size: var(--fs-sm);
+  /* inline-flex so a leading <svg class="icon"> and its label sit centred on
+     one line with a consistent gap; harmless for text-only buttons. */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4em;
   transition: transform 120ms var(--ease-out),
               box-shadow 120ms var(--ease-out),
               background 120ms var(--ease-out),
               color 120ms var(--ease-out);
 }
+
+/* ---------- Lucide UI icons ----------
+   One class, ONE size everywhere: the icon is always 1.15× the height of the
+   text it sits next to, so every interface icon reads at the same optical size
+   (unlike the emoji they replaced, which each rendered at their own size and
+   baseline). Colour follows `currentColor`, so icons pick up the child / teen /
+   adult theme automatically. */
+.icon {
+  width: 1.15em;
+  height: 1.15em;
+  flex: none;
+  display: inline-block;
+  vertical-align: -0.19em;   /* sit on the text baseline when inline */
+  stroke: currentColor;
+  color: inherit;
+}
+/* When an icon is the button's only content (settings / mic / close / send),
+   the flex gap has nothing to space, and the round .btn-icon centres it. */
+.btn-icon .icon,
+.btn-send .icon { vertical-align: middle; }
+/* Wrapper for icons hydrated from data-icon in the static markup. */
+.icon-slot { display: inline-flex; align-items: center; line-height: 0; }
+/* Round single-icon buttons that aren't .btn (no flex centering of their own). */
+.profile-avatar-edit,
+.mic-btn { display: grid; place-items: center; }
 
 .btn-primary {
   background: var(--primary);
@@ -2105,6 +2136,10 @@ body.mascot-theme .chat-bubble--assistant {
 .star {
   filter: grayscale(1) opacity(0.3);
 }
+/* Empty vs earned: the Lucide star is an outline, so "earned" fills it gold
+   (both fill and stroke) while the base stays a faint outline. */
+.star .icon { color: var(--text-faint); }
+.star--filled .icon { color: #f4b400; fill: #f4b400; }
 
 .star--filled {
   filter: none;

@@ -16,7 +16,8 @@
 // v4: bypass the browser HTTP cache on fetch (see below) so a fresh upload
 // takes effect on the next load instead of up to 10 minutes later. Bumping this
 // also drops every stale entry from earlier versions on activate.
-const CACHE_VERSION = "socatei-v5";
+// v6: Lucide UI icons — new js/icons.js module + emoji→SVG swaps across the app.
+const CACHE_VERSION = "socatei-v6";
 
 self.addEventListener("install", (event) => {
   // Activate this new worker immediately instead of waiting for every old

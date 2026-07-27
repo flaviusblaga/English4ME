@@ -44,9 +44,9 @@
         Continuă cu Google
       </button>
       <p id="login-error" class="error" hidden></p>
-      <button id="install-app-btn" class="btn btn-small" hidden>📲 Instalează pe telefon</button>
+      <button id="install-app-btn" class="btn btn-small" hidden><span class="icon-slot" data-icon="smartphone"></span> Instalează pe telefon</button>
       <p id="ios-install-hint" class="hint" hidden>Pe iPhone: apasă Share ⬆️ (în Safari), apoi „Add to Home Screen".</p>
-      <p class="login-invite">🔒 Acces doar cu invitație — contul tău Google trebuie adăugat de administrator.</p>
+      <p class="login-invite"><span class="icon-slot" data-icon="lock"></span> Acces doar cu invitație — contul tău Google trebuie adăugat de administrator.</p>
     </div>
   </main>
 
@@ -56,7 +56,7 @@
       <p class="profile-picker-sub">Alege profilul tău</p>
       <div id="profile-picker-list" class="profile-picker-list"></div>
       <!-- Only the super-admin (checked server-side too) sees this. -->
-      <button id="admin-entry-btn" type="button" class="btn btn-small admin-entry-btn" hidden>⚙️ Gestionează familiile</button>
+      <button id="admin-entry-btn" type="button" class="btn btn-small admin-entry-btn" hidden><span class="icon-slot" data-icon="settings"></span> Gestionează familiile</button>
     </div>
 
     <!-- Avatar chooser. Lives inside the picker screen so it disappears with
@@ -83,11 +83,11 @@
 
   <main id="screen-level-picker" class="screen" hidden>
     <div class="card card-wide">
-      <button id="level-picker-back-btn" class="btn btn-small">← Alt membru</button>
-      <h1 id="level-picker-title">Alege nivelul 🎯</h1>
+      <button id="level-picker-back-btn" class="btn btn-small"><span class="icon-slot" data-icon="arrow-left"></span> Alt membru</button>
+      <h1 id="level-picker-title">Alege nivelul <span class="icon-slot" data-icon="target"></span></h1>
       <p class="profile-picker-sub">Poți face orice nivel — testul doar îți recomandă unul.</p>
       <div id="level-picker-list" class="profile-picker-list"></div>
-      <button id="level-picker-retake-btn" class="btn btn-small level-picker-retake">🔄 Reia testul de nivel</button>
+      <button id="level-picker-retake-btn" class="btn btn-small level-picker-retake"><span class="icon-slot" data-icon="rotate-cw"></span> Reia testul de nivel</button>
     </div>
   </main>
 
@@ -109,8 +109,8 @@
         <div id="placement-result-emoji" class="placement-result-emoji">🎉</div>
         <h1 id="placement-result-title"></h1>
         <p id="placement-result-sub" class="hint"></p>
-        <button id="placement-start-btn" class="btn btn-primary">Începe primele lecții →</button>
-        <button id="placement-retake-btn" class="btn btn-small">↻ Reia testul</button>
+        <button id="placement-start-btn" class="btn btn-primary">Începe primele lecții <span class="icon-slot" data-icon="arrow-right"></span></button>
+        <button id="placement-retake-btn" class="btn btn-small"><span class="icon-slot" data-icon="rotate-cw"></span> Reia testul</button>
       </div>
     </div>
   </main>
@@ -127,11 +127,11 @@
         </div>
         <div class="app-header-status">
           <div id="gamification-bar" class="gamification-bar" hidden>
-            <span id="gamification-points" class="gamification-points">⭐ 0</span>
-            <span id="gamification-streak" class="gamification-streak">🔥 0</span>
+            <span id="gamification-points" class="gamification-points"><span class="icon-slot" data-icon="star"></span> 0</span>
+            <span id="gamification-streak" class="gamification-streak"><span class="icon-slot" data-icon="flame"></span> 0</span>
           </div>
           <span id="budget-indicator" class="budget-indicator"></span>
-          <button id="settings-btn" class="btn btn-small btn-icon" aria-label="Settings" aria-pressed="false">⚙️</button>
+          <button id="settings-btn" class="btn btn-small btn-icon" aria-label="Settings" aria-pressed="false"><span class="icon-slot" data-icon="settings"></span></button>
         </div>
       </div>
       <!-- Adult dashboard usage card. Shown only for the Business profile (CSS,
@@ -151,11 +151,11 @@
             <option value="">Free conversation</option>
           </select>
         </div>
-        <button id="gamification-badges-btn" class="btn btn-small" hidden>🏅 Badges</button>
-        <button id="back-to-lessons-btn" class="btn btn-small" hidden>📚 Exercises</button>
-        <button id="reading-btn" class="btn btn-small" hidden>📖 Reading</button>
-        <button id="view-child-progress-btn" class="btn btn-small" hidden>👀 View child's progress</button>
-        <button id="home-btn" class="btn btn-small">🏠 Levels</button>
+        <button id="gamification-badges-btn" class="btn btn-small" hidden><span class="icon-slot" data-icon="award"></span> Badges</button>
+        <button id="back-to-lessons-btn" class="btn btn-small" hidden><span class="icon-slot" data-icon="notebook-pen"></span> Exercises</button>
+        <button id="reading-btn" class="btn btn-small" hidden><span class="icon-slot" data-icon="book-open"></span> Reading</button>
+        <button id="view-child-progress-btn" class="btn btn-small" hidden><span class="icon-slot" data-icon="eye"></span> View child's progress</button>
+        <button id="home-btn" class="btn btn-small"><span class="icon-slot" data-icon="home"></span> Levels</button>
       </div>
     </header>
 
@@ -164,7 +164,7 @@
         <option value="female">👩 Female voice</option>
         <option value="male">👨 Male voice</option>
       </select>
-      <button id="tts-mute-btn" class="btn btn-small" aria-pressed="false">🔊 Voice on</button>
+      <button id="tts-mute-btn" class="btn btn-small" aria-pressed="false"><span class="icon-slot" data-icon="volume-2"></span> Voice on</button>
       <button id="debug-data-btn" class="btn btn-small">Show saved data</button>
       <button id="logout-btn" class="btn btn-small">Sign out</button>
     </div>
@@ -216,9 +216,9 @@
     <div id="chat-log" class="chat-log"></div>
 
     <footer class="chat-input-row">
-      <button id="mic-btn" class="btn btn-small btn-icon" hidden aria-label="Speak">🎤</button>
+      <button id="mic-btn" class="btn btn-small btn-icon" hidden aria-label="Speak"><span class="icon-slot" data-icon="mic"></span></button>
       <textarea id="chat-input" rows="2" placeholder="Type your message in English..."></textarea>
-      <button id="chat-send" class="btn btn-primary btn-send" aria-label="Send">➤</button>
+      <button id="chat-send" class="btn btn-primary btn-send" aria-label="Send"><span class="icon-slot" data-icon="send"></span></button>
     </footer>
 
     <pre id="debug-data-output" class="debug-output" hidden></pre>
@@ -236,15 +236,15 @@
         </div>
         <div class="app-header-status">
           <div id="lesson-gamification-bar" class="gamification-bar">
-            <span id="lesson-gamification-points" class="gamification-points">⭐ 0</span>
-            <span id="lesson-gamification-streak" class="gamification-streak">🔥 0</span>
+            <span id="lesson-gamification-points" class="gamification-points"><span class="icon-slot" data-icon="star"></span> 0</span>
+            <span id="lesson-gamification-streak" class="gamification-streak"><span class="icon-slot" data-icon="flame"></span> 0</span>
           </div>
-          <button id="lesson-settings-btn" class="btn btn-small btn-icon" aria-label="Settings" aria-pressed="false">⚙️</button>
+          <button id="lesson-settings-btn" class="btn btn-small btn-icon" aria-label="Settings" aria-pressed="false"><span class="icon-slot" data-icon="settings"></span></button>
         </div>
       </div>
       <div class="app-header-actions">
-        <button id="lesson-just-chat-btn" class="btn btn-small">💬 Chat</button>
-        <button id="lesson-home-btn" class="btn btn-small">🏠 Levels</button>
+        <button id="lesson-just-chat-btn" class="btn btn-small"><span class="icon-slot" data-icon="message-circle"></span> Chat</button>
+        <button id="lesson-home-btn" class="btn btn-small"><span class="icon-slot" data-icon="home"></span> Levels</button>
       </div>
     </header>
 
@@ -288,7 +288,7 @@
 
     <div id="lesson-exercise-view" hidden>
       <div class="lesson-progress-bar">
-        <button id="lesson-exit-btn" class="btn btn-small btn-icon" aria-label="Exit lesson">✕</button>
+        <button id="lesson-exit-btn" class="btn btn-small btn-icon" aria-label="Exit lesson"><span class="icon-slot" data-icon="x"></span></button>
         <div class="progress-track"><div id="lesson-progress-fill" class="progress-fill"></div></div>
         <span id="lesson-progress-label" class="progress-label"></span>
       </div>
@@ -307,7 +307,7 @@
         <button id="lesson-unscramble-check-btn" class="btn btn-primary">Check</button>
       </div>
       <div id="lesson-say-area" class="lesson-say-area" hidden>
-        <button id="lesson-mic-btn" type="button" class="mic-btn" aria-label="Say it">🎤</button>
+        <button id="lesson-mic-btn" type="button" class="mic-btn" aria-label="Say it"><span class="icon-slot" data-icon="mic"></span></button>
         <p id="lesson-say-status" class="lesson-say-status"></p>
         <button id="lesson-say-skip-btn" type="button" class="btn btn-small">Sar peste · Skip</button>
       </div>
@@ -322,8 +322,8 @@
         </div>
       </div>
       <div class="lesson-action-bar">
-        <button id="lesson-replay-btn" class="btn btn-small" hidden>🔊 Hear it again</button>
-        <button id="lesson-next-btn" class="btn btn-primary" hidden>Next →</button>
+        <button id="lesson-replay-btn" class="btn btn-small" hidden><span class="icon-slot" data-icon="volume-2"></span> Hear it again</button>
+        <button id="lesson-next-btn" class="btn btn-primary" hidden>Next <span class="icon-slot" data-icon="arrow-right"></span></button>
       </div>
     </div>
 
@@ -335,22 +335,22 @@
         </span>
         <p id="lesson-complete-line" class="mascot-text"></p>
       </div>
-      <div id="lesson-complete-stars" class="star-row" hidden><span class="star">⭐</span><span class="star">⭐</span><span class="star">⭐</span></div>
+      <div id="lesson-complete-stars" class="star-row" hidden><span class="star"><span class="icon-slot" data-icon="star"></span></span><span class="star"><span class="icon-slot" data-icon="star"></span></span><span class="star"><span class="icon-slot" data-icon="star"></span></span></div>
       <p id="lesson-complete-score" class="lesson-score"></p>
       <div id="lesson-complete-rewards" class="rewards-callout" hidden></div>
       <div id="lesson-summary" class="lesson-summary" hidden></div>
       <div class="lesson-complete-actions">
-        <button id="lesson-chat-about-it-btn" class="btn btn-primary">💬 Chat about it with the Socatei</button>
-        <button id="lesson-save-recap-btn" class="btn btn-small">💾 Save recap to Drive · Salvează pe Drive</button>
-        <button id="lesson-back-to-menu-btn" class="btn btn-small">← Back to lessons</button>
+        <button id="lesson-chat-about-it-btn" class="btn btn-primary"><span class="icon-slot" data-icon="message-circle"></span> Chat about it with the Socatei</button>
+        <button id="lesson-save-recap-btn" class="btn btn-small"><span class="icon-slot" data-icon="save"></span> Save recap to Drive · Salvează pe Drive</button>
+        <button id="lesson-back-to-menu-btn" class="btn btn-small"><span class="icon-slot" data-icon="arrow-left"></span> Back to lessons</button>
       </div>
     </div>
   </main>
 
   <main id="screen-reading" class="screen" hidden>
     <header class="chat-header">
-      <strong>📖 Reading practice</strong>
-      <button id="reading-back-btn" class="btn btn-small">← Back to chat</button>
+      <strong><span class="icon-slot" data-icon="book-open"></span> Reading practice</strong>
+      <button id="reading-back-btn" class="btn btn-small"><span class="icon-slot" data-icon="arrow-left"></span> Back to chat</button>
     </header>
 
     <div id="reading-menu-view" class="reading-body">
@@ -360,25 +360,25 @@
 
     <div id="reading-passage-view" class="reading-body" hidden>
       <div class="lesson-progress-bar">
-        <button id="reading-exit-btn" class="btn btn-small btn-icon" aria-label="Back to stories">✕</button>
+        <button id="reading-exit-btn" class="btn btn-small btn-icon" aria-label="Back to stories"><span class="icon-slot" data-icon="x"></span></button>
         <div class="progress-track"><div id="reading-progress-fill" class="progress-fill"></div></div>
         <span id="reading-progress-label" class="progress-label"></span>
       </div>
       <div class="reading-passage-head">
         <h2 id="reading-passage-title" class="reading-passage-title"></h2>
-        <button id="reading-listen-btn" type="button" class="btn btn-small">🔊 Ascultă</button>
+        <button id="reading-listen-btn" type="button" class="btn btn-small"><span class="icon-slot" data-icon="volume-2"></span> Ascultă</button>
       </div>
       <p id="reading-passage-text" class="reading-passage-text"></p>
       <p id="reading-question-text" class="reading-question-text"></p>
       <div id="reading-options-grid" class="lesson-options-grid lesson-options-grid--sentences"></div>
       <p id="reading-feedback" class="reading-feedback"></p>
-      <button id="reading-next-btn" class="btn btn-primary" hidden>Next question →</button>
+      <button id="reading-next-btn" class="btn btn-primary" hidden>Next question <span class="icon-slot" data-icon="arrow-right"></span></button>
     </div>
 
     <div id="reading-complete-view" class="reading-body" hidden>
       <p id="reading-complete-score" class="lesson-score"></p>
       <div class="lesson-complete-actions">
-        <button id="reading-back-to-menu-btn" class="btn btn-primary">← Back to stories</button>
+        <button id="reading-back-to-menu-btn" class="btn btn-primary"><span class="icon-slot" data-icon="arrow-left"></span> Back to stories</button>
       </div>
     </div>
   </main>
@@ -386,14 +386,14 @@
   <main id="screen-parent-view" class="screen" hidden>
     <header class="chat-header">
       <strong>Parent view</strong>
-      <button id="parent-view-back-btn" class="btn btn-small">← Back to chat</button>
+      <button id="parent-view-back-btn" class="btn btn-small"><span class="icon-slot" data-icon="arrow-left"></span> Back to chat</button>
     </header>
 
     <div class="parent-view-body">
       <!-- Each household decides what practice is worth. Saved per FAMILY on
            the Worker, so it reaches the children's devices too. -->
       <details id="reward-settings" class="reward-settings">
-        <summary>⚙️ Recompensele familiei — ce câștigă copiii</summary>
+        <summary><span class="icon-slot" data-icon="settings"></span> Recompensele familiei — ce câștigă copiii</summary>
         <p class="hint">
           Tu decizi ce primesc copiii. Poate fi orice — minute pe tabletă, puncte
           spre o bicicletă, lei. Se aplică imediat pe telefoanele lor.
@@ -426,13 +426,13 @@
 
         <p class="reward-settings-subhead">Bonus la terminarea unui modul întreg</p>
         <div class="reward-settings-grid">
-          <label for="reward-bonus-beginner">🎨 Playroom</label>
+          <label for="reward-bonus-beginner"><span class="icon-slot" data-icon="palette"></span> Playroom</label>
           <input id="reward-bonus-beginner" type="number" min="0" step="1" inputmode="numeric" />
-          <label for="reward-bonus-intermediate">🧭 Adventure</label>
+          <label for="reward-bonus-intermediate"><span class="icon-slot" data-icon="compass"></span> Adventure</label>
           <input id="reward-bonus-intermediate" type="number" min="0" step="1" inputmode="numeric" />
-          <label for="reward-bonus-advanced">📖 Storytime</label>
+          <label for="reward-bonus-advanced"><span class="icon-slot" data-icon="book-open"></span> Storytime</label>
           <input id="reward-bonus-advanced" type="number" min="0" step="1" inputmode="numeric" />
-          <label for="reward-bonus-expert">🏆 Mastery Cup</label>
+          <label for="reward-bonus-expert"><span class="icon-slot" data-icon="trophy"></span> Mastery Cup</label>
           <input id="reward-bonus-expert" type="number" min="0" step="1" inputmode="numeric" />
         </div>
 
@@ -466,11 +466,11 @@
         <select id="parent-view-child-select"></select>
         <label for="parent-view-profile-select">Modulul:</label>
         <select id="parent-view-profile-select">
-          <option value="kids-primar">🎨 Playroom with Bobo</option>
-          <option value="kids-intermediate">🧭 Adventure with Fizz</option>
-          <option value="kids-advanced">📖 Storytime with Sushi</option>
-          <option value="kids-expert">🏆 Mastery Cup</option>
-          <option value="teen">🎓 Teen (14-18)</option>
+          <option value="kids-primar">Playroom with Bobo</option>
+          <option value="kids-intermediate">Adventure with Fizz</option>
+          <option value="kids-advanced">Storytime with Sushi</option>
+          <option value="kids-expert">Mastery Cup</option>
+          <option value="teen">Teen (14-18)</option>
         </select>
         <button id="parent-view-load-btn" class="btn btn-primary">Vezi progresul</button>
       </div>
@@ -504,16 +504,16 @@
   <!-- Persistent bottom navigation — moved into the active app screen by app.js. -->
   <nav id="app-nav" class="app-nav" hidden>
     <button id="nav-home" type="button" class="app-nav-btn">
-      <span class="app-nav-icon">🏠</span><span class="app-nav-label">Acasă</span>
+      <span class="app-nav-icon"><span class="icon-slot" data-icon="home"></span></span><span class="app-nav-label">Acasă</span>
     </button>
     <button id="nav-chat" type="button" class="app-nav-btn">
-      <span class="app-nav-icon">💬</span><span class="app-nav-label">Chat</span>
+      <span class="app-nav-icon"><span class="icon-slot" data-icon="message-circle"></span></span><span class="app-nav-label">Chat</span>
     </button>
     <button id="nav-reading" type="button" class="app-nav-btn">
-      <span class="app-nav-icon">📖</span><span class="app-nav-label">Lectură</span>
+      <span class="app-nav-icon"><span class="icon-slot" data-icon="book-open"></span></span><span class="app-nav-label">Lectură</span>
     </button>
     <button id="nav-parent" type="button" class="app-nav-btn">
-      <span class="app-nav-icon">👀</span><span class="app-nav-label">Părinte</span>
+      <span class="app-nav-icon"><span class="icon-slot" data-icon="eye"></span></span><span class="app-nav-label">Părinte</span>
     </button>
   </nav>
 
