@@ -1093,7 +1093,8 @@ body[data-usertype="adult"] .usage-card {
 }
 
 /* Profile picker */
-#screen-profile-picker {
+#screen-profile-picker,
+#screen-level-picker {
   padding: 26px 20px;
 }
 
