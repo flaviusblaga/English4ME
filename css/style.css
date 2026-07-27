@@ -2572,13 +2572,16 @@ body.mascot-theme .chat-bubble--assistant {
 }
 
 /* ---------- Daily practice (spaced repetition) card ---------- */
+/* The home HERO. It intentionally dominates the screen: one number, one
+   button. Everything else on home (mascot bubble, lesson path) is calmer and
+   the stats moved to their own screen. */
 .daily-card {
-  margin: 0 var(--sp-4) var(--sp-3);
+  margin: var(--sp-3) var(--sp-4) var(--sp-4);
   background: linear-gradient(135deg, var(--primary), var(--primary-dark));
   color: #fff;
-  border-radius: var(--r-lg);
-  padding: var(--sp-4);
-  box-shadow: var(--shadow-md);
+  border-radius: var(--r-xl);
+  padding: var(--sp-5) var(--sp-4) var(--sp-4);
+  box-shadow: var(--shadow-lg);
   text-align: center;
 }
 
@@ -2587,27 +2590,116 @@ body.mascot-theme .chat-bubble--assistant {
   font-family: var(--font-display);
   font-weight: 800;
   font-size: var(--fs-md);
+  opacity: 0.92;
+}
+
+/* The single big number — the one count a child reads on this screen. */
+.daily-card-big {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  line-height: 1;
+  margin: var(--sp-2) 0 var(--sp-3);
+}
+.daily-card-num {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 4.5rem;
+  letter-spacing: -0.02em;
+}
+.daily-card-unit {
+  font-weight: 700;
+  font-size: var(--fs-sm);
+  opacity: 0.9;
+  margin-top: 2px;
 }
 
 .daily-card-line {
-  margin: 4px 0 0;
+  margin: var(--sp-2) 0 0;
   font-weight: 700;
-  font-size: var(--fs-sm);
-}
-
-.daily-card-progress {
-  margin: 2px 0 0;
-  font-size: var(--fs-xs);
-  opacity: 0.85;
+  font-size: var(--fs-md);
 }
 
 .daily-card-btn {
-  margin-top: var(--sp-3);
+  margin-top: var(--sp-2);
   width: 100%;
   background: #fff;
   color: var(--primary-dark);
   box-shadow: none;
+  font-size: var(--fs-md);
+  padding: 0.9rem 1.3rem;
 }
+
+/* Secondary, calm entry to the stats screen — must not compete with the hero. */
+.stats-entry-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4em;
+  margin: 0 var(--sp-4) var(--sp-4);
+  width: calc(100% - 2 * var(--sp-4));
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: var(--fs-sm);
+  padding: 0.5rem;
+  cursor: pointer;
+}
+.stats-entry-btn:active { transform: translateY(1px); }
+
+/* De-emphasise everything below the hero on the home screen so the blue card
+   clearly leads. Scoped to the menu view so the same elements elsewhere keep
+   their normal weight. */
+#lesson-menu-view .lesson-mascot-intro { opacity: 0.85; transform: scale(0.96); transform-origin: left center; }
+
+/* ---------- Stats screen ---------- */
+.stats-head {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  padding: var(--sp-3) var(--sp-4) var(--sp-2);
+}
+.stats-head strong { font-family: var(--font-display); font-weight: 800; font-size: var(--fs-lg); }
+.stats-card {
+  margin: 0 var(--sp-4) var(--sp-3);
+  background: var(--surface-raised);
+  border: 2px solid var(--line);
+  border-radius: var(--r-lg);
+  padding: var(--sp-3) var(--sp-4);
+  box-shadow: var(--shadow-sm);
+}
+.stats-card-heading {
+  display: flex; align-items: center; gap: 0.4em;
+  margin: 0 0 var(--sp-2);
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: var(--fs-sm);
+  color: var(--text-muted);
+}
+.stats-figures { display: flex; gap: var(--sp-3); }
+.stats-fig {
+  flex: 1;
+  display: flex; flex-direction: column; align-items: center;
+  padding: var(--sp-2);
+  border-radius: var(--r-md);
+  background: var(--surface);
+}
+.stats-fig b { font-family: var(--font-display); font-weight: 800; font-size: var(--fs-xl); line-height: 1; }
+.stats-fig span { font-size: var(--fs-xs); color: var(--text-muted); margin-top: 2px; }
+.stats-fig--good b { color: var(--primary); }
+.stats-fig--learn b { color: #e08a2b; }
+.stats-fig--muted b { color: var(--text-faint); }
+.stats-mod-row {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 6px 0;
+  border-top: 1px solid var(--line);
+  font-weight: 600;
+}
+.stats-mod-row:first-of-type { border-top: none; }
+.stats-mod-row b { font-family: var(--font-display); }
+.stats-mod-row--done { color: var(--primary); }
 
 /* ---------- Days-practised (streak) zone ---------- */
 .streak-card {

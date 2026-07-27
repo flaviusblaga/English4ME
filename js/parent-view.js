@@ -1,7 +1,8 @@
 import { fetchChildProgress, fetchFamilyRewards, saveFamilyRewards } from "./worker-client.js";
-import { BADGES } from "./gamification.js";
+import { BADGES, badgeLabel } from "./gamification.js";
 import { setActiveRewards } from "./rewards.js";
 import { iconSvg } from "./icons.js";
+import { t, moduleName } from "./i18n.js";
 
 const LAST_CHILD_EMAIL_KEY = "engleza-familie:lastChildEmail";
 
@@ -26,7 +27,7 @@ export function setParentChildren(children) {
   if (!children.length) {
     const opt = document.createElement("option");
     opt.value = "";
-    opt.textContent = "(niciun copil în familie)";
+    opt.textContent = t("parent.noChild");
     select.appendChild(opt);
     return;
   }
@@ -80,19 +81,20 @@ async function handleSaveRewards() {
 
   button.disabled = true;
   status.hidden = false;
-  status.textContent = "Se salvează…";
+  status.textContent = t("admin.saving");
 
   try {
     const result = await saveFamilyRewards(payload);
     // Apply to this session too, so the parent sees the new wording without
     // signing out and back in.
     setActiveRewards(result.rewards);
-    status.innerHTML = `${iconSvg("circle-check")} Salvat. Copiii vor vedea noile recompense la următoarea deschidere.`;
+    status.innerHTML = iconSvg("circle-check");
+    status.append(t("parent.saved"));
   } catch (err) {
     status.textContent =
       err.code === "forbidden"
-        ? "Doar un părinte din familie poate schimba recompensele."
-        : `Nu s-a putut salva: ${err.message}`;
+        ? t("parent.saveForbidden")
+        : t("parent.saveErr", { msg: err.message });
   } finally {
     button.disabled = false;
   }
@@ -105,14 +107,14 @@ async function handleLoad() {
   const results = el("parent-view-results");
 
   if (!email) {
-    status.textContent = "Selectează un copil din listă.";
+    status.textContent = t("parent.selectChild");
     status.hidden = false;
     results.hidden = true;
     return;
   }
 
   localStorage.setItem(LAST_CHILD_EMAIL_KEY, email);
-  status.textContent = "Loading...";
+  status.textContent = t("parent.loading");
   status.hidden = false;
   results.hidden = true;
 
@@ -124,9 +126,9 @@ async function handleLoad() {
   } catch (err) {
     results.hidden = true;
     if (err.code === "not_found") {
-      status.textContent = "No practice data found yet for this email — check the spelling, or the child hasn't practiced yet.";
+      status.textContent = t("parent.notFound");
     } else {
-      status.textContent = `Couldn't load progress: ${err.message}`;
+      status.textContent = t("parent.loadErr", { msg: err.message });
     }
     status.hidden = false;
   }
@@ -135,7 +137,7 @@ async function handleLoad() {
 function renderRecord(record) {
   const nameEl = el("parent-view-name");
   nameEl.innerHTML = iconSvg("eye");
-  nameEl.append(` Progresul lui ${record.displayName || record.userEmail}`);
+  nameEl.append(t("parent.progressTitle", { name: record.displayName || record.userEmail }));
   el("parent-view-points").textContent = record.gamification ? record.gamification.points : 0;
   el("parent-view-streak").textContent = record.gamification ? record.gamification.currentStreak : 0;
   el("parent-view-turns").textContent = record.progress ? record.progress.totalTurns : 0;
@@ -148,13 +150,13 @@ function renderRecord(record) {
   for (const badge of BADGES) {
     const chip = document.createElement("span");
     chip.className = `gamification-badge-chip${unlocked.has(badge.id) ? "" : " gamification-badge-chip--locked"}`;
-    chip.textContent = `${badge.emoji} ${badge.label}`;
+    chip.textContent = `${badge.emoji} ${badgeLabel(badge.id)}`;
     badgesPanel.appendChild(chip);
   }
 
   const capsNote = el("parent-view-caps-note");
   if (record.droppedDays > 0) {
-    capsNote.textContent = `Showing the most recent ${record.dailyLogs.length} days. ${record.droppedDays} earlier day(s) have aged out and are no longer stored.`;
+    capsNote.textContent = t("parent.capsNote", { n: record.dailyLogs.length, d: record.droppedDays });
     capsNote.hidden = false;
   } else {
     capsNote.hidden = true;
@@ -185,22 +187,19 @@ function renderRewards(rewards) {
   const heading = document.createElement("p");
   heading.className = "rewards-card-heading";
   heading.innerHTML = iconSvg("trophy");
-  heading.append(" Recompense de onorat");
+  heading.append(t("parent.rewardsHeading"));
   card.appendChild(heading);
 
   const progressLine = document.createElement("p");
   progressLine.className = "rewards-row";
-  const moduleName = {
-    beginner: "Playroom", intermediate: "Adventure", advanced: "Storytime", expert: "Mastery Cup", teen: "Teen",
-  }[rewards.tier] || rewards.tier;
   progressLine.innerHTML = iconSvg("book-open");
-  progressLine.append(` ${rewards.lessonsCompleted} / ${rewards.totalLessons} lecții terminate — ${moduleName}`);
+  progressLine.append(t("parent.rwProgress", { a: rewards.lessonsCompleted, b: rewards.totalLessons, module: moduleName(rewards.tier) }));
   card.appendChild(progressLine);
 
   const screenTimeLine = document.createElement("p");
   screenTimeLine.className = "rewards-row";
   screenTimeLine.innerHTML = iconSvg("timer");
-  screenTimeLine.append(` Câștigat: ${rewards.earnedAmount} ${rewards.perLessonUnit} (${rewards.perLessonAmount} / lecție)`);
+  screenTimeLine.append(t("parent.rwEarned", { amount: rewards.earnedAmount, unit: rewards.perLessonUnit, per: rewards.perLessonAmount }));
   card.appendChild(screenTimeLine);
 
   const bonusLine = document.createElement("p");
@@ -208,7 +207,7 @@ function renderRewards(rewards) {
   if (rewards.bonusEarned) {
     bonusLine.classList.add("rewards-row--earned");
     bonusLine.innerHTML = iconSvg("gift");
-    bonusLine.append(` BONUS DE ONORAT: ${rewards.bonusAmount} ${rewards.bonusUnit} — modulul e terminat integral!`);
+    bonusLine.append(t("parent.rwBonusEarned", { amount: rewards.bonusAmount, unit: rewards.bonusUnit }));
   } else {
     bonusLine.innerHTML = iconSvg("gift");
     bonusLine.append(` Bonus la modul complet: ${rewards.bonusAmount} ${rewards.bonusUnit} (mai are ${rewards.totalLessons - rewards.lessonsCompleted} lecții)`);
@@ -223,8 +222,8 @@ function renderDay(day) {
   details.className = "parent-view-day";
 
   const summary = document.createElement("summary");
-  const droppedNote = day.turnsDroppedToday > 0 ? ` (${day.turnsDroppedToday} earliest messages that day were trimmed)` : "";
-  summary.textContent = `${day.date} — ${day.turns.length} messages${droppedNote}`;
+  const droppedNote = day.turnsDroppedToday > 0 ? t("parent.dayTrimmed", { n: day.turnsDroppedToday }) : "";
+  summary.textContent = t("parent.dayMessages", { date: day.date, n: day.turns.length, note: droppedNote });
   details.appendChild(summary);
 
   const transcript = document.createElement("div");
@@ -233,7 +232,7 @@ function renderDay(day) {
     const line = document.createElement("p");
     line.className = `parent-view-line parent-view-line--${turn.role}`;
     const time = new Date(turn.ts).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
-    line.textContent = `[${time}] ${turn.role === "user" ? "Child" : "Socatei"}: ${turn.text}`;
+    line.textContent = `[${time}] ${turn.role === "user" ? t("parent.roleChild") : t("parent.roleMascot")}: ${turn.text}`;
     transcript.appendChild(line);
   }
   details.appendChild(transcript);

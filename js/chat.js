@@ -2,9 +2,10 @@ import { sendChatMessage, syncProgress } from "./worker-client.js";
 import { saveState } from "./drive.js";
 import { SCENARIOS } from "./scenarios-client.js";
 import { initDocumentsUi, refreshDocumentsSummary } from "./documents-ui.js";
-import { BADGES, updateGamificationAfterTurn } from "./gamification.js";
+import { BADGES, updateGamificationAfterTurn, badgeLabel } from "./gamification.js";
 import { gamificationWithRewards } from "./rewards.js";
 import { iconSvg } from "./icons.js";
+import { t } from "./i18n.js";
 import {
   isSpeechRecognitionSupported,
   isSpeechSynthesisSupported,
@@ -150,8 +151,8 @@ export function initChat({ accessToken, userEmail, displayName, fileId, state, p
   // Chat-first tiers frame the same button as the way INTO exercises rather
   // than the way back to a lesson menu they started from.
   el("back-to-lessons-btn").innerHTML = profile.features.chatFirst
-    ? `${iconSvg("notebook-pen")} Exercises`
-    : `${iconSvg("notebook-pen")} Lessons`;
+    ? `${iconSvg("notebook-pen")} ${t("header.exercises")}`
+    : `${iconSvg("notebook-pen")} ${t("header.lessons")}`;
   el("back-to-lessons-btn").onclick = () => {
     if (onBackToLessons) onBackToLessons();
   };
@@ -297,7 +298,7 @@ function initVoiceUi() {
 
 function updateTtsButtonLabel() {
   const muted = isTtsMuted();
-  el("tts-mute-btn").innerHTML = muted ? `${iconSvg("volume-x")} Voice off` : `${iconSvg("volume-2")} Voice on`;
+  el("tts-mute-btn").innerHTML = muted ? `${iconSvg("volume-x")} ${t("settings.voiceOff")}` : `${iconSvg("volume-2")} ${t("settings.voiceOn")}`;
   el("tts-mute-btn").setAttribute("aria-pressed", String(muted));
 }
 
@@ -422,7 +423,7 @@ function renderBadgesPanel() {
   for (const badge of BADGES) {
     const chip = document.createElement("span");
     chip.className = `gamification-badge-chip${unlocked.has(badge.id) ? "" : " gamification-badge-chip--locked"}`;
-    chip.textContent = `${badge.emoji} ${badge.label}`;
+    chip.textContent = `${badge.emoji} ${badgeLabel(badge.id)}`;
     panel.appendChild(chip);
   }
 }
@@ -509,7 +510,7 @@ async function handleSend() {
         renderGamificationBar();
         renderBadgesPanel();
         for (const badge of newlyUnlocked) {
-          appendSystemNotice(`🎉 New badge: ${badge.label}!`);
+          appendSystemNotice(t("chat.newBadge", { label: badgeLabel(badge.id) }));
         }
       }
 

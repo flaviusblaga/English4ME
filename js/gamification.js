@@ -2,6 +2,14 @@
 // completed exchange (a full user message + assistant reply round-trip) for
 // any profile with features.gamification === true.
 
+import { t } from "./i18n.js";
+
+// The badge's display name, from the translations file (keyed by badge id).
+// BADGES keeps an English `label` only as a last-resort fallback / dev aid.
+export function badgeLabel(id) {
+  return t("badges." + id);
+}
+
 const POINTS_PER_EXCHANGE = 10;
 const POINTS_PER_LESSON_COMPLETION = 20;
 

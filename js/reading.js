@@ -10,6 +10,9 @@ import { recordTurnForParentSync, todayLocalDateString } from "./chat.js";
 import { getReadingSet, getPassage } from "./reading-client.js";
 import { gamificationWithRewards } from "./rewards.js";
 import { speak } from "./voice.js";
+import { t } from "./i18n.js";
+import { badgeLabel } from "./gamification.js";
+import { iconSvg } from "./icons.js";
 
 let session = null; // { accessToken, userEmail, displayName, fileId, state, profile }
 let onBackCallback = null;
@@ -54,7 +57,7 @@ function showMenu() {
     const title = document.createElement("strong");
     title.textContent = passage.title;
     const sub = document.createElement("span");
-    sub.textContent = record ? `Best: ${record.bestScore}/${passage.questions.length}` : "Not read yet";
+    sub.textContent = record ? t("reading.best", { s: record.bestScore, t: passage.questions.length }) : t("reading.notRead");
     card.appendChild(icon);
     card.appendChild(title);
     card.appendChild(sub);
@@ -116,16 +119,16 @@ function handleAnswer(chosenIdx, chosenBtn) {
   if (wasCorrect) {
     currentScore += 1;
     chosenBtn.classList.add("lesson-option-btn--correct");
-    el("reading-feedback").textContent = "Correct! Well spotted.";
+    el("reading-feedback").textContent = t("reading.correct");
   } else {
     chosenBtn.classList.add("lesson-option-btn--incorrect");
     optionButtons[question.correct].classList.add("lesson-option-btn--correct");
-    el("reading-feedback").textContent = "Not quite — the highlighted answer is the right one. Re-read that part of the passage if you like.";
+    el("reading-feedback").textContent = t("reading.wrong");
   }
 
   const isLast = currentQuestionIndex === currentPassage.questions.length - 1;
   const nextBtn = el("reading-next-btn");
-  nextBtn.textContent = isLast ? "See my results →" : "Next question →";
+  nextBtn.innerHTML = (isLast ? t("reading.seeResults") : t("reading.nextQuestion")) + ` ${iconSvg("arrow-right")}`;
   nextBtn.hidden = false;
   nextBtn.onclick = isLast ? finishPassage : advanceToNextQuestion;
 
@@ -176,10 +179,10 @@ function finishPassage() {
 
   el("reading-passage-view").hidden = true;
   el("reading-complete-view").hidden = false;
-  el("reading-complete-score").textContent = `You got ${score} out of ${total}!`;
+  el("reading-complete-score").textContent = t("reading.score", { s: score, t: total });
 
   if (newlyUnlocked.length > 0) {
-    const badgeNames = newlyUnlocked.map((b) => `${b.emoji} ${b.label}`).join(", ");
-    el("reading-complete-score").textContent += ` New badge: ${badgeNames}!`;
+    const badgeNames = newlyUnlocked.map((b) => `${b.emoji} ${badgeLabel(b.id)}`).join(", ");
+    el("reading-complete-score").textContent += t("reading.newBadge", { names: badgeNames });
   }
 }

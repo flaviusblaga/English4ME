@@ -22,6 +22,7 @@ import { initParentView, setParentChildren } from "./parent-view.js";
 import { initPwa } from "./pwa.js";
 import { initPlacement } from "./placement.js";
 import { iconSvg, hydrateIcons } from "./icons.js";
+import { t, moduleName, profileTagLabel, hydrateStrings } from "./i18n.js";
 
 let currentUser = null; // { email, name } — set after sign-in, used once a profile is picked
 let currentSession = null; // { accessToken, userEmail, displayName, fileId, state, profile } — reused across lesson<->chat navigation
@@ -117,7 +118,7 @@ async function handleLogin() {
     showScreen("profile-picker");
     await renderProfilePicker();
   } catch (err) {
-    el("login-error").textContent = `Sign-in failed: ${err.message}`;
+    el("login-error").textContent = t("login.signInFailed", { msg: err.message });
     el("login-error").hidden = false;
   } finally {
     el("login-btn").disabled = false;
@@ -154,8 +155,8 @@ async function renderProfilePicker() {
     const notice = document.createElement("p");
     notice.className = "profile-picker-empty";
     notice.textContent = currentUser
-      ? `Contul ${currentUser.email} nu este înscris în nicio familie din aplicație. Cere-i lui Flavius să te adauge.`
-      : "Conectează-te ca să vezi cine învață azi.";
+      ? t("picker.notEnrolled", { email: currentUser.email })
+      : t("picker.signInToSee");
     list.appendChild(notice);
     return;
   }
@@ -300,7 +301,7 @@ function renderTeenCard(member, remembered) {
 
   const who = document.createElement("span");
   who.className = "who";
-  who.innerHTML = `<strong></strong><span class="sub">Teen · 14-18</span>`;
+  who.innerHTML = `<strong></strong><span class="sub">${t("picker.teenTag")}</span>`;
   who.querySelector("strong").textContent = member.name;
 
   const go = document.createElement("span");
@@ -334,7 +335,7 @@ function renderKidCard(member, remembered, levelLabel) {
   const placed = getMemberPlacement(member.id);
   const lvl = document.createElement("span");
   lvl.className = "klvl";
-  lvl.textContent = placed ? (levelLabel[placed] || "Nivel setat") : "Dă testul de nivel";
+  lvl.textContent = placed ? (levelLabel[placed] || t("picker.kidLevelSet")) : t("picker.kidLevelUnset");
 
   const go = document.createElement("span");
   go.className = "kgo"; go.innerHTML = PICKER_PLAY;
@@ -405,8 +406,8 @@ async function openAdminMenu() {
 
 async function renderFamilyList() {
   const body = el("admin-panel-body");
-  el("admin-panel-title").textContent = "Familii adăugate";
-  body.innerHTML = '<p class="hint">Se încarcă…</p>';
+  el("admin-panel-title").textContent = t("admin.titleList");
+  body.innerHTML = `<p class="hint">${t("admin.loading")}</p>`;
 
   let families;
   try {
@@ -415,7 +416,7 @@ async function renderFamilyList() {
     body.innerHTML = "";
     const p = document.createElement("p");
     p.className = "hint";
-    p.textContent = err.code === "forbidden" ? "Doar administratorul poate gestiona familii." : `Eroare: ${err.message}`;
+    p.textContent = err.code === "forbidden" ? t("admin.forbidden") : t("admin.error", { msg: err.message });
     body.appendChild(p);
     return;
   }
@@ -424,14 +425,14 @@ async function renderFamilyList() {
   const add = document.createElement("button");
   add.type = "button";
   add.className = "btn btn-primary admin-add-btn";
-  add.innerHTML = `${iconSvg("plus")} Adaugă o familie`;
+  add.innerHTML = `${iconSvg("plus")} ${t("admin.add")}`;
   add.addEventListener("click", () => openFamilyForm(null));
   body.appendChild(add);
 
   if (!families.length) {
     const p = document.createElement("p");
     p.className = "hint";
-    p.textContent = "Nicio familie adăugată încă. (Familia ta principală e în cod, nu apare aici.)";
+    p.textContent = t("admin.empty");
     body.appendChild(p);
   }
 
@@ -446,18 +447,18 @@ async function renderFamilyList() {
     const strong = document.createElement("strong");
     strong.textContent = fam.name;
     const small = document.createElement("small");
-    small.textContent = `${counts.adult} adulți · ${counts.teen} adolescenți · ${counts.kid} copii`;
+    small.textContent = t("admin.counts", { a: counts.adult, t: counts.teen, k: counts.kid });
     info.append(strong, small);
 
     const edit = document.createElement("button");
     edit.type = "button"; edit.className = "btn btn-small";
-    edit.textContent = "Editează";
+    edit.textContent = t("admin.edit");
     edit.addEventListener("click", () => openFamilyForm(fam));
 
     const del = document.createElement("button");
     del.type = "button"; del.className = "btn btn-small admin-del-btn";
     del.innerHTML = iconSvg("trash-2");
-    del.setAttribute("aria-label", `Șterge ${fam.name}`);
+    del.setAttribute("aria-label", t("admin.deleteAria", { name: fam.name }));
     del.addEventListener("click", () => confirmDeleteFamily(fam));
 
     row.append(info, edit, del);
@@ -493,13 +494,13 @@ function parseCategory(text, kind) {
 
 function openFamilyForm(fam) {
   const body = el("admin-panel-body");
-  el("admin-panel-title").textContent = fam ? "Editează familia" : "Familie nouă";
+  el("admin-panel-title").textContent = fam ? t("admin.famEdit") : t("admin.famNew");
   body.innerHTML = "";
 
   const cats = [
-    ["adult", `${iconSvg("users")} Adulți / părinți`, "un email pe linie (sau: Nume, email)"],
-    ["teen", `${iconSvg("graduation-cap")} Adolescenți (14-18)`, "un email pe linie"],
-    ["kid", `${iconSvg("smile")} Copii`, "un email pe linie"],
+    ["adult", `${iconSvg("users")} ${t("admin.catAdult")}`, "un email pe linie (sau: Nume, email)"],
+    ["teen", `${iconSvg("graduation-cap")} ${t("admin.catTeen")}`, "un email pe linie"],
+    ["kid", `${iconSvg("smile")} ${t("admin.catKid")}`, "un email pe linie"],
   ];
 
   const nameRow = fieldRow("Numele familiei", `<input id="af-name" type="text" maxlength="60" placeholder="ex: Familia Popescu" />`);
@@ -515,8 +516,8 @@ function openFamilyForm(fam) {
   const opts = document.createElement("div");
   opts.className = "admin-toggles";
   opts.innerHTML = `
-    <label><input type="checkbox" id="af-drive" /> Raport de progres în Google Drive-ul copilului</label>
-    <label><input type="checkbox" id="af-mirror" /> Salvează conversațiile pe serverul meu (necesită acordul familiei)</label>`;
+    <label><input type="checkbox" id="af-drive" /> ${t("admin.optDrive")}</label>
+    <label><input type="checkbox" id="af-mirror" /> ${t("admin.optMirror")}</label>`;
   body.appendChild(opts);
   el("af-drive").checked = fam ? fam.driveReport !== false : true;
   el("af-mirror").checked = fam ? fam.progressMirror === true : false;
@@ -529,11 +530,11 @@ function openFamilyForm(fam) {
   actions.className = "admin-form-actions";
   const save = document.createElement("button");
   save.type = "button"; save.className = "btn btn-primary";
-  save.textContent = "Salvează";
+  save.textContent = t("admin.save");
   save.addEventListener("click", () => saveFamilyForm(fam, save));
   const back = document.createElement("button");
   back.type = "button"; back.className = "btn btn-small";
-  back.innerHTML = `${iconSvg("arrow-left")} Înapoi`;
+  back.innerHTML = `${iconSvg("arrow-left")} ${t("admin.back")}`;
   back.addEventListener("click", renderFamilyList);
   actions.append(back, save);
   body.appendChild(actions);
@@ -569,12 +570,12 @@ async function saveFamilyForm(fam, button) {
 
   button.disabled = true;
   status.hidden = false;
-  status.textContent = "Se salvează…";
+  status.textContent = t("admin.saving");
   try {
     await adminSaveFamily(payload);
     await renderFamilyList();
   } catch (err) {
-    status.textContent = err.message || "Nu s-a putut salva.";
+    status.textContent = err.message || t("admin.saveFail");
     button.disabled = false;
   }
 }
@@ -646,7 +647,7 @@ const MODULES = {
 
 function showLevelPicker(member, recommendedProfileId) {
   currentMember = member;
-  el("level-picker-title").textContent = `Alege aventura, ${member.name}!`;
+  el("level-picker-title").textContent = t("picker.levelTitle", { name: member.name });
 
   const list = el("level-picker-list");
   list.innerHTML = "";
@@ -681,7 +682,7 @@ function showLevelPicker(member, recommendedProfileId) {
     if (levelId === recommendedProfileId) {
       const badge = document.createElement("span");
       badge.className = "mod-reco";
-      badge.innerHTML = `${iconSvg("star")} Recomandat`;
+      badge.innerHTML = `${iconSvg("star")} ${t("picker.recommended")}`;
       h.appendChild(badge);
     }
     const p = document.createElement("span");
@@ -726,7 +727,7 @@ async function loadSession(profile, displayName) {
   document.body.dataset.usertype = isAdult ? "adult" : profile.contentTier === "teen" ? "teen" : "child";
 
   el("current-user-name").textContent = displayName;
-  el("current-profile-name").textContent = profile.displayName;
+  el("current-profile-name").textContent = profileTagLabel(profile);
   // Adults get their cartoon avatar in the header; kids keep the plain initial.
   const headerAv = el("header-avatar");
   const headerAvatar = currentMember ? getMemberAvatar(currentMember) : null;
@@ -820,6 +821,7 @@ function restoreOrShowLogin() {
 
 window.addEventListener("DOMContentLoaded", async () => {
   hydrateIcons(); // swap every data-icon placeholder in the static markup for its SVG
+  hydrateStrings(); // fill every data-i18n label in the static markup
   el("login-btn").addEventListener("click", handleLogin);
   el("logout-btn").addEventListener("click", handleLogout);
   el("avatar-picker-close").addEventListener("click", () => {

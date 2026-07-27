@@ -17,7 +17,8 @@
 // takes effect on the next load instead of up to 10 minutes later. Bumping this
 // also drops every stale entry from earlier versions on activate.
 // v6: Lucide UI icons — new js/icons.js module + emoji→SVG swaps across the app.
-const CACHE_VERSION = "socatei-v6";
+// v7: i18n — new js/i18n.js (all UI copy in Romanian) + stats screen + home redesign.
+const CACHE_VERSION = "socatei-v7";
 
 self.addEventListener("install", (event) => {
   // Activate this new worker immediately instead of waiting for every old

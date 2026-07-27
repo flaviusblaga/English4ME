@@ -151,28 +151,28 @@
             <option value="">Free conversation</option>
           </select>
         </div>
-        <button id="gamification-badges-btn" class="btn btn-small" hidden><span class="icon-slot" data-icon="award"></span> Badges</button>
-        <button id="back-to-lessons-btn" class="btn btn-small" hidden><span class="icon-slot" data-icon="notebook-pen"></span> Exercises</button>
-        <button id="reading-btn" class="btn btn-small" hidden><span class="icon-slot" data-icon="book-open"></span> Reading</button>
-        <button id="view-child-progress-btn" class="btn btn-small" hidden><span class="icon-slot" data-icon="eye"></span> View child's progress</button>
-        <button id="home-btn" class="btn btn-small"><span class="icon-slot" data-icon="home"></span> Levels</button>
+        <button id="gamification-badges-btn" class="btn btn-small" hidden><span class="icon-slot" data-icon="award"></span> <span data-i18n="header.badges">Badges</span></button>
+        <button id="back-to-lessons-btn" class="btn btn-small" hidden><span class="icon-slot" data-icon="notebook-pen"></span> <span data-i18n="header.exercises">Exercises</span></button>
+        <button id="reading-btn" class="btn btn-small" hidden><span class="icon-slot" data-icon="book-open"></span> <span data-i18n="header.reading">Reading</span></button>
+        <button id="view-child-progress-btn" class="btn btn-small" hidden><span class="icon-slot" data-icon="eye"></span> <span data-i18n="header.viewChild">View child's progress</span></button>
+        <button id="home-btn" class="btn btn-small"><span class="icon-slot" data-icon="home"></span> <span data-i18n="header.levels">Levels</span></button>
       </div>
     </header>
 
     <div id="settings-panel" class="settings-panel" hidden>
       <select id="voice-gender-select" class="voice-gender-select" title="Interlocutor voice">
-        <option value="female">👩 Female voice</option>
-        <option value="male">👨 Male voice</option>
+        <option value="female" data-i18n="settings.voiceFemale">👩 Female voice</option>
+        <option value="male" data-i18n="settings.voiceMale">👨 Male voice</option>
       </select>
-      <button id="tts-mute-btn" class="btn btn-small" aria-pressed="false"><span class="icon-slot" data-icon="volume-2"></span> Voice on</button>
-      <button id="debug-data-btn" class="btn btn-small">Show saved data</button>
-      <button id="logout-btn" class="btn btn-small">Sign out</button>
+      <button id="tts-mute-btn" class="btn btn-small" aria-pressed="false"><span class="icon-slot" data-icon="volume-2"></span> <span data-i18n="settings.voiceOn">Voice on</span></button>
+      <button id="debug-data-btn" class="btn btn-small" data-i18n="settings.showData">Show saved data</button>
+      <button id="logout-btn" class="btn btn-small" data-i18n="settings.signOut">Sign out</button>
     </div>
 
     <div id="gamification-badges-panel" class="gamification-badges-panel" hidden></div>
 
     <div id="mascot-select-bar" class="mascot-select-bar" hidden>
-      <span class="mascot-select-label">Talk to:</span>
+      <span class="mascot-select-label" data-i18n="mascotSel.talkTo">Talk to:</span>
       <button id="mascot-select-bobo" type="button" class="mascot-select-btn">
         <img class="mascot-avatar mascot-avatar--tiny" src="assets/socatei/bobo-face.png" alt="Bobo"
              onerror="this.replaceWith(Object.assign(document.createElement('span'),{textContent:'🦫'}))" />
@@ -188,7 +188,7 @@
              onerror="this.replaceWith(Object.assign(document.createElement('span'),{textContent:'🎀'}))" />
         Sushi
       </button>
-      <button id="mascot-select-both" type="button" class="mascot-select-btn">👥 All</button>
+      <button id="mascot-select-both" type="button" class="mascot-select-btn">👥 <span data-i18n="mascotSel.all">All</span></button>
     </div>
 
     <div id="scenario-documents" class="scenario-documents" hidden>
@@ -217,7 +217,7 @@
 
     <footer class="chat-input-row">
       <button id="mic-btn" class="btn btn-small btn-icon" hidden aria-label="Speak"><span class="icon-slot" data-icon="mic"></span></button>
-      <textarea id="chat-input" rows="2" placeholder="Type your message in English..."></textarea>
+      <textarea id="chat-input" rows="2" data-i18n-ph="chat.inputPlaceholder" placeholder="Type your message in English..."></textarea>
       <button id="chat-send" class="btn btn-primary btn-send" aria-label="Send"><span class="icon-slot" data-icon="send"></span></button>
     </footer>
 
@@ -244,7 +244,7 @@
       </div>
       <div class="app-header-actions">
         <button id="lesson-just-chat-btn" class="btn btn-small"><span class="icon-slot" data-icon="message-circle"></span> Chat</button>
-        <button id="lesson-home-btn" class="btn btn-small"><span class="icon-slot" data-icon="home"></span> Levels</button>
+        <button id="lesson-home-btn" class="btn btn-small"><span class="icon-slot" data-icon="home"></span> <span data-i18n="header.levels">Levels</span></button>
       </div>
     </header>
 
@@ -253,7 +253,7 @@
     </div>
 
     <div id="lesson-mascot-select-bar" class="mascot-select-bar">
-      <span class="mascot-select-label">My teacher today:</span>
+      <span class="mascot-select-label" data-i18n="mascotSel.teacherToday">My teacher today:</span>
       <button id="lesson-mascot-select-bobo" type="button" class="mascot-select-btn">
         <img class="mascot-avatar mascot-avatar--tiny" src="assets/socatei/bobo-face.png" alt="Bobo"
              onerror="this.replaceWith(Object.assign(document.createElement('span'),{textContent:'🦫'}))" />
@@ -269,7 +269,7 @@
              onerror="this.replaceWith(Object.assign(document.createElement('span'),{textContent:'🎀'}))" />
         Sushi
       </button>
-      <button id="lesson-mascot-select-both" type="button" class="mascot-select-btn">👥 All</button>
+      <button id="lesson-mascot-select-both" type="button" class="mascot-select-btn">👥 <span data-i18n="mascotSel.all">All</span></button>
     </div>
 
     <div id="lesson-menu-view">
@@ -281,9 +281,22 @@
         <p id="lesson-menu-intro-line" class="mascot-text"></p>
       </div>
       <div id="lesson-daily-card" class="daily-card" hidden></div>
-      <div id="lesson-rewards-card" class="rewards-card" hidden></div>
-      <div id="lesson-streak-card" class="streak-card" hidden></div>
+      <button id="lesson-stats-btn" type="button" class="stats-entry-btn"></button>
       <div id="lesson-menu-grid" class="lesson-menu-grid"></div>
+    </div>
+
+    <!-- Statistics live on their own screen so the home stays a single clear
+         call to action. Streak + rewards cards were moved here from the menu. -->
+    <div id="lesson-stats-view" hidden>
+      <div class="stats-head">
+        <button id="lesson-stats-back-btn" class="btn btn-small"></button>
+        <strong data-i18n="stats.title"></strong>
+      </div>
+      <div id="stats-words" class="stats-card" hidden></div>
+      <div id="stats-modules" class="stats-card" hidden></div>
+      <div id="lesson-streak-card" class="streak-card" hidden></div>
+      <div id="lesson-rewards-card" class="rewards-card" hidden></div>
+      <div id="stats-badges" class="stats-card" hidden></div>
     </div>
 
     <div id="lesson-exercise-view" hidden>
@@ -322,7 +335,7 @@
         </div>
       </div>
       <div class="lesson-action-bar">
-        <button id="lesson-replay-btn" class="btn btn-small" hidden><span class="icon-slot" data-icon="volume-2"></span> Hear it again</button>
+        <button id="lesson-replay-btn" class="btn btn-small" hidden><span class="icon-slot" data-icon="volume-2"></span> <span data-i18n="lesson.hearAgain">Hear it again</span></button>
         <button id="lesson-next-btn" class="btn btn-primary" hidden>Next <span class="icon-slot" data-icon="arrow-right"></span></button>
       </div>
     </div>
@@ -342,19 +355,19 @@
       <div class="lesson-complete-actions">
         <button id="lesson-chat-about-it-btn" class="btn btn-primary"><span class="icon-slot" data-icon="message-circle"></span> Chat about it with the Socatei</button>
         <button id="lesson-save-recap-btn" class="btn btn-small"><span class="icon-slot" data-icon="save"></span> Save recap to Drive · Salvează pe Drive</button>
-        <button id="lesson-back-to-menu-btn" class="btn btn-small"><span class="icon-slot" data-icon="arrow-left"></span> Back to lessons</button>
+        <button id="lesson-back-to-menu-btn" class="btn btn-small"><span class="icon-slot" data-icon="arrow-left"></span> <span data-i18n="lesson.backToLessons">Back to lessons</span></button>
       </div>
     </div>
   </main>
 
   <main id="screen-reading" class="screen" hidden>
     <header class="chat-header">
-      <strong><span class="icon-slot" data-icon="book-open"></span> Reading practice</strong>
-      <button id="reading-back-btn" class="btn btn-small"><span class="icon-slot" data-icon="arrow-left"></span> Back to chat</button>
+      <strong><span class="icon-slot" data-icon="book-open"></span> <span data-i18n="reading.practiceHeader">Reading practice</span></strong>
+      <button id="reading-back-btn" class="btn btn-small"><span class="icon-slot" data-icon="arrow-left"></span> <span data-i18n="reading.backToChat">Back to chat</span></button>
     </header>
 
     <div id="reading-menu-view" class="reading-body">
-      <p class="hint">Read a short story, then answer the questions. Take your time — you can look back at the story anytime.</p>
+      <p class="hint" data-i18n="reading.intro">Read a short story, then answer the questions. Take your time — you can look back at the story anytime.</p>
       <div id="reading-menu-grid" class="lesson-menu-grid"></div>
     </div>
 
@@ -378,15 +391,15 @@
     <div id="reading-complete-view" class="reading-body" hidden>
       <p id="reading-complete-score" class="lesson-score"></p>
       <div class="lesson-complete-actions">
-        <button id="reading-back-to-menu-btn" class="btn btn-primary"><span class="icon-slot" data-icon="arrow-left"></span> Back to stories</button>
+        <button id="reading-back-to-menu-btn" class="btn btn-primary"><span class="icon-slot" data-icon="arrow-left"></span> <span data-i18n="reading.backToStories">Back to stories</span></button>
       </div>
     </div>
   </main>
 
   <main id="screen-parent-view" class="screen" hidden>
     <header class="chat-header">
-      <strong>Parent view</strong>
-      <button id="parent-view-back-btn" class="btn btn-small"><span class="icon-slot" data-icon="arrow-left"></span> Back to chat</button>
+      <strong data-i18n="parent.header">Parent view</strong>
+      <button id="parent-view-back-btn" class="btn btn-small"><span class="icon-slot" data-icon="arrow-left"></span> <span data-i18n="reading.backToChat">Back to chat</span></button>
     </header>
 
     <div class="parent-view-body">
@@ -482,15 +495,15 @@
         <div class="parent-stat-row">
           <div class="parent-stat">
             <div id="parent-view-points" class="parent-stat-num parent-stat-num--purple">0</div>
-            <div class="parent-stat-label">Puncte</div>
+            <div class="parent-stat-label" data-i18n="parent.statPoints">Puncte</div>
           </div>
           <div class="parent-stat">
             <div id="parent-view-streak" class="parent-stat-num parent-stat-num--coral">0</div>
-            <div class="parent-stat-label">Streak</div>
+            <div class="parent-stat-label" data-i18n="parent.statStreak">Streak</div>
           </div>
           <div class="parent-stat">
             <div id="parent-view-turns" class="parent-stat-num parent-stat-num--teal">0</div>
-            <div class="parent-stat-label">Mesaje</div>
+            <div class="parent-stat-label" data-i18n="parent.statTurns">Mesaje</div>
           </div>
         </div>
         <div id="parent-view-rewards" class="rewards-card" hidden></div>

@@ -5,6 +5,7 @@
 
 import { PLACEMENT_QUESTIONS, PLACEMENT_TOTAL, levelForScore } from "./placement-client.js";
 import { setMemberPlacement, clearMemberPlacement } from "./profile.js";
+import { t, moduleName } from "./i18n.js";
 
 let member = null;
 let onDoneCallback = null;
@@ -34,7 +35,7 @@ export function initPlacement({ member: m, onDone }) {
 
   el("placement-quiz-view").hidden = false;
   el("placement-result-view").hidden = true;
-  el("placement-lead").textContent = `Salut, ${member.name}! Hai să vedem de unde pornim. Alege răspunsul corect — nu-i nimic dacă nu știi toate! 😊`;
+  el("placement-lead").textContent = t("placement.lead", { name: member.name });
 
   el("placement-retake-btn").onclick = () => {
     clearMemberPlacement(member.id);
@@ -94,9 +95,8 @@ function showResult() {
 
   const emojiByLevel = { beginner: "🌱", intermediate: "🌿", advanced: "🌳", expert: "🏆" };
   el("placement-result-emoji").textContent = emojiByLevel[result.contentTier] || "🎉";
-  el("placement-result-title").textContent = `Nivelul tău: ${result.label}!`;
-  el("placement-result-sub").textContent =
-    `Ai răspuns corect la ${score} din ${PLACEMENT_TOTAL}. Te-am pus la nivelul potrivit — poți schimba oricând reluând testul.`;
+  el("placement-result-title").textContent = t("placement.resultTitle", { label: moduleName(result.contentTier) });
+  el("placement-result-sub").textContent = t("placement.resultSub", { n: score, total: PLACEMENT_TOTAL });
 
   el("placement-start-btn").onclick = () => {
     if (onDoneCallback) onDoneCallback(result.profileId);
