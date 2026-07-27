@@ -424,7 +424,13 @@ function renderDailyCard() {
   const { due, fresh } = buildDailyItems(session.state, contentTier, labels, { maxDue: 14, maxNew: 6 });
   const sessionSize = due.length + fresh.length;
 
+  // Once today's practice is done, the card locks until tomorrow — even if the
+  // SRS could still surface new words — so "the daily practice" means one clear
+  // session a day, not an endless grind.
+  const doneToday = !!(session.state.dailyPractice && session.state.dailyPractice[contentTier] === todayLocalDateString());
+
   card.innerHTML = "";
+  card.classList.toggle("daily-card--done", doneToday || !sessionSize);
 
   const title = document.createElement("p");
   title.className = "daily-card-title";
@@ -434,7 +440,12 @@ function renderDailyCard() {
   // The hero shows ONE number — how many items today — and a single Start
   // button. Every other count (mastery, per-module, streak) lives on the stats
   // screen so this screen has a single, unmistakable call to action.
-  if (sessionSize) {
+  if (doneToday) {
+    const line = document.createElement("p");
+    line.className = "daily-card-line";
+    line.innerHTML = `${iconSvg("circle-check")} ${t("home.doneToday")}`;
+    card.appendChild(line);
+  } else if (sessionSize) {
     const big = document.createElement("div");
     big.className = "daily-card-big";
     const num = document.createElement("span");
@@ -1193,6 +1204,12 @@ function finishLesson() {
       lastCompletedAt: new Date().toISOString(),
       [tier.masteryField]: [...masteredSet],
     };
+  } else {
+    // Daily practice is once per day: record the date it was completed so the
+    // home card locks until tomorrow (the SRS would otherwise keep offering new
+    // words the same day).
+    if (!session.state.dailyPractice) session.state.dailyPractice = {};
+    session.state.dailyPractice[session.profile.contentTier] = todayLocalDateString();
   }
 
   const newlyUnlocked = updateGamificationAfterLesson(session.state);
@@ -1311,8 +1328,11 @@ function showComplete(score, total, newlyUnlocked, rewardInfo = {}) {
     if (onChatAboutItCallback) {
       // What "today's words" means per tier: the word bank, the sentence
       // bank, or (for grammar lessons) each question's correct answer.
+      // Daily practice has no `currentLesson.words/sentences/questions` (it is a
+      // synthetic session), so its words come from the queue it just ran.
       let words;
-      if (currentLesson.words) words = currentLesson.words.map((w) => w.en);
+      if (isDailyPractice) words = currentQueue.map(getItemLabel);
+      else if (currentLesson.words) words = currentLesson.words.map((w) => w.en);
       else if (currentLesson.sentences) words = currentLesson.sentences.map((s) => s.en);
       else words = currentLesson.questions.map((q) => q.options[q.correct]);
       onChatAboutItCallback({ label: currentLesson.label, words });

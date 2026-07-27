@@ -125,6 +125,7 @@ const STRINGS = {
     todayItemsOne: "1 exercițiu de făcut azi",
     todayItemsMany: "{n} de exersat azi",
     allDone: "Ai terminat tot pentru azi — revino mâine!",
+    doneToday: "Practica de azi e gata! Ne vedem mâine.",
     start: "Începe",
     categoryCount: "{d}/{t} lecții",
     seeStats: "Statisticile mele",

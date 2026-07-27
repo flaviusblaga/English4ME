@@ -18,7 +18,8 @@
 // also drops every stale entry from earlier versions on activate.
 // v6: Lucide UI icons — new js/icons.js module + emoji→SVG swaps across the app.
 // v7: i18n — new js/i18n.js (all UI copy in Romanian) + stats screen + home redesign.
-const CACHE_VERSION = "socatei-v7";
+// v8: fix daily "chat about it" crash + lock daily practice once done for the day.
+const CACHE_VERSION = "socatei-v8";
 
 self.addEventListener("install", (event) => {
   // Activate this new worker immediately instead of waiting for every old

@@ -2618,7 +2618,21 @@ body.mascot-theme .chat-bubble--assistant {
   margin: var(--sp-2) 0 0;
   font-weight: 700;
   font-size: var(--fs-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4em;
 }
+
+/* Locked / finished state: the daily job is done, so the card stops competing
+   for attention — softer background, no big number, no button. */
+.daily-card--done {
+  background: linear-gradient(135deg, #dff1e6, #cfe9e2);
+  color: #1d5b45;
+  box-shadow: var(--shadow-sm);
+  padding: var(--sp-4);
+}
+.daily-card--done .daily-card-title { opacity: 0.75; }
 
 .daily-card-btn {
   margin-top: var(--sp-2);
