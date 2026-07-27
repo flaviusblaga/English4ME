@@ -703,6 +703,13 @@ body.mascot-theme .app-header {
   min-width: 0;
 }
 
+/* The text column (name + profile tag) must be allowed to shrink below its
+   content width, otherwise the nowrap+ellipsis never engages and the long
+   profile name ("… (Bobo, Fizz & Sushi)") overflows under the ⭐/🔥 badges. */
+.app-identity > div {
+  min-width: 0;
+}
+
 .app-identity strong {
   display: block;
   font-size: var(--fs-sm);
