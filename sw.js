@@ -22,7 +22,8 @@
 // v9: gutter on .card-wide screens (profile + level picker) so text isn't flush-left.
 // v10: fix grammar tiers (Storytime/Mastery Cup/Teen) — 3 of 4 exercise types
 //      crashed on render because their stem-line map was missing those keys.
-const CACHE_VERSION = "socatei-v10";
+// v11: resume a half-finished lesson (stored queue + position, per lesson).
+const CACHE_VERSION = "socatei-v11";
 
 self.addEventListener("install", (event) => {
   // Activate this new worker immediately instead of waiting for every old

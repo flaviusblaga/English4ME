@@ -191,6 +191,61 @@ function currentStateBucket() {
   return session.state[currentTierConfig().stateKey];
 }
 
+// ---- Resume a half-finished lesson ----
+// A 50-question lesson can be spread over an hour or a day. Leaving the exercise
+// (to the menu, to chat, or by closing the app) remembers exactly where the
+// child was — the WHOLE built queue is stored, not just the index, so the same
+// questions and the same shuffled options come back (a rebuild would reshuffle
+// everything and effectively restart). Kept per lesson id, and cleared the
+// moment that lesson is finished. Daily practice is excluded (it is a throwaway
+// spaced-repetition session; every answer already updates the schedule).
+function stashLessonProgress(nextIndex) {
+  if (isDailyPractice || !currentLesson) return;
+  if (nextIndex >= currentQueue.length) return; // nothing left to resume
+  const bucket = currentStateBucket();
+  if (!bucket) return;
+  if (!bucket.inProgress) bucket.inProgress = {};
+  bucket.inProgress[currentLesson.id] = {
+    queue: currentQueue,
+    index: nextIndex,
+    score: currentScore,
+    savedAt: new Date().toISOString(),
+  };
+
+  // Each stored queue is a few KB; cap how many paused lessons we keep so the
+  // Drive file can't grow without bound. Drop the least-recently-saved ones.
+  const MAX_PAUSED = 12;
+  const ids = Object.keys(bucket.inProgress);
+  if (ids.length > MAX_PAUSED) {
+    ids
+      .sort((a, b) => (bucket.inProgress[a].savedAt < bucket.inProgress[b].savedAt ? -1 : 1))
+      .slice(0, ids.length - MAX_PAUSED)
+      .forEach((id) => delete bucket.inProgress[id]);
+  }
+}
+
+function clearLessonProgress(lessonId) {
+  const bucket = currentStateBucket();
+  if (bucket && bucket.inProgress) delete bucket.inProgress[lessonId];
+}
+
+// A stored session is only worth resuming if it has real, mid-way progress that
+// still fits the current queue length.
+function resumableProgress(lessonId) {
+  const bucket = currentStateBucket();
+  const saved = bucket && bucket.inProgress && bucket.inProgress[lessonId];
+  if (!saved || !Array.isArray(saved.queue) || saved.queue.length === 0) return null;
+  if (!(saved.index > 0 && saved.index < saved.queue.length)) return null;
+  return saved;
+}
+
+function persistState() {
+  if (!session) return;
+  saveState(session.accessToken, session.fileId, session.state).catch((err) =>
+    console.warn("Could not save lesson progress:", err)
+  );
+}
+
 // A stable identifying label per exercise item (word, sentence, or grammar
 // question), used for scoring/mastery tracking and parent-transcript lines —
 // several question *types* can test the same item, so mastery is tracked per
@@ -339,6 +394,18 @@ export function initLessons({ accessToken, userEmail, displayName, fileId, state
         if (!el("lesson-menu-view").hidden) showMenu();
       });
     }
+
+    // Save the resume point when the app is backgrounded or closed (mobile
+    // app-switch, tab close, reload), so a lesson paused mid-way survives even
+    // if the child never taps back to the menu first. visibilitychange fires
+    // reliably before the tab is frozen; pagehide is the belt-and-suspenders.
+    const persistIfMidLesson = () => {
+      if (!isDailyPractice && currentLesson && resumableProgress(currentLesson.id)) persistState();
+    };
+    document.addEventListener("visibilitychange", () => {
+      if (document.visibilityState === "hidden") persistIfMidLesson();
+    });
+    window.addEventListener("pagehide", persistIfMidLesson);
   }
   updateLessonMascotSelectUi();
 
@@ -474,11 +541,18 @@ function renderDailyCard() {
 }
 
 function showMenu() {
+  // Leaving an unfinished exercise back to the menu: persist the resume point
+  // now (the in-memory snapshot is already set by renderQuestion) so it also
+  // survives a reload or a next-day return, not just this session.
+  const leavingMidLesson = !isDailyPractice && currentLesson && !el("lesson-exercise-view").hidden;
+
   el("lesson-menu-view").hidden = false;
   el("lesson-stats-view").hidden = true;
   el("lesson-exercise-view").hidden = true;
   el("lesson-complete-view").hidden = true;
   setNavVisible(true);
+
+  if (leavingMidLesson && resumableProgress(currentLesson.id)) persistState();
 
   // .closest, not .parentElement — the avatar now sits inside a
   // .mascot-figure wrapper (for the name caption), so its parent is no
@@ -751,9 +825,19 @@ function startLesson(lessonId) {
   const tier = currentTierConfig();
   isDailyPractice = false;
   currentLesson = tier.getLessonFn(lessonId);
-  currentQueue = tier.buildQueue(currentLesson);
-  currentIndex = 0;
-  currentScore = 0;
+
+  // Resume where the child left off, if this lesson was paused mid-way;
+  // otherwise build a fresh 50-question queue.
+  const saved = resumableProgress(lessonId);
+  if (saved) {
+    currentQueue = saved.queue;
+    currentIndex = saved.index;
+    currentScore = saved.score || 0;
+  } else {
+    currentQueue = tier.buildQueue(currentLesson);
+    currentIndex = 0;
+    currentScore = 0;
+  }
 
   currentStateBucket().lastLessonId = lessonId;
 
@@ -768,6 +852,8 @@ function startLesson(lessonId) {
 function renderQuestion() {
   const question = currentQueue[currentIndex];
   const tier = currentTierConfig();
+  // Remember this position, so leaving now resumes on this exact question.
+  stashLessonProgress(currentIndex);
   el("lesson-progress-label").textContent = `${currentIndex + 1} / ${currentQueue.length}`;
   el("lesson-progress-fill").style.width = `${((currentIndex + 1) / currentQueue.length) * 100}%`;
 
@@ -1164,6 +1250,10 @@ function finalizeAnswer(question, wasCorrect) {
   nextBtn.hidden = false;
   nextBtn.onclick = isLast ? finishLesson : advanceToNextQuestion;
 
+  // This question is answered — resume should pick up at the NEXT one (its
+  // wasCorrect flag is kept in the stored queue for the recap).
+  if (!isLast) stashLessonProgress(currentIndex + 1);
+
   recordTurnForParentSync(session.state, {
     role: "user",
     text: `[Lesson: ${currentLesson.label}] ${questionTypeLabel(question.type)} "${getItemLabel(question)}" — ${wasCorrect ? "correct!" : "incorrect"}`,
@@ -1204,6 +1294,8 @@ function finishLesson() {
       lastCompletedAt: new Date().toISOString(),
       [tier.masteryField]: [...masteredSet],
     };
+    // Lesson is done — drop its saved resume point.
+    clearLessonProgress(currentLesson.id);
   } else {
     // Daily practice is once per day: record the date it was completed so the
     // home card locks until tomorrow (the SRS would otherwise keep offering new
