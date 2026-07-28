@@ -1517,6 +1517,10 @@ export function buildSentenceQuestion(sentence, type) {
 }
 
 export function getRandomLine(lines) {
+  // Defensive: a missing/empty list must never crash a whole question render
+  // (it did once — a grammar tier pointed at a stem-line map that only had one
+  // of its four exercise types). Fall back to an empty prompt instead.
+  if (!Array.isArray(lines) || lines.length === 0) return "";
   return lines[Math.floor(Math.random() * lines.length)];
 }
 

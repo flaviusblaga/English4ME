@@ -68,7 +68,7 @@ import {
   getAdvancedLesson,
   getExpertLesson,
   buildGrammarExerciseQueue,
-  GRAMMAR_QUESTION_STEM_LINES,
+  GRAMMAR_STEM_LINES,
 } from "./grammar-client.js";
 
 const MASCOT_AVATARS = {
@@ -112,7 +112,7 @@ const TIER_CONFIG = {
     lessonSet: getStructuredLessons("advanced"),
     getLessonFn: (id) => getStructuredLesson("advanced", id),
     buildQueue: buildFiftyGrammarQueue,
-    stemLines: GRAMMAR_QUESTION_STEM_LINES,
+    stemLines: GRAMMAR_STEM_LINES,
     stateKey: "lessonsAdvanced",
     masteryField: "itemsEverCorrect",
     maxScore: () => EXERCISES_PER_LESSON,
@@ -121,7 +121,7 @@ const TIER_CONFIG = {
     lessonSet: getStructuredLessons("expert"),
     getLessonFn: (id) => getStructuredLesson("expert", id),
     buildQueue: buildFiftyGrammarQueue,
-    stemLines: GRAMMAR_QUESTION_STEM_LINES,
+    stemLines: GRAMMAR_STEM_LINES,
     stateKey: "lessonsExpert",
     masteryField: "itemsEverCorrect",
     maxScore: () => EXERCISES_PER_LESSON,
@@ -131,7 +131,7 @@ const TIER_CONFIG = {
     lessonSet: getStructuredLessons("teen"),
     getLessonFn: (id) => getStructuredLesson("teen", id),
     buildQueue: buildFiftyGrammarQueue,
-    stemLines: GRAMMAR_QUESTION_STEM_LINES,
+    stemLines: GRAMMAR_STEM_LINES,
     stateKey: "lessonsTeen",
     masteryField: "itemsEverCorrect",
     maxScore: () => EXERCISES_PER_LESSON,
