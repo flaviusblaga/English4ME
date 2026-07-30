@@ -23,7 +23,9 @@
 // v10: fix grammar tiers (Storytime/Mastery Cup/Teen) — 3 of 4 exercise types
 //      crashed on render because their stem-line map was missing those keys.
 // v11: resume a half-finished lesson (stored queue + position, per lesson).
-const CACHE_VERSION = "socatei-v11";
+// v12: actually persist that resume point to Drive per answer + on every leave
+//      (re-entering a level re-fetches state, so memory-only wasn't enough).
+const CACHE_VERSION = "socatei-v12";
 
 self.addEventListener("install", (event) => {
   // Activate this new worker immediately instead of waiting for every old

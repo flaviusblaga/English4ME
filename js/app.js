@@ -1,7 +1,7 @@
 import { initAuth, signIn, signOut, getAccessToken, whenGoogleReady, restoreSession } from "./auth.js";
 import { getOrCreateState } from "./drive.js";
 import { initChat } from "./chat.js";
-import { initLessons } from "./lessons.js";
+import { initLessons, flushLessonProgress } from "./lessons.js";
 import { initReading } from "./reading.js";
 import {
   getProfile,
@@ -773,6 +773,7 @@ function handleLogout() {
 
 // "Alt membru" — back to the family picker (switch who's practicing).
 function goToMemberPicker() {
+  flushLessonProgress(); // save any half-finished lesson before leaving the tier
   document.body.className = "";
   document.body.dataset.usertype = "child";
   currentMember = null;
@@ -784,6 +785,7 @@ function goToMemberPicker() {
 // so they can freely switch level; for an adult (no levels) it goes back to the
 // family picker.
 function goHome() {
+  flushLessonProgress(); // save any half-finished lesson before leaving the tier
   document.body.className = "";
   document.body.dataset.usertype = "child";
   if (currentMember && currentMember.kind === "kid") {

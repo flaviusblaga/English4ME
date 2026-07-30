@@ -246,6 +246,37 @@ function persistState() {
   );
 }
 
+// The resume point must live in DRIVE, not just memory: re-entering a level
+// re-fetches the state file from scratch (see app.js loadSession), so an
+// in-memory-only snapshot is lost the moment the child leaves the tier. So we
+// write to Drive as the lesson goes — lightly throttled so fast tapping doesn't
+// spam the API — and flush immediately on any leave/close.
+let persistTimer = null;
+let lastPersistAt = 0;
+const PERSIST_GAP_MS = 1500;
+
+function persistStateSoon() {
+  if (!session || persistTimer) return;
+  const now = Date.now();
+  const wait = Math.max(0, PERSIST_GAP_MS - (now - lastPersistAt));
+  persistTimer = setTimeout(() => {
+    persistTimer = null;
+    lastPersistAt = Date.now();
+    persistState();
+  }, wait);
+}
+
+// Force the resume point to Drive right now (leaving to the menu / levels /
+// chat, or the app being backgrounded or closed). No-op unless a lesson is
+// actually paused mid-way, so it is safe to call from any navigation.
+export function flushLessonProgress() {
+  if (isDailyPractice || !currentLesson) return;
+  if (!resumableProgress(currentLesson.id)) return;
+  if (persistTimer) { clearTimeout(persistTimer); persistTimer = null; }
+  lastPersistAt = Date.now();
+  persistState();
+}
+
 // A stable identifying label per exercise item (word, sentence, or grammar
 // question), used for scoring/mastery tracking and parent-transcript lines —
 // several question *types* can test the same item, so mastery is tracked per
@@ -399,13 +430,10 @@ export function initLessons({ accessToken, userEmail, displayName, fileId, state
     // app-switch, tab close, reload), so a lesson paused mid-way survives even
     // if the child never taps back to the menu first. visibilitychange fires
     // reliably before the tab is frozen; pagehide is the belt-and-suspenders.
-    const persistIfMidLesson = () => {
-      if (!isDailyPractice && currentLesson && resumableProgress(currentLesson.id)) persistState();
-    };
     document.addEventListener("visibilitychange", () => {
-      if (document.visibilityState === "hidden") persistIfMidLesson();
+      if (document.visibilityState === "hidden") flushLessonProgress();
     });
-    window.addEventListener("pagehide", persistIfMidLesson);
+    window.addEventListener("pagehide", flushLessonProgress);
   }
   updateLessonMascotSelectUi();
 
@@ -552,7 +580,7 @@ function showMenu() {
   el("lesson-complete-view").hidden = true;
   setNavVisible(true);
 
-  if (leavingMidLesson && resumableProgress(currentLesson.id)) persistState();
+  if (leavingMidLesson) flushLessonProgress();
 
   // .closest, not .parentElement — the avatar now sits inside a
   // .mascot-figure wrapper (for the name caption), so its parent is no
@@ -1251,8 +1279,13 @@ function finalizeAnswer(question, wasCorrect) {
   nextBtn.onclick = isLast ? finishLesson : advanceToNextQuestion;
 
   // This question is answered — resume should pick up at the NEXT one (its
-  // wasCorrect flag is kept in the stored queue for the recap).
-  if (!isLast) stashLessonProgress(currentIndex + 1);
+  // wasCorrect flag is kept in the stored queue for the recap). Persist to Drive
+  // so the position survives leaving the tier (which re-fetches state) or
+  // closing the app entirely.
+  if (!isLast) {
+    stashLessonProgress(currentIndex + 1);
+    persistStateSoon();
+  }
 
   recordTurnForParentSync(session.state, {
     role: "user",
