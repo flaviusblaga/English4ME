@@ -27,7 +27,9 @@
 //      (re-entering a level re-fetches state, so memory-only wasn't enough).
 // v13: admin lesson-reset (per module / category / lesson), applied on the
 //      child's device via a server-queued request. New js modules touched.
-const CACHE_VERSION = "socatei-v13";
+// v14: parent/reading body bottom padding was clobbered → content hid behind
+//      the fixed bottom nav. Restore the nav clearance.
+const CACHE_VERSION = "socatei-v14";
 
 self.addEventListener("install", (event) => {
   // Activate this new worker immediately instead of waiting for every old

@@ -2289,7 +2289,8 @@ body.mascot-theme .chat-bubble--assistant {
 
 /* ---------- 12. Reading ---------- */
 .reading-body {
-  padding: var(--sp-4);
+  /* bottom padding clears the fixed bottom nav (see .app-nav). */
+  padding: var(--sp-4) var(--sp-4) 96px;
   max-width: 640px;
   margin: 0 auto;
   width: 100%;
@@ -2346,7 +2347,9 @@ body.mascot-theme .chat-bubble--assistant {
 
 /* ---------- 13. Parent view ---------- */
 .parent-view-body {
-  padding: var(--sp-4);
+  /* bottom padding clears the fixed bottom nav (see .app-nav) — a plain
+     `padding: var(--sp-4)` here would clobber the earlier clearance rule. */
+  padding: var(--sp-4) var(--sp-4) 96px;
   max-width: 640px;
   margin: 0 auto;
   width: 100%;
