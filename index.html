@@ -474,6 +474,33 @@
         <p id="reward-settings-status" class="hint" hidden></p>
       </details>
 
+      <!-- Admin: reset a child's lesson progress. Whole module, a category, or a
+           single lesson. Applies on the child's device next time they open it. -->
+      <details id="reset-lessons" class="reward-settings">
+        <summary><span class="icon-slot" data-icon="rotate-cw"></span> Reset lecții — pentru un copil</summary>
+        <p class="hint">
+          Alegi copilul și modulul, apoi resetezi tot modulul, o categorie sau o
+          lecție. Resetul se aplică pe dispozitivul copilului când deschide modulul.
+          Punctele și streak-ul rămân.
+        </p>
+        <div class="reward-settings-row">
+          <label for="reset-child-select">Copilul:</label>
+          <select id="reset-child-select"></select>
+        </div>
+        <div class="reward-settings-row">
+          <label for="reset-module-select">Modulul:</label>
+          <select id="reset-module-select">
+            <option value="kids-primar">Playroom (Bobo)</option>
+            <option value="kids-intermediate">Adventure (Fizz)</option>
+            <option value="kids-advanced">Storytime (Sushi)</option>
+            <option value="kids-expert">Mastery Cup</option>
+            <option value="teen">Teen (14-18)</option>
+          </select>
+        </div>
+        <div id="reset-lessons-body" class="reset-lessons-body"></div>
+        <p id="reset-lessons-status" class="hint" hidden></p>
+      </details>
+
       <div class="parent-view-lookup">
         <label for="parent-view-child-select">Copilul:</label>
         <select id="parent-view-child-select"></select>

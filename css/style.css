@@ -368,6 +368,23 @@ body.mascot-theme .btn-primary {
   font-size: 0.8rem;
   color: var(--text-muted);
 }
+
+/* Admin lesson-reset picker (parent view) */
+.reset-lessons-body { margin-top: var(--sp-3); }
+.reset-all-btn { width: 100%; margin-bottom: var(--sp-3); }
+.reset-cat { margin-bottom: var(--sp-3); }
+.reset-cat-head {
+  display: flex; align-items: center; justify-content: space-between; gap: var(--sp-2);
+  margin-bottom: 4px;
+}
+.reset-cat-head strong { font-family: var(--font-display); font-size: var(--fs-sm); }
+.reset-lesson-row {
+  display: flex; align-items: center; justify-content: space-between; gap: var(--sp-2);
+  padding: 5px 0 5px 12px;
+  border-top: 1px solid var(--line);
+}
+.reset-lesson-row span { font-size: var(--fs-sm); min-width: 0; }
+.reset-lesson-row .btn-icon { width: 34px; height: 34px; flex-shrink: 0; }
 .reward-settings-row > label {
   display: block;
   margin-bottom: 4px;

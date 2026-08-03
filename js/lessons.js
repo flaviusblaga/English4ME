@@ -12,7 +12,7 @@ import {
   needsMigration,
   EXERCISES_PER_LESSON,
 } from "./lesson-structure.js";
-import { syncProgress } from "./worker-client.js";
+import { syncProgress, fetchPendingResets } from "./worker-client.js";
 import { updateGamificationAfterLesson, BADGES, badgeLabel } from "./gamification.js";
 import {
   computeRewards,
@@ -275,6 +275,52 @@ export function flushLessonProgress() {
   if (persistTimer) { clearTimeout(persistTimer); persistTimer = null; }
   lastPersistAt = Date.now();
   persistState();
+}
+
+// Applies any lesson resets a parent queued (see worker/src/resets.js). Called
+// once at session load, before any screen renders, so a parent's reset is
+// already in effect when the child opens that module. Each op is applied at most
+// once (its id is remembered per state file in `resetsApplied`); afterwards the
+// child re-completes the lessons normally. Only lesson STATE is cleared
+// (completed + resume point) — points, streak, badges and word mastery stay.
+export async function applyPendingResets(session) {
+  if (!session || !session.profile) return false;
+  const tier = TIER_CONFIG[session.profile.contentTier];
+  if (!tier) return false; // adult profile — no lesson tier
+  const bucket = session.state[tier.stateKey];
+  if (!bucket) return false;
+
+  let ops;
+  try {
+    ops = (await fetchPendingResets()).ops || [];
+  } catch {
+    return false; // best-effort — never block a child from practising
+  }
+  if (!ops.length) return false;
+
+  if (!Array.isArray(session.state.resetsApplied)) session.state.resetsApplied = [];
+  const applied = new Set(session.state.resetsApplied);
+  let changed = false;
+
+  for (const op of ops) {
+    if (op.profileId !== session.profile.id) continue; // this file is one module
+    if (applied.has(op.id)) continue;
+    if (op.all) {
+      bucket.completed = {};
+      if (bucket.inProgress) bucket.inProgress = {};
+    } else if (Array.isArray(op.lessonIds)) {
+      for (const lid of op.lessonIds) {
+        if (bucket.completed) delete bucket.completed[lid];
+        if (bucket.inProgress) delete bucket.inProgress[lid];
+      }
+    }
+    session.state.resetsApplied.push(op.id);
+    applied.add(op.id);
+    changed = true;
+  }
+
+  if (changed) await saveState(session.accessToken, session.fileId, session.state);
+  return changed;
 }
 
 // A stable identifying label per exercise item (word, sentence, or grammar

@@ -25,7 +25,9 @@
 // v11: resume a half-finished lesson (stored queue + position, per lesson).
 // v12: actually persist that resume point to Drive per answer + on every leave
 //      (re-entering a level re-fetches state, so memory-only wasn't enough).
-const CACHE_VERSION = "socatei-v12";
+// v13: admin lesson-reset (per module / category / lesson), applied on the
+//      child's device via a server-queued request. New js modules touched.
+const CACHE_VERSION = "socatei-v13";
 
 self.addEventListener("install", (event) => {
   // Activate this new worker immediately instead of waiting for every old

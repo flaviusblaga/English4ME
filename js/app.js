@@ -1,7 +1,7 @@
 import { initAuth, signIn, signOut, getAccessToken, whenGoogleReady, restoreSession } from "./auth.js";
 import { getOrCreateState } from "./drive.js";
 import { initChat } from "./chat.js";
-import { initLessons, flushLessonProgress } from "./lessons.js";
+import { initLessons, flushLessonProgress, applyPendingResets } from "./lessons.js";
 import { initReading } from "./reading.js";
 import {
   getProfile,
@@ -751,6 +751,11 @@ async function loadSession(profile, displayName) {
     state: data,
     profile,
   };
+
+  // Apply any lesson reset a parent queued for this child, BEFORE the first
+  // screen renders, so the module already reflects it. Best-effort (own errors
+  // swallowed) and a no-op for the adult profile.
+  await applyPendingResets(currentSession);
 
   // Mascot tiers land on the lesson menu; chat-first tiers (Advanced/Expert)
   // land in conversation, with exercises reachable from the chat header.

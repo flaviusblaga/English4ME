@@ -1,8 +1,10 @@
-import { fetchChildProgress, fetchFamilyRewards, saveFamilyRewards } from "./worker-client.js";
+import { fetchChildProgress, fetchFamilyRewards, saveFamilyRewards, adminResetLessons } from "./worker-client.js";
 import { BADGES, badgeLabel } from "./gamification.js";
 import { setActiveRewards } from "./rewards.js";
 import { iconSvg } from "./icons.js";
 import { t, moduleName } from "./i18n.js";
+import { getCategories } from "./lesson-structure.js";
+import { getProfile } from "./profile.js";
 
 const LAST_CHILD_EMAIL_KEY = "engleza-familie:lastChildEmail";
 
@@ -14,6 +16,10 @@ export function initParentView() {
   el("parent-view-load-btn").addEventListener("click", handleLoad);
   el("reward-settings-save").addEventListener("click", handleSaveRewards);
   fillRewardForm();
+
+  const resetModule = el("reset-module-select");
+  if (resetModule) resetModule.addEventListener("change", renderResetPicker);
+  renderResetPicker();
 }
 
 // Fills the child dropdown from the signed-in adult's own family. Called by
@@ -42,6 +48,114 @@ export function setParentChildren(children) {
   // Re-select whoever was viewed last, if they're still in the list.
   const last = localStorage.getItem(LAST_CHILD_EMAIL_KEY);
   if (last && children.some((c) => c.email === last)) select.value = last;
+
+  // The reset panel uses its own copy of the same child list.
+  const resetSelect = el("reset-child-select");
+  if (resetSelect) {
+    resetSelect.innerHTML = "";
+    if (!children.length) {
+      const opt = document.createElement("option");
+      opt.value = "";
+      opt.textContent = t("parent.noChild");
+      resetSelect.appendChild(opt);
+    } else {
+      for (const child of children) {
+        const opt = document.createElement("option");
+        opt.value = child.email;
+        opt.textContent = child.name;
+        resetSelect.appendChild(opt);
+      }
+      if (last && children.some((c) => c.email === last)) resetSelect.value = last;
+    }
+  }
+}
+
+// ---- Admin: reset a child's lessons ----
+// Builds the tier → category → lesson picker (static structure) with a reset
+// button at each level. The reset is queued on the Worker and applied on the
+// child's device when they next open that module (see applyPendingResets).
+function renderResetPicker() {
+  const body = el("reset-lessons-body");
+  if (!body) return;
+  const profileId = el("reset-module-select").value;
+  let contentTier = null;
+  try {
+    contentTier = getProfile(profileId).contentTier;
+  } catch {
+    /* unknown profile — leave empty */
+  }
+  body.innerHTML = "";
+  if (!contentTier) return;
+
+  const allBtn = document.createElement("button");
+  allBtn.type = "button";
+  allBtn.className = "btn btn-small reset-all-btn";
+  allBtn.innerHTML = `${iconSvg("rotate-cw")} Resetează tot modulul`;
+  allBtn.addEventListener("click", () => doReset({ all: true, label: "tot modulul" }));
+  body.appendChild(allBtn);
+
+  for (const cat of getCategories(contentTier)) {
+    const wrap = document.createElement("div");
+    wrap.className = "reset-cat";
+
+    const head = document.createElement("div");
+    head.className = "reset-cat-head";
+    const title = document.createElement("strong");
+    title.textContent = `${cat.emoji} ${cat.label}`;
+    const catBtn = document.createElement("button");
+    catBtn.type = "button";
+    catBtn.className = "btn btn-small";
+    catBtn.textContent = "Resetează categoria";
+    catBtn.addEventListener("click", () =>
+      doReset({ lessonIds: cat.lessons.map((l) => l.id), label: cat.label })
+    );
+    head.append(title, catBtn);
+    wrap.appendChild(head);
+
+    for (const lesson of cat.lessons) {
+      const row = document.createElement("div");
+      row.className = "reset-lesson-row";
+      const name = document.createElement("span");
+      name.textContent = `${lesson.emoji || ""} ${lesson.label}`;
+      const lBtn = document.createElement("button");
+      lBtn.type = "button";
+      lBtn.className = "btn btn-small btn-icon";
+      lBtn.innerHTML = iconSvg("rotate-cw");
+      lBtn.title = `Resetează „${lesson.label}"`;
+      lBtn.setAttribute("aria-label", `Resetează ${lesson.label}`);
+      lBtn.addEventListener("click", () => doReset({ lessonIds: [lesson.id], label: lesson.label }));
+      row.append(name, lBtn);
+      wrap.appendChild(row);
+    }
+    body.appendChild(wrap);
+  }
+}
+
+async function doReset({ all, lessonIds, label }) {
+  const childSelect = el("reset-child-select");
+  const status = el("reset-lessons-status");
+  const childEmail = childSelect ? childSelect.value : "";
+  const childName = childSelect && childSelect.selectedOptions[0] ? childSelect.selectedOptions[0].textContent : "";
+  if (!childEmail) {
+    status.textContent = "Selectează un copil.";
+    status.hidden = false;
+    return;
+  }
+  const profileId = el("reset-module-select").value;
+  if (!window.confirm(`Resetezi „${label}" pentru ${childName}? Lecțiile redevin nefăcute (punctele rămân).`)) return;
+
+  status.hidden = false;
+  status.textContent = "Se trimite…";
+  try {
+    await adminResetLessons({ childEmail, profileId, all: !!all, lessonIds: lessonIds || [] });
+    status.innerHTML = iconSvg("circle-check");
+    status.append(` Reset trimis pentru „${label}". Se aplică pe dispozitivul copilului când deschide modulul.`);
+  } catch (err) {
+    status.textContent =
+      err.code === "forbidden"
+        ? "Doar un părinte din familie poate reseta."
+        : `Nu s-a putut reseta: ${err.message}`;
+  }
 }
 
 const BONUS_TIERS = ["beginner", "intermediate", "advanced", "expert"];

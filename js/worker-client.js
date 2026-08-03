@@ -123,6 +123,27 @@ export async function adminDeleteFamily(id) {
   return response.json();
 }
 
+// Lesson resets a parent has queued for the signed-in learner. The child's app
+// calls this on load and applies each op once (see applyPendingResets).
+export async function fetchPendingResets() {
+  const response = await fetch(`${CONFIG.WORKER_URL}/me/resets`, { headers: authHeaders() });
+  if (!response.ok) throw await failFrom(response);
+  return response.json();
+}
+
+// A parent queues a reset for a child in their family. `all` wipes the whole
+// module; otherwise `lessonIds` are the specific lessons to clear. The Worker
+// verifies the caller is an adult in the child's family.
+export async function adminResetLessons({ childEmail, profileId, all, lessonIds }) {
+  const response = await fetch(`${CONFIG.WORKER_URL}/admin/reset`, {
+    method: "POST",
+    headers: authHeaders({ "content-type": "application/json" }),
+    body: JSON.stringify({ childEmail, profileId, all: !!all, lessonIds: lessonIds || [] }),
+  });
+  if (!response.ok) throw await failFrom(response);
+  return response.json();
+}
+
 // `userEmail` here is the CHILD being asked about, not the caller. The Worker
 // checks that the signed-in adult is in the same family before answering.
 export async function fetchChildProgress({ userEmail, profileId }) {
