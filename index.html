@@ -70,7 +70,7 @@
       <p class="profile-picker-sub">Alege profilul tău</p>
       <div id="profile-picker-list" class="profile-picker-list"></div>
       <!-- Only the super-admin (checked server-side too) sees this. -->
-      <button id="admin-entry-btn" type="button" class="btn btn-small admin-entry-btn" hidden><span class="icon-slot" data-icon="settings"></span> Gestionează familiile</button>
+      <button id="admin-entry-btn" type="button" class="admin-entry-btn" hidden><span class="cp-entry-ico"><span class="icon-slot" data-icon="settings"></span></span><span class="cp-entry-text"><strong>Panou de control</strong><small>Facturare, familii, progres copii</small></span><span class="cp-entry-go"><span class="icon-slot" data-icon="arrow-right"></span></span></button>
     </div>
 
     <!-- Avatar chooser. Lives inside the picker screen so it disappears with
@@ -83,16 +83,6 @@
       </div>
     </div>
 
-    <!-- Super-admin family manager. Contents built in js/app.js. -->
-    <div id="admin-panel" class="admin-panel" hidden>
-      <div class="admin-panel-box">
-        <div class="admin-panel-head">
-          <h2 id="admin-panel-title">Familii</h2>
-          <button id="admin-panel-close" type="button" class="btn btn-small">Închide</button>
-        </div>
-        <div id="admin-panel-body"></div>
-      </div>
-    </div>
   </main>
 
   <main id="screen-level-picker" class="screen" hidden>
@@ -148,16 +138,9 @@
           <button id="settings-btn" class="btn btn-small btn-icon" aria-label="Settings" aria-pressed="false"><span class="icon-slot" data-icon="settings"></span></button>
         </div>
       </div>
-      <!-- Adult dashboard usage card. Shown only for the Business profile (CSS,
-           via body[data-usertype="adult"]); populated by renderBudgetIndicator. -->
-      <div id="usage-card" class="usage-card">
-        <div class="usage-main">
-          <span class="usage-label">Usage this month</span>
-          <span class="usage-val"><b id="usage-spent">$0.00</b> <small id="usage-limit">/ $10.00</small></span>
-          <div class="usage-bar"><i id="usage-fill"></i></div>
-        </div>
-        <div class="usage-ring" id="usage-ring"><b id="usage-pct">0%</b></div>
-      </div>
+      <!-- The billing / usage read-out lives in the Control Panel now (super-admin
+           only), not on the learning header — the parent's own learning zone
+           stays free of admin clutter. See #screen-control-panel. -->
       <div class="app-header-actions">
         <div id="scenario-select-wrap" class="chat-header-center" hidden>
           <label for="scenario-select" class="scenario-label">Practice:</label>
@@ -564,6 +547,55 @@
       </div>
     </div>
   </main>
+
+  <!-- Control Panel — the super-admin's admin zone, kept separate from the
+       parent's own learning. Billing/usage, family management and children's
+       progress live here; reached from a dedicated card in the profile picker. -->
+  <main id="screen-control-panel" class="screen" hidden>
+    <header class="chat-header">
+      <strong><span class="icon-slot" data-icon="settings"></span> Panou de control</strong>
+      <button id="control-panel-back-btn" class="btn btn-small"><span class="icon-slot" data-icon="arrow-left"></span> Înapoi</button>
+    </header>
+
+    <div class="control-panel-body">
+      <section class="cp-section">
+        <p class="cp-section-title"><span class="icon-slot" data-icon="chart-column"></span> Facturare & consum</p>
+        <div id="usage-card" class="usage-card">
+          <div class="usage-main">
+            <span class="usage-label">Consum luna aceasta</span>
+            <span class="usage-val"><b id="usage-spent">$0.00</b> <small id="usage-limit">/ $10.00</small></span>
+            <div class="usage-bar"><i id="usage-fill"></i></div>
+          </div>
+          <div class="usage-ring" id="usage-ring"><b id="usage-pct">0%</b></div>
+        </div>
+        <p id="cp-usage-hint" class="hint" hidden></p>
+      </section>
+
+      <button id="cp-families-btn" type="button" class="cp-tile">
+        <span class="cp-tile-ico"><span class="icon-slot" data-icon="users"></span></span>
+        <span class="cp-tile-text"><strong>Administrare familii</strong><small>Adaugă, editează sau șterge familii</small></span>
+        <span class="cp-tile-go"><span class="icon-slot" data-icon="arrow-right"></span></span>
+      </button>
+
+      <button id="cp-progress-btn" type="button" class="cp-tile">
+        <span class="cp-tile-ico"><span class="icon-slot" data-icon="chart-column"></span></span>
+        <span class="cp-tile-text"><strong>Progres copii</strong><small>Vezi cum stau copiii cu lecțiile și recompensele</small></span>
+        <span class="cp-tile-go"><span class="icon-slot" data-icon="arrow-right"></span></span>
+      </button>
+    </div>
+  </main>
+
+  <!-- Super-admin family manager (a modal overlay). Top-level so it can open over
+       the Control Panel; contents built in js/app.js. -->
+  <div id="admin-panel" class="admin-panel" hidden>
+    <div class="admin-panel-box">
+      <div class="admin-panel-head">
+        <h2 id="admin-panel-title">Familii</h2>
+        <button id="admin-panel-close" type="button" class="btn btn-small">Închide</button>
+      </div>
+      <div id="admin-panel-body"></div>
+    </div>
+  </div>
 
   <!-- Persistent bottom navigation — moved into the active app screen by app.js. -->
   <nav id="app-nav" class="app-nav" hidden>

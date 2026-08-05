@@ -42,6 +42,7 @@ function showScreen(name) {
   el("screen-lesson").hidden = name !== "lesson";
   el("screen-reading").hidden = name !== "reading";
   el("screen-parent-view").hidden = name !== "parent-view";
+  el("screen-control-panel").hidden = name !== "control-panel";
   updateAppNav(name);
 }
 
@@ -97,6 +98,54 @@ function openParentView() {
     .filter((c) => c.email);
   setParentChildren(kids);
   showScreen("parent-view");
+}
+
+// The super-admin's admin zone — billing/usage, family management and children's
+// progress — deliberately separate from the parent's own learning. Reached from
+// the dedicated card in the picker; other families' parents never see it.
+async function openControlPanel() {
+  showScreen("control-panel");
+
+  // Billing: load the admin's OWN usage snapshot (their business profile's saved
+  // state) so the figure is current even when they came straight here from the
+  // picker without entering their learning zone first.
+  const card = el("usage-card");
+  const hint = el("cp-usage-hint");
+  if (card) card.hidden = true;
+  if (hint) { hint.hidden = false; hint.textContent = t("admin.loading"); }
+  try {
+    const me = currentFamilyMembers.find((m) => m.kind === "adult");
+    if (!me) throw new Error("no-adult-profile");
+    const profile = getProfile(me.profileId);
+    const { data } = await getOrCreateState(getAccessToken(), {
+      profileId: profile.id,
+      userEmail: currentUser.email,
+      displayName: me.name,
+      level: profile.level,
+      features: profile.features,
+    });
+    const snap = data && data.usageSnapshot;
+    if (snap && typeof snap.estimatedCostUsd === "number") {
+      fillUsageCard(snap.estimatedCostUsd, snap.budgetUsd);
+      if (card) card.hidden = false;
+      if (hint) hint.hidden = true;
+    } else if (hint) {
+      hint.hidden = false;
+      hint.textContent = "Consumul apare după prima conversație din zona ta de învățare.";
+    }
+  } catch {
+    if (hint) { hint.hidden = false; hint.textContent = "Nu am putut încărca consumul acum."; }
+  }
+}
+
+// Fills the usage card (spent / limit / percent / bar / ring) from a snapshot.
+function fillUsageCard(estimatedCostUsd, budgetUsd) {
+  const pct = budgetUsd > 0 ? Math.min(100, Math.round((estimatedCostUsd / budgetUsd) * 100)) : 0;
+  el("usage-spent").textContent = `$${estimatedCostUsd.toFixed(2)}`;
+  el("usage-limit").textContent = `/ $${budgetUsd.toFixed(2)}`;
+  el("usage-pct").textContent = `${pct}%`;
+  el("usage-fill").style.width = `${pct}%`;
+  el("usage-ring").style.setProperty("--pct", pct);
 }
 
 function openLessons() {
@@ -838,7 +887,12 @@ window.addEventListener("DOMContentLoaded", async () => {
   el("avatar-picker-close").addEventListener("click", () => {
     el("avatar-picker").hidden = true;
   });
-  el("admin-entry-btn").addEventListener("click", openAdminMenu);
+  // The super-admin's picker entry now opens the whole Control Panel (billing +
+  // families + progress), not the family modal directly.
+  el("admin-entry-btn").addEventListener("click", openControlPanel);
+  el("control-panel-back-btn").addEventListener("click", goToMemberPicker);
+  el("cp-families-btn").addEventListener("click", openAdminMenu);
+  el("cp-progress-btn").addEventListener("click", openParentView);
   el("admin-panel-close").addEventListener("click", closeAdminMenu);
   el("admin-panel").addEventListener("click", (event) => {
     if (event.target === el("admin-panel")) closeAdminMenu();

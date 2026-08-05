@@ -67,7 +67,13 @@
 //      its purple palette for the shared teal (scene included); the adult zone
 //      turns from a dark dashboard into the same light teal premium (header +
 //      usage card). Kids unchanged.
-const CACHE_VERSION = "socatei-v30";
+// v31: separate the parent's LEARNING zone from the admin CONTROL PANEL. New
+//      #screen-control-panel (super-admin only) gathers billing/usage, family
+//      management and children's progress; the usage card moved here off the
+//      learning header, so the parent's own learning stays clutter-free. The
+//      super-admin picker entry ("Panou de control") opens it; the family modal
+//      is now a top-level overlay.
+const CACHE_VERSION = "socatei-v31";
 
 self.addEventListener("install", (event) => {
   // Activate this new worker immediately instead of waiting for every old
