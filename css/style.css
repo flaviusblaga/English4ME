@@ -2769,6 +2769,66 @@ body.mascot-theme .chat-bubble--assistant {
 }
 .stats-entry-btn:active { transform: translateY(1px); }
 
+/* Home greeting (mockup: "Hi, Alex!"). */
+.home-greeting {
+  padding: var(--sp-4) var(--sp-4) var(--sp-2);
+}
+.home-greeting h2 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: var(--fs-lg);
+  color: var(--text);
+}
+.home-greeting p {
+  margin: 2px 0 0;
+  font-size: var(--fs-sm);
+  color: var(--text-muted);
+}
+
+/* Home "your progress" strip — three real-data tiles (mockup). */
+.home-progress {
+  margin: 0 var(--sp-4) var(--sp-4);
+}
+.home-progress-heading {
+  margin: 0 0 var(--sp-2);
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: var(--fs-md);
+  color: var(--text);
+}
+.home-progress-tiles {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--sp-3);
+}
+.home-tile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: var(--sp-3) var(--sp-2);
+  background: var(--surface-raised);
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  box-shadow: var(--shadow-sm);
+  text-align: center;
+}
+.home-tile-ico { color: var(--primary); line-height: 0; }
+.home-tile-ico .icon { width: 1.2em; height: 1.2em; }
+.home-tile-num {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: var(--fs-xl);
+  line-height: 1.1;
+  color: var(--text);
+}
+.home-tile-label {
+  font-size: var(--fs-xs);
+  color: var(--text-muted);
+  line-height: 1.2;
+}
+
 /* De-emphasise everything below the hero on the home screen so the blue card
    clearly leads. Scoped to the menu view so the same elements elsewhere keep
    their normal weight. */

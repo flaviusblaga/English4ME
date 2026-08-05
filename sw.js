@@ -41,7 +41,9 @@
 // v21: new E4ME logo/favicon (colourful book mark) + login logo above wordmark;
 //      subtitle "Bobo, Fizz, Sushi & friends"; new friend stickers added.
 // v22: cache-bust favicon links (?v=2) + Spike/Rex/Otto as selectable avatars.
-const CACHE_VERSION = "socatei-v22";
+// v23: dashboard — "your progress" stat tiles on the home screen (real data).
+// v24: dashboard — personal greeting header on the home screen.
+const CACHE_VERSION = "socatei-v24";
 
 self.addEventListener("install", (event) => {
   // Activate this new worker immediately instead of waiting for every old

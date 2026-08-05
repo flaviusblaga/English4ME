@@ -614,6 +614,38 @@ function renderDailyCard() {
   card.hidden = false;
 }
 
+// A compact "your progress" strip on the home screen (mockup: three stat tiles).
+// Real data only — words mastered, lessons completed in this module, current
+// streak. The full breakdown lives on the stats screen (the button below).
+function renderHomeProgress() {
+  const cont = el("home-progress");
+  if (!cont) return;
+  const tier = currentTierConfig();
+  const bucket = currentStateBucket();
+  const g = session.state.gamification || {};
+  if (!tier.pool || !session.profile.features.gamification) {
+    cont.hidden = true;
+    return;
+  }
+  const labels = tier.pool.map(tier.itemLabel);
+  const s = srsStats(session.state, session.profile.contentTier, labels);
+  const lessonsDone = bucket && bucket.completed ? Object.keys(bucket.completed).length : 0;
+  const streak = g.currentStreak || 0;
+
+  const tile = (icon, num, label) =>
+    `<div class="home-tile"><span class="home-tile-ico">${icon}</span>` +
+    `<b class="home-tile-num">${num}</b><span class="home-tile-label">${label}</span></div>`;
+
+  cont.innerHTML =
+    `<p class="home-progress-heading">${t("home.progressHeading")}</p>` +
+    `<div class="home-progress-tiles">` +
+    tile(iconSvg("book-open"), s.mastered, t("home.tileWords")) +
+    tile(iconSvg("circle-check"), lessonsDone, t("home.tileLessons")) +
+    tile(iconSvg("flame"), streak, t("home.tileStreak")) +
+    `</div>`;
+  cont.hidden = false;
+}
+
 function showMenu() {
   // Leaving an unfinished exercise back to the menu: persist the resume point
   // now (the in-memory snapshot is already set by renderQuestion) so it also
@@ -627,6 +659,12 @@ function showMenu() {
   setNavVisible(true);
 
   if (leavingMidLesson) flushLessonProgress();
+
+  // Warm personal greeting at the top (mockup: "Hi, Alex!").
+  const greetTitle = el("home-greeting-title");
+  if (greetTitle) greetTitle.textContent = t("home.greeting", { name: session.displayName });
+  const greetSub = el("home-greeting-sub");
+  if (greetSub) greetSub.textContent = t("home.greetingSub");
 
   // .closest, not .parentElement — the avatar now sits inside a
   // .mascot-figure wrapper (for the name caption), so its parent is no
@@ -644,6 +682,7 @@ function showMenu() {
   }
 
   renderDailyCard();
+  renderHomeProgress();
 
   // The one-tap entry to the stats screen (mastery, modules, streak, rewards,
   // badges). Label set here so it stays in sync with the translations file.
