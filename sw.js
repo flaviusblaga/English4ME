@@ -51,7 +51,11 @@
 // v26: same login backdrop on the rest of the kid-facing screens — profile
 //      picker, level picker, chat, reading and parent view — so the whole app
 //      shares one scene (veiled for readability on the text-heavy ones).
-const CACHE_VERSION = "socatei-v26";
+// v27: premium pass on the stats screen (unified white card chrome, bolder
+//      headings, per-module progress bars, brighter earned badges) and the quiz
+//      screen (gradient progress bar, card-style option buttons with hover, a
+//      white speech card for the mascot's question).
+const CACHE_VERSION = "socatei-v27";
 
 self.addEventListener("install", (event) => {
   // Activate this new worker immediately instead of waiting for every old
