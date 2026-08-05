@@ -433,8 +433,8 @@ function updateLessonMascotSelectUi() {
   }
 }
 
-export function initLessons({ accessToken, userEmail, displayName, fileId, state, profile, onJustChat, onChatAboutIt }) {
-  session = { accessToken, userEmail, displayName, fileId, state, profile };
+export function initLessons({ accessToken, userEmail, displayName, fileId, state, profile, avatar, onJustChat, onChatAboutIt }) {
+  session = { accessToken, userEmail, displayName, fileId, state, profile, avatar };
   applyStructureMigration();
   onJustChatCallback = onJustChat;
   onChatAboutItCallback = onChatAboutIt;
@@ -646,6 +646,102 @@ function renderHomeProgress() {
   cont.hidden = false;
 }
 
+// The full-body sticker to show on the "continue" card: the child's own chosen
+// avatar when it's a mascot, otherwise the sticker of whichever mascot leads
+// their lessons (a single-mascot preference, or Bobo for "both").
+function continueMascotSrc() {
+  const av = session.avatar || "";
+  if (/-sticker\.png$/.test(av)) return av;
+  const pref = getMascotPreference();
+  const name = MASCOT_NAMES.includes(pref) ? pref : "Bobo";
+  return `assets/socatei/${name.toLowerCase()}-sticker.png`;
+}
+
+// Which lesson the "continue" card points at: first a genuinely half-finished
+// one (real resume point), else the first not-yet-completed lesson (a fresh
+// start). Returns null when every lesson in the tier is done.
+function findContinueLesson() {
+  const bucket = currentStateBucket();
+  if (!bucket) return null;
+  const cats = getCategories(session.profile.contentTier);
+  for (const category of cats) {
+    for (const lesson of category.lessons) {
+      const saved = resumableProgress(lesson.id);
+      if (saved) {
+        const pct = Math.round((saved.index / saved.queue.length) * 100);
+        return { lesson, category, pct, resuming: true };
+      }
+    }
+  }
+  for (const category of cats) {
+    for (const lesson of category.lessons) {
+      if (!bucket.completed[lesson.id]) return { lesson, category, pct: 0, resuming: false };
+    }
+  }
+  return null;
+}
+
+// The hero card of the redesigned dashboard: "continue where you left off",
+// with the child's mascot and a one-tap jump straight back into the lesson.
+function renderContinueCard() {
+  const card = el("lesson-continue-card");
+  if (!card) return;
+  const tier = currentTierConfig();
+  if (!tier.pool || !session.profile.features.mascots) {
+    card.hidden = true;
+    return;
+  }
+  const next = findContinueLesson();
+  if (!next) {
+    card.hidden = true;
+    return;
+  }
+  const pctText = next.resuming ? t("home.continuePct", { n: next.pct }) : t("home.continueFresh");
+  const btnText = next.resuming ? t("home.continueBtn") : t("home.continueStartBtn");
+  card.innerHTML =
+    `<span class="continue-body">` +
+    `<span class="continue-eyebrow">${t("home.continueEyebrow")}</span>` +
+    `<strong class="continue-title">${next.lesson.label}</strong>` +
+    `<span class="continue-sub">${next.category.label}</span>` +
+    `<span class="continue-bar"><i style="width:${Math.max(6, next.pct)}%"></i></span>` +
+    `<span class="continue-foot"><span class="continue-pct">${pctText}</span>` +
+    `<span class="continue-cta">${btnText} ${iconSvg("arrow-right")}</span></span>` +
+    `</span>` +
+    `<img class="continue-mascot" src="${continueMascotSrc()}" alt="" ` +
+    `onerror="this.style.display='none'">`;
+  card.onclick = () => startLesson(next.lesson.id);
+  card.hidden = false;
+}
+
+// A compact row of the child's most recent badges (mockup: "recent
+// achievements"). Real unlocked badges only; hidden until the first one is won.
+function renderAchievements() {
+  const cont = el("lesson-achievements");
+  if (!cont) return;
+  const g = session.state.gamification || {};
+  const earned = Array.isArray(g.badges) ? g.badges : [];
+  if (!session.profile.features.gamification || earned.length === 0) {
+    cont.hidden = true;
+    return;
+  }
+  const byId = Object.fromEntries(BADGES.map((b) => [b.id, b]));
+  const recent = earned.slice(-4).reverse();
+  cont.innerHTML =
+    `<p class="home-section-heading">${t("home.achievementsHeading")}</p>` +
+    `<div class="achievements-row">` +
+    recent
+      .map((id) => {
+        const emoji = byId[id] ? byId[id].emoji : "🏅";
+        return (
+          `<div class="achievement-chip"><span class="achievement-emoji">${emoji}</span>` +
+          `<span class="achievement-label">${badgeLabel(id)}</span></div>`
+        );
+      })
+      .join("") +
+    `</div>`;
+  cont.hidden = false;
+}
+
 function showMenu() {
   // Leaving an unfinished exercise back to the menu: persist the resume point
   // now (the in-memory snapshot is already set by renderQuestion) so it also
@@ -681,13 +777,24 @@ function showMenu() {
     menuIntroRow.hidden = true;
   }
 
+  renderContinueCard();
   renderDailyCard();
   renderHomeProgress();
+  renderAchievements();
 
   // The one-tap entry to the stats screen (mastery, modules, streak, rewards,
   // badges). Label set here so it stays in sync with the translations file.
   const statsBtn = el("lesson-stats-btn");
   if (statsBtn) statsBtn.innerHTML = `${iconSvg("chart-column")} ${t("home.seeStats")}`;
+
+  // Heading over the lesson trail ("your lessons"), shown only for the mascot
+  // tiers that actually have a trail below it.
+  const listHeading = el("lesson-list-heading");
+  if (listHeading) {
+    const hasTrail = currentTierConfig().pool && session.profile.features.mascots;
+    listHeading.textContent = t("home.lessonsHeading");
+    listHeading.hidden = !hasTrail;
+  }
 
   const tier = currentTierConfig();
   const bucket = currentStateBucket();

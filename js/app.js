@@ -750,6 +750,10 @@ async function loadSession(profile, displayName) {
     fileId,
     state: data,
     profile,
+    // The child's chosen mascot sticker (bobo/fizz/…-sticker.png) — the lesson
+    // screen's "continue" card shows it, so the dashboard uses the same avatar
+    // the child picked in the picker, not a generic placeholder.
+    avatar: currentMember ? getMemberAvatar(currentMember) : null,
   };
 
   // Apply any lesson reset a parent queued for this child, BEFORE the first

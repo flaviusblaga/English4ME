@@ -43,7 +43,12 @@
 // v22: cache-bust favicon links (?v=2) + Spike/Rex/Otto as selectable avatars.
 // v23: dashboard — "your progress" stat tiles on the home screen (real data).
 // v24: dashboard — personal greeting header on the home screen.
-const CACHE_VERSION = "socatei-v24";
+// v25: dashboard redesign — "continue where you left off" hero card (child's
+//      chosen mascot + real resume point), recent-achievements row, "your
+//      lessons" heading, and the login illustrated backdrop on the kid lesson
+//      screen. New DOM ids: lesson-continue-card, lesson-achievements,
+//      lesson-list-heading; session now carries the member's avatar.
+const CACHE_VERSION = "socatei-v25";
 
 self.addEventListener("install", (event) => {
   // Activate this new worker immediately instead of waiting for every old

@@ -2829,6 +2829,144 @@ body.mascot-theme .chat-bubble--assistant {
   line-height: 1.2;
 }
 
+/* ---------- Dashboard: "continue where you left off" hero card ---------- */
+.continue-card {
+  position: relative;
+  display: block;
+  width: calc(100% - 2 * var(--sp-4));
+  margin: var(--sp-2) var(--sp-4) var(--sp-4);
+  padding: var(--sp-4);
+  min-height: 148px;
+  text-align: left;
+  background: var(--surface-raised);
+  border: 1px solid var(--line);
+  border-radius: var(--r-xl);
+  box-shadow: var(--shadow-md);
+  cursor: pointer;
+  overflow: hidden;
+  font: inherit;
+  color: var(--text);
+  -webkit-tap-highlight-color: transparent;
+}
+.continue-card:active { transform: translateY(1px); }
+.continue-body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+  max-width: 66%;
+}
+.continue-eyebrow {
+  font-size: var(--fs-xs);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--primary);
+}
+.continue-title {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.15rem;
+  line-height: 1.2;
+  color: var(--text);
+}
+.continue-sub {
+  margin-top: -4px;
+  font-size: var(--fs-sm);
+  color: var(--text-muted);
+}
+.continue-bar {
+  display: block;
+  height: 9px;
+  border-radius: var(--r-pill);
+  background: var(--surface);
+  overflow: hidden;
+}
+.continue-bar > i {
+  display: block;
+  height: 100%;
+  border-radius: var(--r-pill);
+  background: linear-gradient(90deg, var(--primary), #22c3ad);
+}
+.continue-foot {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  flex-wrap: wrap;
+}
+.continue-pct {
+  font-size: var(--fs-xs);
+  font-weight: 700;
+  color: var(--primary);
+}
+.continue-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35em;
+  padding: 0.42rem 0.9rem;
+  border-radius: var(--r-pill);
+  background: var(--primary);
+  color: #fff;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: var(--fs-sm);
+}
+.continue-cta .icon { width: 1.05em; height: 1.05em; }
+.continue-mascot {
+  position: absolute;
+  right: -2px;
+  top: -4px;
+  width: 92px;
+  height: auto;
+  filter: drop-shadow(0 6px 10px rgba(15, 23, 42, 0.15));
+  pointer-events: none;
+}
+
+/* Section heading over the lesson trail ("your lessons") + achievements. */
+.home-section-heading {
+  margin: 0 var(--sp-4) var(--sp-2);
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: var(--fs-md);
+  color: var(--text);
+}
+.home-achievements { margin: 0 var(--sp-4) var(--sp-4); }
+.home-achievements .home-section-heading { margin-left: 0; margin-right: 0; }
+.achievements-row {
+  display: flex;
+  gap: var(--sp-2);
+  overflow-x: auto;
+  padding-bottom: 2px;
+  -webkit-overflow-scrolling: touch;
+}
+.achievement-chip {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 0.4em;
+  padding: 0.4rem 0.7rem;
+  background: var(--surface-raised);
+  border: 1px solid var(--line);
+  border-radius: var(--r-pill);
+  box-shadow: var(--shadow-sm);
+}
+.achievement-emoji { font-size: 1.05rem; line-height: 1; }
+.achievement-label {
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  color: var(--text);
+  white-space: nowrap;
+}
+
+/* Same illustrated backdrop as the login screen, softened with a light veil so
+   the white cards over it stay readable. Kid (mascot) dashboard only — teen and
+   adult keep their own themed canvases. */
+body[data-usertype="child"] #screen-lesson {
+  background:
+    linear-gradient(rgba(248, 250, 252, 0.62), rgba(248, 250, 252, 0.82)),
+    url("../assets/socatei/login-scene.svg") center top / cover no-repeat fixed,
+    var(--surface);
+}
+
 /* De-emphasise everything below the hero on the home screen so the blue card
    clearly leads. Scoped to the menu view so the same elements elsewhere keep
    their normal weight. */

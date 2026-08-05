@@ -137,6 +137,13 @@ const STRINGS = {
     seeStats: "Statisticile mele",
     streakPill: "{n} zile la rând",
     streakPillOne: "1 zi la rând",
+    continueEyebrow: "Continuă unde ai rămas",
+    continueBtn: "Continuă",
+    continueStartBtn: "Începe",
+    continuePct: "{n}% terminat",
+    continueFresh: "Lecție nouă",
+    lessonsHeading: "Lecțiile tale",
+    achievementsHeading: "Realizări recente",
   },
 
   stats: {
