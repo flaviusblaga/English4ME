@@ -55,7 +55,10 @@
 //      headings, per-module progress bars, brighter earned badges) and the quiz
 //      screen (gradient progress bar, card-style option buttons with hover, a
 //      white speech card for the mascot's question).
-const CACHE_VERSION = "socatei-v27";
+// v28: premium pass on the last screens — lesson-complete (stars + score on one
+//      white celebration card, unified summary/reward chrome), chat (softer
+//      assistant bubble) and reading (the story now on a proper premium page).
+const CACHE_VERSION = "socatei-v28";
 
 self.addEventListener("install", (event) => {
   // Activate this new worker immediately instead of waiting for every old

@@ -1849,8 +1849,9 @@ body.mascot-theme .chat-bubble--user {
 .chat-bubble--assistant {
   align-self: flex-start;
   background: var(--surface-raised);
-  border: 2px solid var(--line);
+  border: 1px solid var(--line);
   border-bottom-left-radius: 6px;
+  box-shadow: var(--shadow-sm);
 }
 
 /* Kids: the mascot speech bubbles ARE the chrome — drop the outer bubble. */
@@ -2309,6 +2310,23 @@ body.mascot-theme .chat-bubble--assistant {
   to   { transform: none; opacity: 1; }
 }
 
+/* The reward moment: stars + score together on one white celebration card, so
+   the result lifts clearly off the illustrated backdrop. */
+.complete-result-card {
+  width: 100%;
+  max-width: 480px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--sp-2);
+  padding: var(--sp-5) var(--sp-4);
+  background: var(--surface-raised);
+  border: 1px solid var(--line);
+  border-radius: var(--r-xl);
+  box-shadow: var(--shadow-md);
+}
+.complete-result-card .lesson-score { padding: 0; }
+
 .lesson-complete-actions {
   display: flex;
   flex-direction: column;
@@ -2345,10 +2363,11 @@ body.mascot-theme .chat-bubble--assistant {
   width: 100%;
   max-width: 480px;
   background: var(--surface-raised);
-  border: 2px solid var(--line);
-  border-radius: var(--r-lg);
+  border: 1px solid var(--line);
+  border-radius: var(--r-xl);
   padding: var(--sp-4);
   text-align: left;
+  box-shadow: var(--shadow-md);
 }
 
 .lesson-summary-heading {
@@ -2440,12 +2459,12 @@ body.mascot-theme .chat-bubble--assistant {
 
 .reading-passage-text {
   background: var(--surface-raised);
-  border: 2px solid var(--line);
-  border-radius: var(--r-lg);
-  padding: var(--sp-4);
-  line-height: 1.7;
-  font-size: var(--fs-base);
-  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--line);
+  border-radius: var(--r-xl);
+  padding: var(--sp-5) var(--sp-4);
+  line-height: 1.75;
+  font-size: var(--fs-md);
+  box-shadow: var(--shadow-md);
 }
 
 .reading-question-text {
@@ -3187,9 +3206,10 @@ body[data-usertype="child"] #screen-reading {
   width: 100%;
   max-width: 480px;
   background: var(--surface-raised);
-  border: 2px solid var(--line);
-  border-radius: var(--r-lg);
-  padding: var(--sp-3) var(--sp-4);
+  border: 1px solid var(--line);
+  border-radius: var(--r-xl);
+  box-shadow: var(--shadow-md);
+  padding: var(--sp-4);
   text-align: center;
 }
 
