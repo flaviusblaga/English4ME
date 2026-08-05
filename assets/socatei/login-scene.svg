@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 390 844" preserveAspectRatio="xMidYMax slice">
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#cbe8f2"/>
+      <stop offset="0.38" stop-color="#e3f3f1"/>
+      <stop offset="0.62" stop-color="#f2fbf6"/>
+      <stop offset="1" stop-color="#f7fdf9"/>
+    </linearGradient>
+    <linearGradient id="hillBack" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#c3e9d1"/>
+      <stop offset="1" stop-color="#b3e1c4"/>
+    </linearGradient>
+    <linearGradient id="hillMid" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#a9ddbb"/>
+      <stop offset="1" stop-color="#96d3aa"/>
+    </linearGradient>
+    <linearGradient id="hillFront" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#8ace9f"/>
+      <stop offset="1" stop-color="#7ac592"/>
+    </linearGradient>
+  </defs>
+
+  <!-- sky -->
+  <rect width="390" height="844" fill="url(#sky)"/>
+
+  <!-- clouds -->
+  <g fill="#ffffff" opacity="0.9">
+    <ellipse cx="80" cy="104" rx="58" ry="19"/>
+    <ellipse cx="120" cy="118" rx="40" ry="15"/>
+    <ellipse cx="322" cy="168" rx="64" ry="21"/>
+    <ellipse cx="286" cy="180" rx="38" ry="14"/>
+    <ellipse cx="205" cy="66" rx="42" ry="13"/>
+  </g>
+
+  <!-- rolling hills, rising to about the lower third so there is a clear ground -->
+  <path d="M0 560 Q 110 500 220 545 T 390 528 V844 H0 Z" fill="url(#hillBack)"/>
+  <path d="M0 648 Q 140 588 270 628 T 390 620 V844 H0 Z" fill="url(#hillMid)"/>
+  <path d="M0 738 Q 120 690 250 720 T 390 712 V844 H0 Z" fill="url(#hillFront)"/>
+
+  <!-- leaf clusters in the bottom corners -->
+  <g opacity="0.95">
+    <g fill="#7ec495" transform="translate(24 774) rotate(-18)">
+      <path d="M0 0 C 30 -12 62 5 68 40 C 34 46 5 32 0 0 Z"/>
+    </g>
+    <g fill="#6fbb88" transform="translate(6 808) rotate(8)">
+      <path d="M0 0 C 26 -9 56 7 60 36 C 30 42 5 28 0 0 Z"/>
+    </g>
+    <g fill="#7ec495" transform="translate(366 776) rotate(198)">
+      <path d="M0 0 C 30 -12 62 5 68 40 C 34 46 5 32 0 0 Z"/>
+    </g>
+    <g fill="#6fbb88" transform="translate(384 810) rotate(172)">
+      <path d="M0 0 C 26 -9 56 7 60 36 C 30 42 5 28 0 0 Z"/>
+    </g>
+  </g>
+</svg>
