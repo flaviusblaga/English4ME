@@ -58,7 +58,11 @@
 // v28: premium pass on the last screens — lesson-complete (stars + score on one
 //      white celebration card, unified summary/reward chrome), chat (softer
 //      assistant bubble) and reading (the story now on a proper premium page).
-const CACHE_VERSION = "socatei-v28";
+// v29: lessons menu is now a collapsible accordion — each category is a card
+//      header (emoji, name, progress) that opens to a tidy list of its lessons
+//      (stars if done, a play chip if not); the current category starts open.
+//      New icons: chevron-down, play. Replaces the zig-zag trail.
+const CACHE_VERSION = "socatei-v29";
 
 self.addEventListener("install", (event) => {
   // Activate this new worker immediately instead of waiting for every old

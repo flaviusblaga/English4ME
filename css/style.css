@@ -3012,6 +3012,126 @@ body.mascot-theme .chat-bubble--assistant {
   white-space: nowrap;
 }
 
+/* ---------- Lessons accordion (collapsible category cards) ---------- */
+.lesson-accordion {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+  padding: 0 var(--sp-4) var(--sp-4);
+}
+.lesson-cat {
+  background: var(--surface-raised);
+  border: 1px solid var(--line);
+  border-radius: var(--r-xl);
+  box-shadow: var(--shadow-md);
+  overflow: hidden;
+}
+.lesson-cat-head {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  width: 100%;
+  padding: var(--sp-3) var(--sp-4);
+  background: none;
+  border: none;
+  cursor: pointer;
+  font: inherit;
+  color: var(--text);
+  text-align: left;
+  -webkit-tap-highlight-color: transparent;
+}
+.lesson-cat-emoji {
+  flex-shrink: 0;
+  width: 42px;
+  height: 42px;
+  display: grid;
+  place-items: center;
+  font-size: 1.5rem;
+  line-height: 1;
+  background: var(--surface);
+  border-radius: var(--r-md);
+}
+.lesson-cat--done .lesson-cat-emoji { background: var(--success-soft); }
+.lesson-cat-text { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px; }
+.lesson-cat-text strong { font-family: var(--font-display); font-weight: 700; font-size: var(--fs-md); }
+.lesson-cat-text small { font-size: var(--fs-xs); color: var(--text-muted); }
+.lesson-cat-bar {
+  height: 5px;
+  margin-top: 3px;
+  border-radius: var(--r-pill);
+  background: var(--surface);
+  overflow: hidden;
+}
+.lesson-cat-bar > i {
+  display: block;
+  height: 100%;
+  border-radius: var(--r-pill);
+  background: linear-gradient(90deg, var(--primary), #22c3ad);
+}
+.lesson-cat--done .lesson-cat-bar > i { background: var(--primary); }
+.lesson-cat-chevron {
+  flex-shrink: 0;
+  line-height: 0;
+  color: var(--text-muted);
+  transition: transform 200ms var(--ease-out);
+}
+.lesson-cat-chevron .icon { width: 1.25em; height: 1.25em; }
+.lesson-cat.is-open .lesson-cat-chevron { transform: rotate(180deg); }
+
+.lesson-cat-lessons {
+  display: none;
+  flex-direction: column;
+  gap: 6px;
+  padding: 0 var(--sp-3) var(--sp-3);
+}
+.lesson-cat.is-open .lesson-cat-lessons { display: flex; }
+
+.lesson-row {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  width: 100%;
+  padding: var(--sp-2) var(--sp-3);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  cursor: pointer;
+  font: inherit;
+  color: var(--text);
+  text-align: left;
+  transition: transform 100ms var(--ease-out), border-color 100ms var(--ease-out);
+}
+.lesson-row:active { transform: scale(0.99); }
+@media (hover: hover) { .lesson-row:hover { border-color: var(--primary); } }
+.lesson-row-icon {
+  flex-shrink: 0;
+  width: 34px;
+  height: 34px;
+  display: grid;
+  place-items: center;
+  font-size: 1.25rem;
+  line-height: 1;
+  background: var(--surface-raised);
+  border: 1px solid var(--line);
+  border-radius: 50%;
+}
+.lesson-row-label { flex: 1; min-width: 0; font-weight: 600; font-size: var(--fs-sm); }
+.lesson-row-status { flex-shrink: 0; display: inline-flex; align-items: center; }
+.lesson-row-play {
+  width: 30px;
+  height: 30px;
+  justify-content: center;
+  border-radius: 50%;
+  background: var(--primary);
+  color: #fff;
+}
+.lesson-row-play .icon { width: 0.95em; height: 0.95em; fill: currentColor; stroke: currentColor; }
+.lesson-row-stars { gap: 1px; color: #f4b400; }
+.lesson-row-stars .icon { width: 1em; height: 1em; fill: #f4b400; color: #f4b400; }
+.lesson-row--current { border-color: var(--primary); box-shadow: 0 0 0 2px rgba(13, 148, 136, 0.15); }
+.lesson-row--current .lesson-row-icon { border-color: var(--primary); }
+.lesson-row--done .lesson-row-label { color: var(--text-muted); }
+
 /* Same illustrated backdrop as the login screen, softened with a light veil so
    the white cards over it stay readable. Kid (mascot) screens only — teen and
    adult keep their own themed canvases. The veil is slightly stronger on the

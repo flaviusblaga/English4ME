@@ -799,79 +799,94 @@ function showMenu() {
   const tier = currentTierConfig();
   const bucket = currentStateBucket();
   const grid = el("lesson-menu-grid");
-  grid.className = "lesson-path";
+  grid.className = "lesson-accordion";
   grid.innerHTML = "";
 
-  // Adventure path: a vertical trail of circular lesson nodes. Completed ones
-  // are coloured with their star count; the first not-yet-finished lesson is
-  // marked "current" (pulsing). Every node stays tappable — no hard locking,
-  // so kids keep the freedom to replay or jump ahead.
-  // The path is now split into CATEGORIES, each introduced by a banner showing
-  // how far the child is inside that group. Without the banners a 17-node trail
-  // reads as one endless list; with them it reads as five short journeys.
+  // Lessons are grouped into collapsible CATEGORY cards (an accordion) instead
+  // of one long trail: each category is a header (emoji, name, progress) that
+  // opens to reveal its lessons as a tidy list. The category holding the next
+  // unfinished lesson starts open; the rest start collapsed, so the menu is
+  // short and the child can jump straight to where they are. No hard locking —
+  // any lesson stays tappable for replay or skipping ahead.
+  const cats = getCategories(session.profile.contentTier);
+  let currentCatIdx = cats.findIndex((c) => c.lessons.some((l) => !bucket.completed[l.id]));
+  if (currentCatIdx < 0) currentCatIdx = 0;
   let currentMarked = false;
-  let nodeIndex = 0;
 
-  for (const category of getCategories(session.profile.contentTier)) {
-    const doneInCategory = category.lessons.filter((l) => bucket.completed[l.id]).length;
+  cats.forEach((category, ci) => {
+    const total = category.lessons.length;
+    const done = category.lessons.filter((l) => bucket.completed[l.id]).length;
+    const pct = total ? Math.round((done / total) * 100) : 0;
+    const complete = done === total;
 
-    const banner = document.createElement("div");
-    banner.className = "lesson-category";
-    if (doneInCategory === category.lessons.length) banner.classList.add("lesson-category--done");
+    const cat = document.createElement("div");
+    cat.className = "lesson-cat" + (complete ? " lesson-cat--done" : "");
+    const open = ci === currentCatIdx;
+    if (open) cat.classList.add("is-open");
 
-    const badge = document.createElement("span");
-    badge.className = "lesson-category-emoji";
-    badge.textContent = category.emoji;
-    banner.appendChild(badge);
+    const head = document.createElement("button");
+    head.type = "button";
+    head.className = "lesson-cat-head";
+    head.setAttribute("aria-expanded", open ? "true" : "false");
+    head.innerHTML =
+      `<span class="lesson-cat-emoji">${category.emoji}</span>` +
+      `<span class="lesson-cat-text">` +
+        `<strong>${category.label}</strong>` +
+        `<small>${t("home.categoryCount", { d: done, t: total })}</small>` +
+        `<span class="lesson-cat-bar"><i style="width:${pct}%"></i></span>` +
+      `</span>` +
+      `<span class="lesson-cat-chevron">${iconSvg("chevron-down")}</span>`;
 
-    const titles = document.createElement("span");
-    titles.className = "lesson-category-text";
-    const name = document.createElement("strong");
-    name.textContent = category.label;
-    const count = document.createElement("small");
-    count.textContent = t("home.categoryCount", { d: doneInCategory, t: category.lessons.length });
-    titles.append(name, count);
-    banner.appendChild(titles);
-
-    grid.appendChild(banner);
+    const panel = document.createElement("div");
+    panel.className = "lesson-cat-lessons";
 
     for (const lesson of category.lessons) {
       const record = bucket.completed[lesson.id];
       const maxScore = tier.maxScore(lesson);
 
-      const node = document.createElement("button");
-      node.type = "button";
-      node.className = "lesson-node";
-      // zig-zag left/right, continuing across categories so the trail stays one line
-      node.style.setProperty("--node-shift", nodeIndex % 2 === 0 ? "36px" : "-36px");
-      nodeIndex++;
+      const row = document.createElement("button");
+      row.type = "button";
+      row.className = "lesson-row";
       if (record) {
-        node.classList.add("lesson-node--done");
+        row.classList.add("lesson-row--done");
       } else if (!currentMarked) {
-        node.classList.add("lesson-node--current");
+        row.classList.add("lesson-row--current");
         currentMarked = true;
       }
 
-      const circle = document.createElement("span");
-      circle.className = "lesson-node-circle";
-      circle.textContent = lesson.emoji || "📘";
-      node.appendChild(circle);
+      const icon = document.createElement("span");
+      icon.className = "lesson-row-icon";
+      icon.textContent = lesson.emoji || "📘";
+      row.appendChild(icon);
 
       const label = document.createElement("span");
-      label.className = "lesson-node-label";
+      label.className = "lesson-row-label";
       label.textContent = lesson.label;
-      node.appendChild(label);
+      row.appendChild(label);
 
-      const stars = document.createElement("span");
-      stars.className = "lesson-node-stars";
-      const starCount = record ? starsForScore(record.bestScore, maxScore) : 0;
-      stars.innerHTML = record ? (iconSvg("star").repeat(starCount) || "·") : "";
-      node.appendChild(stars);
+      const status = document.createElement("span");
+      if (record) {
+        const starCount = starsForScore(record.bestScore, maxScore);
+        status.className = "lesson-row-status lesson-row-stars";
+        status.innerHTML = iconSvg("star").repeat(starCount) || iconSvg("circle-check");
+      } else {
+        status.className = "lesson-row-status lesson-row-play";
+        status.innerHTML = iconSvg("play");
+      }
+      row.appendChild(status);
 
-      node.addEventListener("click", () => startLesson(lesson.id));
-      grid.appendChild(node);
+      row.addEventListener("click", () => startLesson(lesson.id));
+      panel.appendChild(row);
     }
-  }
+
+    head.addEventListener("click", () => {
+      const nowOpen = cat.classList.toggle("is-open");
+      head.setAttribute("aria-expanded", nowOpen ? "true" : "false");
+    });
+
+    cat.append(head, panel);
+    grid.appendChild(cat);
+  });
 }
 
 // The reward ladder agreed with the parents, always visible above the lesson
