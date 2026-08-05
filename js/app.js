@@ -216,7 +216,7 @@ function mascotFromAvatar(src) {
 // mum/dad/teen person sticker). Mascots are tall die-cut characters and must be
 // CONTAINED whole in the small adult/teen tiles; people stickers fill/crop.
 function isMascotAvatar(src) {
-  return /(bobo|fizz|sushi)-sticker/.test(src || "");
+  return /(bobo|fizz|sushi|spike|rex|otto)-sticker/.test(src || "");
 }
 
 function sectionLabel(kind, emoji, text) {

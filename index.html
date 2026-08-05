@@ -7,7 +7,7 @@
 
   <!-- Installable-app (PWA) wiring -->
   <link rel="manifest" href="manifest.webmanifest" />
-  <meta name="theme-color" content="#0587bd" />
+  <meta name="theme-color" content="#0D9488" />
   <link rel="icon" href="assets/socatei/favicon.ico" sizes="16x16 32x32 48x48" />
   <link rel="icon" href="assets/socatei/favicon-32.png" type="image/png" sizes="32x32" />
   <link rel="apple-touch-icon" href="assets/socatei/apple-touch-icon.png" />
@@ -18,7 +18,7 @@
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito:wght@400;600;700;800&display=swap" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Baloo+2:wght@500;600;700;800&family=Nunito:wght@400;600;700;800&display=swap" />
   <link rel="stylesheet" href="css/style.css" />
   <script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
@@ -26,9 +26,19 @@
 
   <main id="screen-login" class="screen">
     <div class="login-card">
-      <!-- Redesign: the three Socatei in one row (each ~31%, so they scale to
-           fit any width instead of overflowing), Sushi slightly larger in the
-           middle. -->
+      <!-- Order follows the redesign mockup: brand → headline → subtitle →
+           mascot illustration → Google button → install → invitation card. -->
+      <div class="login-brand">
+        <!-- The E4ME app logo (the colourful book mark), above the wordmark. -->
+        <img class="login-logo" src="assets/socatei/logo-e4me.png" alt="English4ME" width="88" height="88"
+             onerror="this.remove()" />
+        <h1 class="wordmark"><span class="wm-en">English</span><span class="wm-4">4</span><span class="wm-me">ME</span></h1>
+      </div>
+
+      <h2 class="login-headline">Învață engleza.<br /><span class="hl-accent">Deschide-ți lumea.</span></h2>
+      <p class="subtitle">Învață împreună cu<br /><span class="subtitle-names"><b class="nm nm-bobo">Bobo</b>, <b class="nm nm-fizz">Fizz</b>, <b class="nm nm-sushi">Sushi</b> <span class="nm-friends">&amp; friends</span></span></p>
+
+      <!-- The current die-cut stickers, standing on the CSS grass scene. -->
       <div class="login-mascots">
         <img class="mascot-sticker-hero" src="assets/socatei/bobo-sticker.png" alt="Bobo"
              onerror="this.replaceWith(Object.assign(document.createElement('span'),{className:'mascot-avatar mascot-avatar--big mascot-avatar--emoji-fallback',textContent:'🦫'}))" />
@@ -37,8 +47,7 @@
         <img class="mascot-sticker-hero" src="assets/socatei/fizz-sticker.png" alt="Fizz"
              onerror="this.replaceWith(Object.assign(document.createElement('span'),{className:'mascot-avatar mascot-avatar--big mascot-avatar--emoji-fallback',textContent:'🐿️'}))" />
       </div>
-      <h1 class="wordmark"><span class="wm-en">English</span><span class="wm-4">4</span><span class="wm-me">ME</span></h1>
-      <p class="subtitle">Învață engleza jucându-te, cu prietenii tăi Bobo, Fizz și Sushi! 🎉</p>
+
       <button id="login-btn" class="btn btn-google">
         <svg class="google-g" viewBox="0 0 24 24" aria-hidden="true"><path fill="#4285F4" d="M22 12c0-.7-.1-1.4-.2-2H12v4h5.6a4.8 4.8 0 0 1-2 3.1v2.6h3.3C20.8 18 22 15.3 22 12z"/><path fill="#34A853" d="M12 22c2.7 0 5-.9 6.6-2.4l-3.3-2.6c-.9.6-2 1-3.3 1-2.5 0-4.7-1.7-5.5-4H3.1v2.6A10 10 0 0 0 12 22z"/><path fill="#FBBC05" d="M6.5 14a6 6 0 0 1 0-3.9V7.5H3.1a10 10 0 0 0 0 9z"/><path fill="#EA4335" d="M12 6.1c1.5 0 2.8.5 3.8 1.5l2.9-2.9A10 10 0 0 0 3.1 7.5l3.4 2.6c.8-2.3 3-4 5.5-4z"/></svg>
         Continuă cu Google
@@ -46,7 +55,11 @@
       <p id="login-error" class="error" hidden></p>
       <button id="install-app-btn" class="btn btn-small" hidden><span class="icon-slot" data-icon="smartphone"></span> Instalează pe telefon</button>
       <p id="ios-install-hint" class="hint" hidden>Pe iPhone: apasă Share ⬆️ (în Safari), apoi „Add to Home Screen".</p>
-      <p class="login-invite"><span class="icon-slot" data-icon="lock"></span> Acces doar cu invitație — contul tău Google trebuie adăugat de administrator.</p>
+
+      <div class="login-invite">
+        <span class="icon-slot login-invite-icon" data-icon="lock"></span>
+        <p><strong>Acces doar cu invitație.</strong> Contul tău Google trebuie adăugat de administrator.</p>
+      </div>
     </div>
   </main>
 

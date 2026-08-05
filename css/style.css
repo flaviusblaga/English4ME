@@ -8,67 +8,73 @@
 /* Single purple "Bobo & Fizz" system, applied to everyone (matches the
    redesign mockup: kids + parent share one playful purple look). */
 :root {
-  /* fonts */
-  --font-display: "Baloo 2", "Nunito", system-ui, sans-serif; /* headings, buttons, labels — Baloo 2 has full Romanian (ș ț) support; Nunito fallback is also diacritic-safe */
-  --font-body: "Nunito", system-ui, sans-serif;     /* body text, numbers */
+  /* fonts — Poppins is the mockup's typeface (geometric, modern, clean); Baloo 2
+     and Nunito stay as diacritic-safe fallbacks while Poppins loads. */
+  --font-display: "Poppins", "Baloo 2", "Nunito", system-ui, sans-serif;
+  --font-body: "Poppins", "Nunito", system-ui, sans-serif;
 
-  /* spacing */
+  /* spacing — 8px system (mockup): 8 16 24 32 40 48 64 */
   --sp-1: 4px; --sp-2: 8px; --sp-3: 12px; --sp-4: 16px; --sp-5: 24px; --sp-6: 32px;
-  /* radius */
-  --r-sm: 12px; --r-md: 14px; --r-lg: 18px; --r-xl: 24px; --r-pill: 999px;
+  --sp-7: 40px; --sp-8: 48px; --sp-10: 64px;
+  /* radius — cards 24, buttons 18, inputs 16 (mockup design system) */
+  --r-sm: 12px; --r-md: 16px; --r-lg: 18px; --r-xl: 24px; --r-pill: 999px;
   /* type */
   --fs-xs: 0.75rem; --fs-sm: 0.875rem; --fs-base: 1rem; --fs-md: 1.15rem;
   --fs-lg: 1.35rem; --fs-xl: 1.75rem; --fs-2xl: 2.2rem;
-  /* soft teal-tinted shadows */
-  --shadow-sm: 0 2px 8px rgba(16, 74, 88, 0.08);
-  --shadow-md: 0 8px 20px rgba(16, 74, 88, 0.12);
-  --shadow-lg: 0 20px 48px rgba(16, 74, 88, 0.16);
+  /* shadows — very subtle, slate-tinted (mockup: no heavy shadows) */
+  --shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.04);
+  --shadow-md: 0 4px 14px rgba(15, 23, 42, 0.06);
+  --shadow-lg: 0 12px 32px rgba(15, 23, 42, 0.08);
   /* motion */
   --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
 
-  /* colour system — Bobo (blue tongue) + Fizz (green tongue): the app's two
-     signature colours. Blue leads the actions, green marks every win. */
-  --backdrop: #cfe9ee;        /* behind the phone column */
-  --surface: #edf8fb;         /* screen canvas (light aqua) */
+  /* colour system — premium EdTech (mockup): teal primary, amber accents,
+     slate neutrals on a near-white canvas. Variable NAMES are unchanged so no
+     selector or JS reference breaks; only the values move. */
+  --backdrop: #eef2f7;        /* behind the phone column (neutral slate) */
+  --surface: #f8fafc;         /* screen canvas */
   --surface-raised: #ffffff;  /* cards */
-  --surface-tint: #f4fdff;    /* subtly-off-white panels (parent) */
-  --line: #d5edf3;
-  --line-strong: #b9e0e9;
-  --text: #123c46;
-  --text-muted: #5d8894;
-  --text-faint: #a1c6cf;      /* inactive nav / chevrons */
+  --surface-tint: #ffffff;    /* panels */
+  --line: #e2e8f0;
+  --line-strong: #cbd5e1;
+  --text: #0f172a;
+  --text-muted: #64748b;
+  --text-faint: #94a3b8;      /* inactive nav / chevrons */
 
-  --primary: #0587bd;         /* Bobo blue — deep enough for legible white button text */
-  --primary-dark: #05699a;
-  --primary-soft: #d4f0fb;
-  --primary-tint: #eafaff;
-  --accent: #0587bd;
+  --primary: #0d9488;         /* teal-600 */
+  --primary-dark: #0b7c71;
+  --primary-soft: #ccfbf1;
+  --primary-tint: #f0fdfa;
+  --accent: #0d9488;          /* kept == primary (many rules use it as such) */
+  --secondary: #f59e0b;       /* amber-500 */
+  --highlight: #fbbf24;       /* amber-400 */
 
-  --success: #1fbf88;         /* Fizz green */
-  --success-soft: #d2f6e7;
-  --success-text: #0f854f;
-  --danger: #ff6b6b;
-  --danger-soft: #ffe3e3;
-  --danger-text: #c23b3b;
+  --success: #10b981;
+  --success-soft: #d1fae5;
+  --success-text: #047857;
+  --danger: #ef4444;
+  --danger-soft: #fee2e2;
+  --danger-text: #b91c1c;
 
-  /* warm status chips */
-  --chip-warm-bg: #fff3d1;    /* ⭐ points */
-  --chip-warm-text: #8a6a00;
-  --chip-hot-bg: #ffe3e3;     /* 🔥 streak */
-  --chip-hot-text: #c23b3b;
+  /* warm status chips — points (amber) + streak (orange) */
+  --chip-warm-bg: #fef3c7;    /* points */
+  --chip-warm-text: #92400e;
+  --chip-hot-bg: #ffedd5;     /* streak */
+  --chip-hot-text: #c2410c;
 
-  /* playful accents — profile-card tints, confetti, lesson nodes.
-     --kid-purple is kept as a var NAME but now carries Bobo blue, so every
-     "primary/current" accent that referenced it turns blue, not purple. */
-  --kid-purple: #12a5d4; --kid-purple-dark: #0b7ea8;
-  --kid-coral: #ff6b6b;  --kid-coral-dark: #e94f4f;
-  --kid-teal: #1fbf88;   --kid-teal-dark: #16a473;
-  --kid-yellow: #ffcb3d; --kid-yellow-dark: #e6b000;
-  --kid-pink: #ff8fc7;   --kid-pink-dark: #f06ba8;
-  --kid-blue: #2fc1e8;   --kid-blue-dark: #1fa8cc;
+  /* accents — profile-card tints, confetti, lesson nodes. Retuned toward the
+     mockup (teal / amber / green / soft neutrals) instead of the old rainbow.
+     --kid-purple keeps its NAME but carries the teal primary, so every
+     "current/primary" accent that referenced it turns teal. */
+  --kid-purple: #0d9488; --kid-purple-dark: #0b7c71;
+  --kid-coral: #f97316;  --kid-coral-dark: #ea580c;
+  --kid-teal: #10b981;   --kid-teal-dark: #059669;
+  --kid-yellow: #fbbf24; --kid-yellow-dark: #f59e0b;
+  --kid-pink: #f472b6;   --kid-pink-dark: #ec4899;
+  --kid-blue: #38bdf8;   --kid-blue-dark: #0ea5e9;
 
   /* tint backgrounds for the round icon tiles */
-  --tile-coral: #ffe3e3; --tile-blue: #dff6fc; --tile-green: #d2f6e7; --tile-yellow: #fff3d1;
+  --tile-coral: #ffedd5; --tile-blue: #e0f2fe; --tile-green: #d1fae5; --tile-yellow: #fef3c7;
 }
 
 /* Kept as a hook so JS that toggles body.mascot-theme still works; the visual
@@ -1012,102 +1018,181 @@ body[data-usertype="adult"] .usage-card {
 }
 
 /* ---------- 6. Login + profile picker ---------- */
+/* Rebuilt to the redesign mockup: a calm centred column — brand mark, bold
+   headline, subtitle, mascot illustration, then the actions and an invitation
+   card. Clean neutrals, one teal accent, generous breathing room. */
 #screen-login {
   justify-content: center;
   align-items: center;
-  padding: 28px;
+  padding: var(--sp-6) var(--sp-5) calc(var(--sp-6) + env(safe-area-inset-bottom, 0px));
+  position: relative;
+  /* Illustrated backdrop: soft sky, rolling hills and leaves at the base — the
+     content sits on top. Falls back to the plain canvas if the SVG is missing. */
+  background: url("../assets/socatei/login-scene.svg") center bottom / cover no-repeat, var(--surface);
 }
 
 .login-card {
   width: 100%;
-  max-width: 360px;
+  max-width: 380px;
   text-align: center;
   display: flex;
   flex-direction: column;
   align-items: center;
+  position: relative;
+  z-index: 1;
+  animation: login-fade 380ms var(--ease-out) both;
 }
 
-/* The three Socatei in ONE row, each ~31% so they scale to fit any width (no
-   overflow, no need to split rows). Sushi in the middle a touch larger. */
+/* Subtle fade + tiny rise on first paint (no bounce, no scaling). */
+@keyframes login-fade {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .login-card { animation: none; }
+}
+
+.login-brand {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--sp-2);
+}
+.login-logo {
+  width: 88px;
+  height: 88px;
+  border-radius: 22px;
+  box-shadow: var(--shadow-md);
+}
+
+/* Wordmark: English (slate) · 4 (amber) · ME (teal) — echoes the app icon. */
+.login-card h1.wordmark {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.6rem;
+  letter-spacing: -0.01em;
+  margin: 0;
+}
+.wordmark .wm-en { color: var(--text); }
+.wordmark .wm-4 { color: var(--secondary); }
+.wordmark .wm-me { color: var(--primary); }
+
+.login-headline {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 2rem;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  color: var(--text);
+  margin: var(--sp-5) 0 0;
+}
+.login-headline .hl-accent { color: var(--primary); }
+
+.subtitle {
+  color: var(--text-muted);
+  font-weight: 500;
+  margin: var(--sp-3) auto 0;
+  max-width: 340px;
+  font-size: 1rem;
+  line-height: 1.5;
+}
+/* All mascot names on ONE row — nowrap, and the font scales down on narrow
+   screens so six names still fit without wrapping. */
+.subtitle-names {
+  display: inline-block;
+  white-space: nowrap;
+  font-size: clamp(0.72rem, 3.3vw, 0.95rem);
+}
+.subtitle .nm { font-weight: 700; }
+.subtitle .nm-bobo { color: var(--primary); }
+.subtitle .nm-sushi { color: var(--secondary); }
+.subtitle .nm-fizz { color: var(--kid-teal); }
+.subtitle .nm-friends { color: var(--text-muted); font-weight: 600; }
+
+/* The three die-cut stickers standing on the CSS grass mound. Sushi slightly
+   larger and overlapping in the middle. */
 .login-mascots {
+  /* soft grassy mound so the stickers look grounded, not floating on white */
+  background: radial-gradient(125% 82% at 50% 100%, #b4e5c6 0%, #d7f1e0 46%, transparent 72%);
+  padding: var(--sp-4) 0 var(--sp-2);
   display: flex;
   justify-content: center;
   align-items: flex-end;
   gap: 2px;
-  margin-bottom: 6px;
+  width: 100%;
+  margin: var(--sp-5) 0;
 }
-
 .mascot-sticker-hero {
   width: 31%;
   height: auto;
-  filter: drop-shadow(0 6px 10px rgba(16, 74, 88, 0.26));
+  filter: drop-shadow(0 10px 16px rgba(15, 23, 42, 0.12));
 }
 .mascot-sticker-hero.mid {
   width: 34%;
   margin: 0 -6px;
   z-index: 1;
 }
-
-/* If a sticker PNG fails to load, the emoji fallback swaps in as a round badge. */
 .login-mascots .mascot-avatar--emoji-fallback {
   width: 72px;
   height: 72px;
   margin: 0 -4px;
 }
 
-/* Wordmark: English (slate) · 4 (Bobo blue) · ME (Sushi pink). */
-.login-card h1.wordmark {
-  font-family: var(--font-display);
-  font-weight: 800;
-  font-size: 2.4rem;
-  letter-spacing: -0.01em;
-  margin: 4px 0 8px;
-}
-.wordmark .wm-en { color: #334155; }
-.wordmark .wm-4 { color: var(--primary); }
-.wordmark .wm-me { color: var(--kid-pink); }
-
-.subtitle {
-  color: var(--text-muted);
-  font-weight: 600;
-  margin: 0 auto 28px;
-  max-width: 300px;
-  font-size: 0.98rem;
-  line-height: 1.4;
-}
-
-/* White Google button with the coloured G mark. */
+/* White Google button, 56px, soft shadow, coloured G mark. */
 .btn-google {
   width: 100%;
+  min-height: 56px;
   background: var(--surface-raised);
   color: var(--text);
-  border: 1.5px solid var(--line);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
   box-shadow: var(--shadow-md);
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 12px;
+  font-size: 1rem;
+  font-weight: 600;
 }
-.btn-google .google-g { width: 22px; height: 22px; flex-shrink: 0; }
+.btn-google .google-g { width: 20px; height: 20px; flex-shrink: 0; }
+.btn-google:active { transform: translateY(1px); }
 
-.btn-google:active {
-  transform: translateY(1px) scale(0.99);
-}
-
+/* Install: outlined teal, secondary to the Google action. */
 #install-app-btn {
   width: 100%;
-  margin-top: 12px;
-}
-
-/* Access is by admin-approved Google account — no self sign-up. */
-.login-invite {
-  color: var(--text-faint);
-  font-size: 0.82rem;
+  min-height: 52px;
+  margin-top: var(--sp-3);
+  background: transparent;
+  color: var(--primary);
+  border: 1.5px solid var(--primary);
+  border-radius: var(--r-lg);
+  box-shadow: none;
   font-weight: 600;
-  line-height: 1.4;
-  margin-top: 20px;
-  max-width: 300px;
 }
+#install-app-btn:active { background: var(--primary-tint); transform: translateY(1px); }
+
+/* Access is by admin-approved Google account — shown as a soft info card. */
+.login-invite {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--sp-3);
+  text-align: left;
+  width: 100%;
+  margin-top: var(--sp-5);
+  padding: var(--sp-3) var(--sp-4);
+  background: var(--primary-tint);
+  border: 1px solid var(--primary-soft);
+  border-radius: var(--r-md);
+}
+.login-invite-icon { color: var(--primary); margin-top: 1px; }
+.login-invite-icon .icon { width: 1.25em; height: 1.25em; }
+.login-invite p {
+  margin: 0;
+  font-size: 0.85rem;
+  line-height: 1.45;
+  color: var(--text-muted);
+}
+.login-invite strong { color: var(--text); }
 
 /* Profile picker */
 #screen-profile-picker,
