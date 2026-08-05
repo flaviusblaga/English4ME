@@ -29,7 +29,19 @@
 //      child's device via a server-queued request. New js modules touched.
 // v14: parent/reading body bottom padding was clobbered → content hid behind
 //      the fixed bottom nav. Restore the nav clearance.
-const CACHE_VERSION = "socatei-v14";
+// v15: UI redesign phase 2/3 — new design-system tokens (teal/amber/slate,
+//      Poppins, subtle shadows) matching the mockup. Visual only.
+// v16: UI redesign phase 4 — login screen rebuilt to the mockup layout.
+// v17: login wired for supplied assets (logo-e4me.svg, login-hero.png) with
+//      graceful fallback to the wordmark + sticker row; subtle fade-in.
+// v18: login illustrated backdrop (sky/hills/leaves SVG scene) + grass under
+//      the current stickers, so it's not a bare white screen.
+// v19: make the login scene clearly visible (blue sky, clouds, 3 green hills).
+// v20: login subtitle lists all mascots on one row (Bobo…Otto), scaled to fit.
+// v21: new E4ME logo/favicon (colourful book mark) + login logo above wordmark;
+//      subtitle "Bobo, Fizz, Sushi & friends"; new friend stickers added.
+// v22: cache-bust favicon links (?v=2) + Spike/Rex/Otto as selectable avatars.
+const CACHE_VERSION = "socatei-v22";
 
 self.addEventListener("install", (event) => {
   // Activate this new worker immediately instead of waiting for every old
