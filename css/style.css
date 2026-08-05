@@ -1198,6 +1198,10 @@ body[data-usertype="adult"] .usage-card {
 #screen-profile-picker,
 #screen-level-picker {
   padding: 26px 20px;
+  /* Same illustrated backdrop as the login screen, so the whole family gateway
+     (sign in → who's learning → pick a level) shares one calm scene. The member
+     and level cards below have solid backgrounds, so they stay readable. */
+  background: url("../assets/socatei/login-scene.svg") center bottom / cover no-repeat, var(--surface);
 }
 
 .card {
@@ -2958,11 +2962,20 @@ body.mascot-theme .chat-bubble--assistant {
 }
 
 /* Same illustrated backdrop as the login screen, softened with a light veil so
-   the white cards over it stay readable. Kid (mascot) dashboard only — teen and
-   adult keep their own themed canvases. */
-body[data-usertype="child"] #screen-lesson {
+   the white cards over it stay readable. Kid (mascot) screens only — teen and
+   adult keep their own themed canvases. The veil is slightly stronger on the
+   text-heavy chat/reading screens so long passages stay comfortable to read. */
+body[data-usertype="child"] #screen-lesson,
+body[data-usertype="child"] #screen-parent-view {
   background:
     linear-gradient(rgba(248, 250, 252, 0.62), rgba(248, 250, 252, 0.82)),
+    url("../assets/socatei/login-scene.svg") center top / cover no-repeat fixed,
+    var(--surface);
+}
+body[data-usertype="child"] #screen-chat,
+body[data-usertype="child"] #screen-reading {
+  background:
+    linear-gradient(rgba(248, 250, 252, 0.80), rgba(248, 250, 252, 0.9)),
     url("../assets/socatei/login-scene.svg") center top / cover no-repeat fixed,
     var(--surface);
 }

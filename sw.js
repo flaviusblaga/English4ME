@@ -48,7 +48,10 @@
 //      lessons" heading, and the login illustrated backdrop on the kid lesson
 //      screen. New DOM ids: lesson-continue-card, lesson-achievements,
 //      lesson-list-heading; session now carries the member's avatar.
-const CACHE_VERSION = "socatei-v25";
+// v26: same login backdrop on the rest of the kid-facing screens — profile
+//      picker, level picker, chat, reading and parent view — so the whole app
+//      shares one scene (veiled for readability on the text-heavy ones).
+const CACHE_VERSION = "socatei-v26";
 
 self.addEventListener("install", (event) => {
   // Activate this new worker immediately instead of waiting for every old
