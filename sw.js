@@ -62,7 +62,12 @@
 //      header (emoji, name, progress) that opens to a tidy list of its lessons
 //      (stars if done, a play chip if not); the current category starts open.
 //      New icons: chevron-down, play. Replaces the zig-zag trail.
-const CACHE_VERSION = "socatei-v29";
+// v30: one premium teal look for everyone — the level-placement test now sits on
+//      the illustrated backdrop with a white question card; the teen theme drops
+//      its purple palette for the shared teal (scene included); the adult zone
+//      turns from a dark dashboard into the same light teal premium (header +
+//      usage card). Kids unchanged.
+const CACHE_VERSION = "socatei-v30";
 
 self.addEventListener("install", (event) => {
   // Activate this new worker immediately instead of waiting for every old

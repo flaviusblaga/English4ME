@@ -867,63 +867,63 @@ body.mascot-theme .identity-avatar {
    Business profile in loadSession — so the kids' shared chat screen is never
    touched. It turns the chat header into a dark SaaS dashboard header. */
 body[data-usertype="adult"] .app-header {
-  background: linear-gradient(165deg, #12314a 0%, #0c2233 100%);
-  border-bottom: 0;
-  color: #fff;
+  background: var(--surface-raised);
+  border-bottom: 1px solid var(--line);
+  color: var(--text);
   padding-bottom: var(--sp-2);
 }
 body[data-usertype="adult"] .app-header-top { padding-top: 40px; }
 body[data-usertype="adult"] .app-identity { gap: var(--sp-3); }
 body[data-usertype="adult"] .identity-avatar {
   width: 54px; height: 54px; overflow: hidden;
-  background: radial-gradient(circle at 50% 35%, #1c3a5a, #0e2338);
-  box-shadow: 0 0 0 2px rgba(90, 150, 220, 0.5), 0 6px 16px rgba(0, 0, 0, 0.4);
+  background: radial-gradient(circle at 50% 35%, #d5f2ee, #b9e8e1);
+  box-shadow: 0 0 0 2px rgba(13, 148, 136, 0.35), var(--shadow-sm);
 }
 body[data-usertype="adult"] .identity-avatar img {
   width: 100%; height: 100%; object-fit: cover; object-position: top center;
 }
-body[data-usertype="adult"] .app-identity strong { font-size: var(--fs-md); color: #fff; }
-body[data-usertype="adult"] .profile-tag { color: #9fb6c9; }
+body[data-usertype="adult"] .app-identity strong { font-size: var(--fs-md); color: var(--text); }
+body[data-usertype="adult"] .profile-tag { color: var(--text-muted); }
 
-/* usage read-out as a soft pill on the dark header */
+/* usage read-out as a soft teal pill */
 body[data-usertype="adult"] .budget-indicator {
-  color: #cfe0ee;
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(120, 170, 220, 0.25);
+  color: var(--primary-dark);
+  background: rgba(13, 148, 136, 0.08);
+  border: 1px solid rgba(13, 148, 136, 0.25);
   border-radius: 999px;
   padding: 6px 12px;
   font-weight: 600;
 }
 body[data-usertype="adult"] #settings-btn {
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  color: #cfe0ee;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  color: var(--text-muted);
   box-shadow: none;
 }
 
-/* action row (View child's progress, Levels) as subtle dark cards */
+/* action row (View child's progress, Levels) as light cards */
 body[data-usertype="adult"] .app-header-actions .btn {
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  color: #eaf2f9;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  color: var(--text);
   box-shadow: none;
   font-family: var(--font-display);
   font-weight: 600;
 }
 body[data-usertype="adult"] .app-header-actions .btn:active { transform: scale(0.97); }
 
-/* the "Practice:" scenario selector, kept legible on the dark header */
-body[data-usertype="adult"] .scenario-label { color: #9fb6c9; }
+/* the "Practice:" scenario selector */
+body[data-usertype="adult"] .scenario-label { color: var(--text-muted); }
 body[data-usertype="adult"] #scenario-select {
-  background: rgba(255, 255, 255, 0.08);
-  border-color: rgba(255, 255, 255, 0.18);
-  color: #eaf2f9;
+  background: var(--surface);
+  border-color: var(--line);
+  color: var(--text);
 }
 
-/* neutral, premium body beneath the dark header */
-body[data-usertype="adult"] #screen-chat { background: #f4f7fa; }
+/* neutral, premium body beneath the header */
+body[data-usertype="adult"] #screen-chat { background: var(--surface); }
 
-/* ---- Usage card (adult only) ----
+/* ---- Usage card (adult only) — light teal premium ----
    Hidden by default; the small text pill is used for kids instead. */
 .usage-card { display: none; }
 body[data-usertype="adult"] .budget-indicator { display: none; }
@@ -931,32 +931,33 @@ body[data-usertype="adult"] .usage-card {
   display: flex;
   align-items: center;
   gap: 14px;
-  margin: 0 var(--sp-4) var(--sp-2);
+  margin: var(--sp-3) var(--sp-4) var(--sp-2);
   padding: 14px 16px;
-  border-radius: 18px;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(120, 170, 220, 0.25);
+  border-radius: var(--r-xl);
+  background: var(--surface-raised);
+  border: 1px solid var(--line);
+  box-shadow: var(--shadow-md);
 }
 .usage-card .usage-main { flex: 1; min-width: 0; }
 .usage-card .usage-label {
   display: block; font-size: 0.66rem; letter-spacing: 0.08em;
-  text-transform: uppercase; color: #9fb6c9;
+  text-transform: uppercase; color: var(--text-muted);
 }
 .usage-card .usage-val { display: block; margin: 4px 0 9px; }
-.usage-card .usage-val b { font-family: var(--font-display); font-weight: 700; font-size: 1.5rem; color: #fff; }
-.usage-card .usage-val small { color: #7f9bb3; font-weight: 500; font-size: 0.95rem; }
-.usage-card .usage-bar { height: 6px; background: rgba(255, 255, 255, 0.12); border-radius: 6px; overflow: hidden; }
-.usage-card .usage-bar > i { display: block; height: 100%; width: 0%; background: #3b82f6; transition: width 400ms var(--ease-out); }
+.usage-card .usage-val b { font-family: var(--font-display); font-weight: 700; font-size: 1.5rem; color: var(--text); }
+.usage-card .usage-val small { color: var(--text-muted); font-weight: 500; font-size: 0.95rem; }
+.usage-card .usage-bar { height: 6px; background: var(--line); border-radius: 6px; overflow: hidden; }
+.usage-card .usage-bar > i { display: block; height: 100%; width: 0%; background: linear-gradient(90deg, var(--primary), #22c3ad); transition: width 400ms var(--ease-out); }
 /* the percent ring — conic fill driven by --pct set in JS */
 .usage-card .usage-ring {
   width: 66px; height: 66px; border-radius: 50%; flex-shrink: 0;
   display: grid; place-items: center;
-  background: conic-gradient(#3b82f6 calc(var(--pct, 0) * 1%), rgba(255, 255, 255, 0.12) 0);
+  background: conic-gradient(var(--primary) calc(var(--pct, 0) * 1%), var(--line) 0);
 }
 .usage-card .usage-ring b {
-  width: 52px; height: 52px; border-radius: 50%; background: #0c2233;
+  width: 52px; height: 52px; border-radius: 50%; background: var(--surface-raised);
   display: grid; place-items: center; font-family: var(--font-display);
-  font-weight: 700; font-size: 0.9rem; color: #fff;
+  font-weight: 700; font-size: 0.9rem; color: var(--text);
 }
 
 /* ---------- 5. Gamification chips + badges ---------- */
@@ -1333,24 +1334,24 @@ body[data-usertype="adult"] .usage-card {
 }
 
 /* ---- Teen (14-18) picker cards — modern, no mascots ---- */
-.grp-label--teens { color: #6d4bd8; background: #ece7ff; }
+.grp-label--teens { color: var(--primary-dark); background: var(--primary-soft); }
 .teen-wrap { display: flex; flex-direction: column; gap: 12px; }
 .picker-cardwrap > .teen-card { flex: 1; }
 .teen-card {
   display: flex; align-items: center; gap: 14px;
-  background: var(--surface-raised); border: 1px solid #e6e1fb;
+  background: var(--surface-raised); border: 1px solid var(--line);
   border-radius: var(--r-xl); padding: 12px 16px; cursor: pointer;
   box-shadow: var(--shadow-sm); text-align: left; font: inherit; color: var(--text);
   transition: transform 120ms var(--ease-out);
 }
 .teen-card:active { transform: scale(0.98); }
-.teen-card.is-remembered { box-shadow: 0 0 0 2px #7c5cff, var(--shadow-sm); }
+.teen-card.is-remembered { box-shadow: 0 0 0 2px var(--primary), var(--shadow-sm); }
 .teen-card .teen-av {
   width: 64px; height: 64px; border-radius: 18px; flex-shrink: 0;
   display: grid; place-items: center; color: #fff;
   font-family: var(--font-display); font-weight: 800; font-size: 1.6rem;
-  background: linear-gradient(135deg, #7c5cff, #14b8a6);
-  box-shadow: 0 6px 16px rgba(124, 92, 255, 0.3);
+  background: linear-gradient(135deg, var(--primary), #22c3ad);
+  box-shadow: 0 6px 16px rgba(13, 148, 136, 0.3);
   overflow: hidden;
 }
 /* when a teen sticker is chosen, it fills the tile (head-and-shoulders crop) */
@@ -1367,23 +1368,20 @@ body[data-usertype="adult"] .usage-card {
 .teen-card .who strong { font-family: var(--font-display); font-weight: 800; font-size: 1.25rem; }
 .teen-card .who .sub { color: var(--text-muted); font-weight: 600; font-size: 0.82rem; }
 .teen-card .teen-go {
-  width: 42px; height: 42px; border-radius: 50%; background: #ece7ff;
-  display: grid; place-items: center; color: #6d4bd8; flex-shrink: 0;
+  width: 42px; height: 42px; border-radius: 50%; background: var(--primary-soft);
+  display: grid; place-items: center; color: var(--primary-dark); flex-shrink: 0;
 }
 
 /* ===================== Teen theme (data-usertype="teen") =====================
-   A modern purple/teal palette layered over the shared screens — mascot-free,
-   cleaner than the kids' world, lighter than the adult dashboard. */
+   The same premium teal palette as the rest of the app — mascot-free and a touch
+   sharper than the kids' world (squared avatar, accent header rule), but the
+   colours, cards and illustrated backdrop are shared. */
 body[data-usertype="teen"] {
-  --primary: #7c5cff; --primary-dark: #5f3fe0; --primary-soft: #ece7ff; --primary-tint: #f5f3ff;
-  --accent: #14b8a6;
-  --success: #14b8a6; --success-soft: #d3f5f0; --success-text: #0d7d72;
-  --surface: #f6f5ff; --backdrop: #e9e6fb;
-  --kid-purple: #7c5cff;  /* the map's "current" accent */
-  --kid-teal: #14b8a6;
+  --kid-purple: var(--primary);  /* the map's "current" accent → teal now */
+  --kid-teal: #22c3ad;
 }
 body[data-usertype="teen"] .app-header { border-bottom: 3px solid var(--primary); }
-body[data-usertype="teen"] .identity-avatar { border-radius: 14px; background: linear-gradient(135deg, #7c5cff, #14b8a6); }
+body[data-usertype="teen"] .identity-avatar { border-radius: 14px; background: linear-gradient(135deg, var(--primary), #22c3ad); }
 
 /* ===================== Module cards (level picker) ===================== */
 .module-list { display: flex; flex-direction: column; gap: 14px; }
@@ -1572,12 +1570,25 @@ body[data-usertype="teen"] .identity-avatar { border-radius: 14px; background: l
 }
 
 /* ---------- Placement test ---------- */
-#screen-placement { padding: 0; }
-#placement-quiz-view { padding: var(--sp-4) var(--sp-4) var(--sp-6); }
+/* The level test is a kid onboarding activity, so it shares the same premium
+   illustrated backdrop as the rest of the child app. */
+#screen-placement {
+  padding: 0;
+  background:
+    linear-gradient(rgba(248, 250, 252, 0.62), rgba(248, 250, 252, 0.82)),
+    url("../assets/socatei/login-scene.svg") center top / cover no-repeat fixed,
+    var(--surface);
+}
+#placement-quiz-view { padding: var(--sp-4) var(--sp-4) var(--sp-6); max-width: 460px; margin: 0 auto; width: 100%; }
 .placement-intro { margin: var(--sp-3) 0 var(--sp-4); text-align: center; }
 #placement-stem {
   text-align: center;
   margin: var(--sp-2) 0 var(--sp-5);
+  padding: var(--sp-5) var(--sp-4);
+  background: var(--surface-raised);
+  border: 1px solid var(--line);
+  border-radius: var(--r-xl);
+  box-shadow: var(--shadow-md);
 }
 .placement-result {
   min-height: 100%;
@@ -3137,14 +3148,18 @@ body.mascot-theme .chat-bubble--assistant {
    adult keep their own themed canvases. The veil is slightly stronger on the
    text-heavy chat/reading screens so long passages stay comfortable to read. */
 body[data-usertype="child"] #screen-lesson,
-body[data-usertype="child"] #screen-parent-view {
+body[data-usertype="child"] #screen-parent-view,
+body[data-usertype="teen"] #screen-lesson,
+body[data-usertype="teen"] #screen-parent-view {
   background:
     linear-gradient(rgba(248, 250, 252, 0.62), rgba(248, 250, 252, 0.82)),
     url("../assets/socatei/login-scene.svg") center top / cover no-repeat fixed,
     var(--surface);
 }
 body[data-usertype="child"] #screen-chat,
-body[data-usertype="child"] #screen-reading {
+body[data-usertype="child"] #screen-reading,
+body[data-usertype="teen"] #screen-chat,
+body[data-usertype="teen"] #screen-reading {
   background:
     linear-gradient(rgba(248, 250, 252, 0.80), rgba(248, 250, 252, 0.9)),
     url("../assets/socatei/login-scene.svg") center top / cover no-repeat fixed,
