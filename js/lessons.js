@@ -998,8 +998,11 @@ function renderModulesProgress() {
     const cls = done === total ? " stats-mod-row--done" : "";
     rows +=
       `<div class="stats-mod-row${cls}">` +
-      `<div class="stats-mod-top"><span>${c.emoji} ${c.label}</span><b>${done}/${total}</b></div>` +
+      `<span class="stats-mod-emoji">${c.emoji}</span>` +
+      `<div class="stats-mod-main">` +
+      `<div class="stats-mod-top"><span>${c.label}</span><b>${done}/${total}</b></div>` +
       `<div class="stats-mod-bar"><i style="width:${pct}%"></i></div>` +
+      `</div>` +
       `</div>`;
   }
   card.innerHTML = `<p class="stats-card-heading">${iconSvg("clipboard-list")} ${t("stats.lessonsHeading")}</p>${rows}`;

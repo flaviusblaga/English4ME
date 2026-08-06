@@ -90,7 +90,11 @@
 //      Google blocks from the Drive scope) can finally use the app. Every other
 //      family keeps their data in their own Drive, unchanged. Needs the Worker
 //      redeploy (new /state routes). New worker/src/state-store.js.
-const CACHE_VERSION = "socatei-v35";
+// v36: the mascot picker chips are now vertical (face on top, name underneath)
+//      and share one row instead of wrapping on narrow phones; the stats screen's
+//      "lessons per module" rows became emoji-tile mini-cards with a visible
+//      progress bar. Visual only.
+const CACHE_VERSION = "socatei-v36";
 
 self.addEventListener("install", (event) => {
   // Activate this new worker immediately instead of waiting for every old

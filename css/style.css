@@ -1881,18 +1881,24 @@ body.mascot-theme .mascot-name {
 }
 
 .mascot-select-label {
+  flex-basis: 100%; /* own line, so the mascot chips get the full width below */
   font-size: var(--fs-xs);
   color: var(--text-muted);
   font-weight: 700;
 }
 
 .mascot-select-btn {
+  flex: 1;
+  min-width: 0;
   display: flex;
+  flex-direction: column;   /* face on top, name underneath */
   align-items: center;
-  gap: 0.4rem;
-  padding: 0.3rem 0.85rem 0.3rem 0.3rem;
+  justify-content: center;
+  gap: 4px;
+  min-height: 66px;
+  padding: 0.45rem 0.25rem;
   border: none;
-  border-radius: var(--r-pill);
+  border-radius: var(--r-lg);
   background: var(--surface-raised);
   box-shadow: var(--shadow-sm);
   cursor: pointer;
@@ -1902,6 +1908,13 @@ body.mascot-theme .mascot-name {
   color: var(--text-muted);
   transition: transform 120ms var(--ease-out), background 120ms, color 120ms;
 }
+
+/* The "All / Toți" chip uses an emoji instead of a face sticker — size the emoji
+   like the faces, but keep its name label small like the others. */
+#lesson-mascot-select-both,
+#mascot-select-both { font-size: 1.7rem; line-height: 1; }
+#lesson-mascot-select-both span,
+#mascot-select-both span { font-size: var(--fs-xs); font-weight: 700; }
 
 .mascot-select-btn:active {
   transform: scale(0.96);
@@ -3353,19 +3366,35 @@ body[data-usertype="teen"] #screen-reading {
 .stats-fig--learn b { color: #e08a2b; }
 .stats-fig--muted b { color: var(--text-faint); }
 .stats-mod-row {
-  padding: var(--sp-2) 0;
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  padding: var(--sp-3) 0;
   border-top: 1px solid var(--line);
   font-weight: 600;
 }
 .stats-mod-row:first-of-type { border-top: none; padding-top: 0; }
-.stats-mod-top { display: flex; align-items: center; justify-content: space-between; }
+.stats-mod-emoji {
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  display: grid;
+  place-items: center;
+  font-size: 1.35rem;
+  line-height: 1;
+  background: var(--surface);
+  border-radius: var(--r-md);
+}
+.stats-mod-row--done .stats-mod-emoji { background: var(--success-soft); }
+.stats-mod-main { flex: 1; min-width: 0; }
+.stats-mod-top { display: flex; align-items: center; justify-content: space-between; gap: var(--sp-2); }
 .stats-mod-row b { font-family: var(--font-display); }
 .stats-mod-row--done { color: var(--primary); }
 .stats-mod-bar {
   height: 6px;
   margin-top: 6px;
   border-radius: var(--r-pill);
-  background: var(--surface);
+  background: var(--line);
   overflow: hidden;
 }
 .stats-mod-bar > i {
