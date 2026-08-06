@@ -94,7 +94,10 @@
 //      and share one row instead of wrapping on narrow phones; the stats screen's
 //      "lessons per module" rows became emoji-tile mini-cards with a visible
 //      progress bar. Visual only.
-const CACHE_VERSION = "socatei-v36";
+// v37: the illustrated backdrop was too heavily veiled to notice — lightened the
+//      veil on the kid/teen lesson, stats, parent, chat and reading screens so
+//      the sky and hills actually show behind the white cards.
+const CACHE_VERSION = "socatei-v37";
 
 self.addEventListener("install", (event) => {
   // Activate this new worker immediately instead of waiting for every old
