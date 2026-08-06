@@ -18,7 +18,8 @@ import {
 import { fetchMyFamily, adminListFamilies, adminSaveFamily, adminDeleteFamily } from "./worker-client.js";
 import { getRememberedProfileId, rememberProfileId } from "./profile-picker.js";
 import { loadFamilyRewards } from "./rewards.js";
-import { initParentView, setParentChildren } from "./parent-view.js";
+import { initParentView, setParentChildren, setAllFamiliesChildren } from "./parent-view.js";
+import { FAMILIES } from "./families.data.js";
 import { initPwa } from "./pwa.js";
 import { initPlacement } from "./placement.js";
 import { iconSvg, hydrateIcons } from "./icons.js";
@@ -136,6 +137,23 @@ async function openControlPanel() {
   } catch {
     if (hint) { hint.hidden = false; hint.textContent = "Nu am putut încărca consumul acum."; }
   }
+}
+
+// Control Panel → "Progres copii": the super-admin's CROSS-family view. Lists
+// every family's children (static families from the app + admin-added KV ones,
+// static winning on id like the Worker), grouped by family. The Worker
+// authorises the super-admin to read/reset any of them.
+async function openControlPanelProgress() {
+  let all = FAMILIES;
+  try {
+    const kv = (await adminListFamilies()).families || [];
+    const staticIds = new Set(FAMILIES.map((f) => f.id));
+    all = [...FAMILIES, ...kv.filter((f) => !staticIds.has(f.id))];
+  } catch {
+    /* KV unreachable — fall back to the static families we already have */
+  }
+  setAllFamiliesChildren(all);
+  showScreen("parent-view");
 }
 
 // Fills the usage card (spent / limit / percent / bar / ring) from a snapshot.
@@ -892,7 +910,7 @@ window.addEventListener("DOMContentLoaded", async () => {
   el("admin-entry-btn").addEventListener("click", openControlPanel);
   el("control-panel-back-btn").addEventListener("click", goToMemberPicker);
   el("cp-families-btn").addEventListener("click", openAdminMenu);
-  el("cp-progress-btn").addEventListener("click", openParentView);
+  el("cp-progress-btn").addEventListener("click", openControlPanelProgress);
   el("admin-panel-close").addEventListener("click", closeAdminMenu);
   el("admin-panel").addEventListener("click", (event) => {
     if (event.target === el("admin-panel")) closeAdminMenu();

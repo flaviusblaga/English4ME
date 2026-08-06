@@ -73,7 +73,11 @@
 //      learning header, so the parent's own learning stays clutter-free. The
 //      super-admin picker entry ("Panou de control") opens it; the family modal
 //      is now a top-level overlay.
-const CACHE_VERSION = "socatei-v31";
+// v32: Control Panel → "Progres copii" is now cross-family for the super-admin —
+//      the child dropdowns list EVERY family's children (static + KV, grouped by
+//      family). Needs the Worker redeploy: canReadProgressOf / adultManagingChild
+//      now allow a super-admin to read/reset any family's child.
+const CACHE_VERSION = "socatei-v32";
 
 self.addEventListener("install", (event) => {
   // Activate this new worker immediately instead of waiting for every old

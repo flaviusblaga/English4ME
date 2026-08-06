@@ -70,6 +70,47 @@ export function setParentChildren(children) {
   }
 }
 
+// The Control Panel's cross-family view (super-admin only): the child dropdowns
+// list EVERY family's children, grouped by family name (an <optgroup> each).
+// `families` is the merged static + KV list built in app.js. The Worker
+// authorises the super-admin to read/reset any of them.
+export function setAllFamiliesChildren(families) {
+  const last = localStorage.getItem(LAST_CHILD_EMAIL_KEY);
+
+  const build = (select) => {
+    if (!select) return;
+    select.innerHTML = "";
+    let any = false;
+    for (const fam of families || []) {
+      const kids = (fam.members || [])
+        .filter((m) => m.kind === "kid")
+        .map((m) => ({ name: m.name, email: (m.emails || [])[0] }))
+        .filter((c) => c.email);
+      if (!kids.length) continue;
+      any = true;
+      const group = document.createElement("optgroup");
+      group.label = fam.name || "Familie";
+      for (const kid of kids) {
+        const opt = document.createElement("option");
+        opt.value = kid.email;
+        opt.textContent = kid.name;
+        group.appendChild(opt);
+      }
+      select.appendChild(group);
+    }
+    if (!any) {
+      const opt = document.createElement("option");
+      opt.value = "";
+      opt.textContent = t("parent.noChild");
+      select.appendChild(opt);
+    }
+    if (last && [...select.options].some((o) => o.value === last)) select.value = last;
+  };
+
+  build(el("parent-view-child-select"));
+  build(el("reset-child-select"));
+}
+
 // ---- Admin: reset a child's lessons ----
 // Builds the tier → category → lesson picker (static structure) with a reset
 // button at each level. The reset is queued on the Worker and applied on the
