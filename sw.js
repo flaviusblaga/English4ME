@@ -81,7 +81,16 @@
 //      screen after every 10 questions lets the child push on or stop and resume
 //      exactly there. One lesson / one reward still (economy unchanged); daily
 //      practice is exempt. New #lesson-checkpoint-view.
-const CACHE_VERSION = "socatei-v33";
+// v34: opening a level no longer fails silently — loadSession is wrapped so a
+//      Drive/network error shows a clear message (with a "grant Drive & sign in
+//      again" hint) instead of a dead tap. Diagnoses the "lessons won't open"
+//      report.
+// v35: the owner's OWN family stores progress on the Worker (KV) instead of
+//      Google Drive, so its children on Google Family Link accounts (which
+//      Google blocks from the Drive scope) can finally use the app. Every other
+//      family keeps their data in their own Drive, unchanged. Needs the Worker
+//      redeploy (new /state routes). New worker/src/state-store.js.
+const CACHE_VERSION = "socatei-v35";
 
 self.addEventListener("install", (event) => {
   // Activate this new worker immediately instead of waiting for every old

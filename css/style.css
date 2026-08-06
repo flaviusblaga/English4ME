@@ -484,6 +484,35 @@ body.mascot-theme .btn-primary {
   padding: var(--sp-4); background: rgba(8, 32, 44, 0.55);
 }
 .admin-panel[hidden] { display: none; }
+
+/* Visible failure when opening a level errors (Drive not granted, offline, …). */
+.session-error {
+  position: fixed; inset: 0; z-index: 80;
+  display: flex; align-items: center; justify-content: center;
+  padding: var(--sp-4); background: rgba(8, 32, 44, 0.55);
+}
+.session-error[hidden] { display: none; }
+.session-error-box {
+  width: min(420px, 100%);
+  background: var(--surface-raised);
+  border-radius: var(--r-xl);
+  box-shadow: var(--shadow-md);
+  padding: var(--sp-5) var(--sp-4);
+  text-align: center;
+  display: flex; flex-direction: column; gap: var(--sp-3);
+}
+.session-error-box strong { font-family: var(--font-display); font-size: var(--fs-lg); color: var(--text); }
+.session-error-box p { margin: 0; font-size: var(--fs-sm); color: var(--text-muted); }
+.session-error-detail {
+  font-size: var(--fs-xs) !important;
+  word-break: break-word;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  padding: var(--sp-2);
+}
+.session-error-actions { display: flex; flex-direction: column; gap: var(--sp-2); align-items: center; }
+.session-error-actions .btn-primary { width: 100%; max-width: 300px; }
 .admin-panel-box {
   width: min(460px, 100%); max-height: 88vh; overflow-y: auto;
   padding: var(--sp-4); border-radius: var(--r-lg);

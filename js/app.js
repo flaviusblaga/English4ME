@@ -775,6 +775,11 @@ function showLevelPicker(member, recommendedProfileId) {
 async function loadSession(profile, displayName) {
   const accessToken = getAccessToken();
 
+  // Everything from here can hit the network (Google Drive). If any of it fails
+  // — most often because Google Drive access was not granted at sign-in — the
+  // tap on a level used to do NOTHING (silent rejected promise). Now it shows a
+  // clear message instead of a dead tap. See showSessionError.
+  try {
   // The family's own reward scheme, fetched before any screen is drawn so the
   // child never sees the coded defaults flash and then change. Best-effort by
   // design — loadFamilyRewards swallows its own errors and keeps the defaults.
@@ -835,6 +840,45 @@ async function loadSession(profile, displayName) {
   } else {
     openChat(null);
   }
+  } catch (err) {
+    console.error("loadSession failed:", err);
+    showSessionError(err);
+  }
+}
+
+// A visible, dismissible error when opening a level fails (instead of a dead
+// tap). A 401/403 almost always means Google Drive access was not granted at
+// sign-in, so we lead with the fix for that; other failures show the raw reason.
+function showSessionError(err) {
+  const status = err && (err.status || err.code);
+  const looksLikePermission =
+    status === 401 || status === 403 || /permission|scope|drive|forbidden|unauthor/i.test(String(err && err.message));
+
+  let box = el("session-error");
+  if (!box) {
+    box = document.createElement("div");
+    box.id = "session-error";
+    box.className = "session-error";
+    document.body.appendChild(box);
+  }
+  const detail = (err && (err.message || err.toString())) || "necunoscut";
+  box.innerHTML =
+    `<div class="session-error-box">` +
+    `<strong>Nu am putut deschide lecțiile 😕</strong>` +
+    (looksLikePermission
+      ? `<p>Aplicația nu a primit acces la Google Drive (acolo se salvează progresul).</p>` +
+        `<p><b>Dacă e un cont de copil cu control parental</b> (Family Link), Google nu îi permite acest acces — ` +
+        `intră în aplicație cu un cont Google <b>obișnuit</b> (același ca pe tabletă). Așa progresul se și sincronizează pe ambele.</p>` +
+        `<p>Altfel: ieși și intră din nou, iar la ecranul Google <b>bifează permisiunea pentru Google Drive</b>.</p>`
+      : `<p>A apărut o eroare de rețea. Verifică internetul și încearcă din nou.</p>`) +
+    `<p class="session-error-detail">${detail}</p>` +
+    `<div class="session-error-actions">` +
+    `<button type="button" id="session-error-signout" class="btn btn-primary">Ieși și reconectează-te</button>` +
+    `<button type="button" id="session-error-close" class="btn btn-small">Închide</button>` +
+    `</div></div>`;
+  box.hidden = false;
+  el("session-error-signout").onclick = handleLogout;
+  el("session-error-close").onclick = () => { box.hidden = true; };
 }
 
 function handleLogout() {

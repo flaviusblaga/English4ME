@@ -36,6 +36,8 @@ const MODULES = [
   "auth.js",
   "families.js",
   "progress.js",
+  "resets.js",
+  "state-store.js",
   "index.js",
 ];
 
@@ -57,6 +59,19 @@ const parts = [HEADER];
 for (const relativePath of MODULES) {
   const base = relativePath.startsWith("js/") ? ROOT : SRC;
   const source = readFileSync(join(base, relativePath), "utf8");
+
+  // Import ALIASES (`import { X as Y }`) are a silent trap: the whole import
+  // line is stripped, so the alias `Y` is never defined once modules share one
+  // scope — the code compiles in Node but throws a ReferenceError in the
+  // deployed Worker. Reject them so the bundle fails loudly at build time.
+  const alias = /import\s*\{[^}]*\bas\b[^}]*\}\s*from/.exec(source);
+  if (alias) {
+    throw new Error(
+      `Import alias in ${relativePath} breaks bundling (the alias vanishes when the import line is stripped). ` +
+        `Use the original name instead: ${alias[0].replace(/\s+/g, " ")}`
+    );
+  }
+
   const body = source
     .replace(IMPORT_RE, "")
     // `export default` must survive — it's the Worker's entry point. Every

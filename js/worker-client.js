@@ -70,6 +70,29 @@ export async function syncProgress({ profileId, displayName, gamification, progr
   return response.json();
 }
 
+// Full learning state stored on the Worker (KV) instead of Google Drive — used
+// only for the owner's family, whose children sign in with Google Family Link
+// accounts that Google blocks from granting the Drive scope. See drive.js
+// usesServerState. The Worker also enforces the same family gate.
+export async function fetchServerState(profileId) {
+  const response = await fetch(
+    `${CONFIG.WORKER_URL}/state?profileId=${encodeURIComponent(profileId)}`,
+    { headers: authHeaders() }
+  );
+  if (!response.ok) throw await failFrom(response);
+  return response.json(); // { found, state }
+}
+
+export async function saveServerState(profileId, state) {
+  const response = await fetch(`${CONFIG.WORKER_URL}/state`, {
+    method: "POST",
+    headers: authHeaders({ "content-type": "application/json" }),
+    body: JSON.stringify({ profileId, state }),
+  });
+  if (!response.ok) throw await failFrom(response);
+  return response.json();
+}
+
 // The reward scheme this family agreed on. Readable by everyone in the family
 // (the children's screens are built from it); only an adult may change it —
 // enforced by the Worker, not here.

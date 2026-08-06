@@ -1,5 +1,19 @@
+import { fetchServerState, saveServerState } from "./worker-client.js";
+import { FAMILIES, lookupEmailIn } from "./families.data.js";
+
 const DRIVE_FILES_URL = "https://www.googleapis.com/drive/v3/files";
 const DRIVE_UPLOAD_URL = "https://www.googleapis.com/upload/drive/v3/files";
+
+// Accounts whose learning state lives on the Worker (KV) instead of Google
+// Drive: the app owner's OWN family, because its children sign in with Google
+// Family Link (supervised) accounts that Google blocks from granting the Drive
+// scope. Everyone else keeps their data in their own Drive, unchanged. The
+// Worker enforces the same gate server-side, so this is convenience, not
+// security.
+function usesServerState(email) {
+  const found = email ? lookupEmailIn(FAMILIES, email) : null;
+  return !!found && found.family.id === "blaga";
+}
 
 function fileNameForProfile(profileId) {
   return `engleza-familie-${profileId}.json`;
@@ -191,6 +205,31 @@ async function saveFileContent(accessToken, fileId, content) {
 
 // Returns { fileId, data } — creates the file with default content on first use.
 export async function getOrCreateState(accessToken, { profileId, userEmail, displayName, level, features }) {
+  // Owner's family → Worker/KV (no Drive scope needed, so Family Link kids work).
+  if (usesServerState(userEmail)) {
+    const { found, state } = await fetchServerState(profileId);
+    if (found && state) {
+      applyFeatureDefaults(state, features); // patch in any fields added since this file was created
+      return { fileId: null, data: state };
+    }
+
+    // First time on the server: carry over any existing Drive progress, so a
+    // regular account (parent, tablet) doesn't lose what it built up. Supervised
+    // accounts can't read Drive at all — that read throws and we start fresh.
+    let seed = null;
+    try {
+      const existingId = await findFile(accessToken, fileNameForProfile(profileId));
+      if (existingId) seed = await loadFileContent(accessToken, existingId);
+    } catch {
+      /* no Drive access (Family Link) or no file — start fresh below */
+    }
+
+    const data = seed || defaultState({ profileId, userEmail, displayName, level, features });
+    applyFeatureDefaults(data, features);
+    await saveServerState(profileId, data);
+    return { fileId: null, data };
+  }
+
   const filename = fileNameForProfile(profileId);
   let fileId = await findFile(accessToken, filename);
 
@@ -207,6 +246,12 @@ export async function getOrCreateState(accessToken, { profileId, userEmail, disp
 
 export async function saveState(accessToken, fileId, data) {
   data.lastUpdatedAt = new Date().toISOString();
+  // Server-state accounts have no Drive file (fileId is null) — save to the
+  // Worker by the profileId carried in the state itself.
+  if (usesServerState(data.userEmail)) {
+    await saveServerState(data.profileId, data);
+    return;
+  }
   await saveFileContent(accessToken, fileId, data);
 }
 
