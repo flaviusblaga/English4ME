@@ -2399,6 +2399,59 @@ body.mascot-theme .chat-bubble--assistant {
 }
 .complete-result-card .lesson-score { padding: 0; }
 
+/* ---------- Mid-lesson checkpoint (every 10 questions) ---------- */
+#lesson-checkpoint-view:not([hidden]) {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  padding: var(--sp-6) var(--sp-4);
+}
+.checkpoint-card {
+  width: 100%;
+  max-width: 420px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--sp-3);
+  padding: var(--sp-6) var(--sp-4);
+  background: var(--surface-raised);
+  border: 1px solid var(--line);
+  border-radius: var(--r-xl);
+  box-shadow: var(--shadow-md);
+  text-align: center;
+  animation: rise-in 240ms var(--ease-out) both;
+}
+.checkpoint-emoji { font-size: 3rem; line-height: 1; }
+#checkpoint-title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: var(--fs-lg);
+  color: var(--text);
+}
+.checkpoint-dots { display: flex; gap: var(--sp-2); }
+.checkpoint-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--surface);
+  border: 2px solid var(--line);
+}
+.checkpoint-dot--done { background: var(--primary); border-color: var(--primary); }
+.checkpoint-sub { margin: 0; font-size: var(--fs-sm); color: var(--text-muted); }
+.checkpoint-actions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+  width: 100%;
+  align-items: center;
+  margin-top: var(--sp-2);
+}
+.checkpoint-actions .btn-primary { width: 100%; max-width: 300px; }
+.checkpoint-stop-hint { margin: 0; font-size: var(--fs-xs); color: var(--text-muted); }
+
 .lesson-complete-actions {
   display: flex;
   flex-direction: column;

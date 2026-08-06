@@ -345,6 +345,23 @@
       </div>
     </div>
 
+    <!-- Mid-lesson checkpoint: shown after every 10 questions so a 50-question
+         lesson is done in five digestible parts. The child can push on or stop
+         and resume later exactly here. -->
+    <div id="lesson-checkpoint-view" hidden>
+      <div class="checkpoint-card">
+        <div class="checkpoint-emoji">🎉</div>
+        <h2 id="checkpoint-title"></h2>
+        <div class="checkpoint-dots" id="checkpoint-dots"></div>
+        <p id="checkpoint-sub" class="checkpoint-sub"></p>
+        <div class="checkpoint-actions">
+          <button id="checkpoint-continue-btn" type="button" class="btn btn-primary"></button>
+          <button id="checkpoint-stop-btn" type="button" class="btn btn-small"></button>
+        </div>
+        <p id="checkpoint-stop-hint" class="checkpoint-stop-hint"></p>
+      </div>
+    </div>
+
     <div id="lesson-complete-view" hidden>
       <div class="lesson-mascot-intro">
         <span class="mascot-figure">

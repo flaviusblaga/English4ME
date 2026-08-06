@@ -77,7 +77,11 @@
 //      the child dropdowns list EVERY family's children (static + KV, grouped by
 //      family). Needs the Worker redeploy: canReadProgressOf / adultManagingChild
 //      now allow a super-admin to read/reset any family's child.
-const CACHE_VERSION = "socatei-v32";
+// v33: a 50-question lesson is now delivered in five parts of 10 — a checkpoint
+//      screen after every 10 questions lets the child push on or stop and resume
+//      exactly there. One lesson / one reward still (economy unchanged); daily
+//      practice is exempt. New #lesson-checkpoint-view.
+const CACHE_VERSION = "socatei-v33";
 
 self.addEventListener("install", (event) => {
   // Activate this new worker immediately instead of waiting for every old

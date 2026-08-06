@@ -147,6 +147,10 @@ let currentQueue = [];
 let currentIndex = 0;
 let currentScore = 0;
 let currentLesson = null;
+
+// A 50-question lesson is delivered in parts of this many questions: after each
+// part the child gets a checkpoint (push on, or stop and resume here later).
+const PART_SIZE = 10;
 let isDailyPractice = false; // true while running a spaced-repetition session
 
 function el(id) {
@@ -450,6 +454,8 @@ export function initLessons({ accessToken, userEmail, displayName, fileId, state
   };
   el("lesson-exit-btn").onclick = showMenu;
   el("lesson-back-to-menu-btn").onclick = showMenu;
+  el("checkpoint-continue-btn").onclick = checkpointContinue;
+  el("checkpoint-stop-btn").onclick = showMenu;
   el("lesson-stats-btn").onclick = showStats;
   el("lesson-stats-back-btn").innerHTML = `${iconSvg("arrow-left")} ${t("stats.back")}`;
   el("lesson-stats-back-btn").onclick = showMenu;
@@ -751,6 +757,7 @@ function showMenu() {
   el("lesson-menu-view").hidden = false;
   el("lesson-stats-view").hidden = true;
   el("lesson-exercise-view").hidden = true;
+  el("lesson-checkpoint-view").hidden = true;
   el("lesson-complete-view").hidden = true;
   setNavVisible(true);
 
@@ -951,6 +958,7 @@ function showStats() {
   el("lesson-menu-view").hidden = true;
   el("lesson-stats-view").hidden = false;
   el("lesson-exercise-view").hidden = true;
+  el("lesson-checkpoint-view").hidden = true;
   el("lesson-complete-view").hidden = true;
   setNavVisible(true);
   renderWordsCard();
@@ -1056,6 +1064,7 @@ function startDailyPractice() {
 
   el("lesson-menu-view").hidden = true;
   el("lesson-exercise-view").hidden = false;
+  el("lesson-checkpoint-view").hidden = true;
   el("lesson-complete-view").hidden = true;
   setNavVisible(false);
 
@@ -1084,6 +1093,7 @@ function startLesson(lessonId) {
 
   el("lesson-menu-view").hidden = true;
   el("lesson-exercise-view").hidden = false;
+  el("lesson-checkpoint-view").hidden = true;
   el("lesson-complete-view").hidden = true;
   setNavVisible(false);
 
@@ -1486,10 +1496,14 @@ function finalizeAnswer(question, wasCorrect) {
     usesMascots ? speakAsMascot(spokenAnswer, replayVoice, reactionAvatar) : speak(spokenAnswer, replayVoice);
 
   const isLast = currentIndex === currentQueue.length - 1;
+  // A checkpoint falls after every PART_SIZE-th question (10, 20, 30, 40) — but
+  // never as the very last step (results screen is the natural stop), and never
+  // in the short daily-review session (it isn't a 50-question themed lesson).
+  const atPartBoundary = !isLast && !isDailyPractice && (currentIndex + 1) % PART_SIZE === 0;
   const nextBtn = el("lesson-next-btn");
   nextBtn.innerHTML = (isLast ? t("lesson.seeResults") : t("lesson.next")) + ` ${iconSvg("arrow-right")}`;
   nextBtn.hidden = false;
-  nextBtn.onclick = isLast ? finishLesson : advanceToNextQuestion;
+  nextBtn.onclick = isLast ? finishLesson : atPartBoundary ? showCheckpoint : advanceToNextQuestion;
 
   // This question is answered — resume should pick up at the NEXT one (its
   // wasCorrect flag is kept in the stored queue for the recap). Persist to Drive
@@ -1510,6 +1524,44 @@ function finalizeAnswer(question, wasCorrect) {
 function advanceToNextQuestion() {
   currentIndex += 1;
   renderQuestion();
+}
+
+// Shown after every PART_SIZE questions: a short "part X of 5 done" screen with
+// a choice to push on or stop. The resume point is already at the next question,
+// so stopping and returning later picks up exactly here.
+function showCheckpoint() {
+  const doneCount = currentIndex + 1; // questions answered so far
+  const totalParts = Math.ceil(currentQueue.length / PART_SIZE);
+  const partDone = Math.round(doneCount / PART_SIZE);
+
+  el("checkpoint-title").textContent = t("lesson.checkpointTitle", { n: partDone, total: totalParts });
+  el("checkpoint-sub").textContent = t("lesson.checkpointSub", { done: doneCount, total: currentQueue.length });
+  el("checkpoint-continue-btn").innerHTML = `${t("lesson.checkpointContinue")} ${iconSvg("arrow-right")}`;
+  el("checkpoint-stop-btn").innerHTML = `${iconSvg("home")} ${t("lesson.checkpointStop")}`;
+  el("checkpoint-stop-hint").textContent = t("lesson.checkpointStopHint");
+
+  const dots = el("checkpoint-dots");
+  if (dots) {
+    dots.innerHTML = "";
+    for (let i = 0; i < totalParts; i++) {
+      const dot = document.createElement("span");
+      dot.className = "checkpoint-dot" + (i < partDone ? " checkpoint-dot--done" : "");
+      dots.appendChild(dot);
+    }
+  }
+
+  el("lesson-exercise-view").hidden = true;
+  el("lesson-checkpoint-view").hidden = false;
+
+  // Belt and braces: the resume point was stashed at the next question in
+  // finalizeAnswer; flush it to Drive now so "stop" survives a close/crash.
+  flushLessonProgress();
+}
+
+function checkpointContinue() {
+  el("lesson-checkpoint-view").hidden = true;
+  el("lesson-exercise-view").hidden = false;
+  advanceToNextQuestion();
 }
 
 function finishLesson() {
