@@ -908,44 +908,34 @@ function renderRewardsCard() {
     return;
   }
 
-  card.innerHTML = "";
+  const pct = rewards.totalLessons
+    ? Math.min(100, Math.round((rewards.lessonsCompleted / rewards.totalLessons) * 100))
+    : 0;
+  const bonusText = rewards.bonusEarned
+    ? t("rewards.bonusEarned", { x: bonusPhrase(rewards) })
+    : t("rewards.bonusToward", { n: rewards.totalLessons, x: bonusPhrase(rewards) });
 
-  const heading = document.createElement("p");
-  heading.className = "rewards-card-heading";
-  heading.innerHTML = `${iconSvg("trophy")} ${t("rewards.heading")}`;
-  card.appendChild(heading);
-
-  const track = document.createElement("div");
-  track.className = "progress-track rewards-progress-track";
-  const fill = document.createElement("div");
-  fill.className = "progress-fill";
-  fill.style.width = `${Math.min(100, (rewards.lessonsCompleted / rewards.totalLessons) * 100)}%`;
-  track.appendChild(fill);
-  card.appendChild(track);
-
-  const progressLine = document.createElement("p");
-  progressLine.className = "rewards-row";
-  progressLine.innerHTML = iconSvg("book-open");
-  progressLine.append(t("rewards.progress", { a: rewards.lessonsCompleted, b: rewards.totalLessons }));
-  card.appendChild(progressLine);
-
-  const screenTimeLine = document.createElement("p");
-  screenTimeLine.className = "rewards-row";
-  screenTimeLine.innerHTML = iconSvg("timer");
-  screenTimeLine.append(t("rewards.perLesson", { x: perLessonPhrase(rewards), y: earnedPhrase(rewards) }));
-  card.appendChild(screenTimeLine);
-
-  const bonusLine = document.createElement("p");
-  bonusLine.className = "rewards-row rewards-row--bonus";
-  if (rewards.bonusEarned) {
-    bonusLine.classList.add("rewards-row--earned");
-    bonusLine.innerHTML = iconSvg("gift");
-    bonusLine.append(t("rewards.bonusEarned", { x: bonusPhrase(rewards) }));
-  } else {
-    bonusLine.innerHTML = iconSvg("gift");
-    bonusLine.append(t("rewards.bonusToward", { n: rewards.totalLessons, x: bonusPhrase(rewards) }));
-  }
-  card.appendChild(bonusLine);
+  // Premium layout: a prominent progress bar with a percent, then the reward
+  // terms as icon-tile rows (screen-time per lesson + the end-of-module bonus).
+  card.innerHTML =
+    `<p class="rewards-card-heading">${iconSvg("trophy")} ${t("rewards.heading")}</p>` +
+    `<div class="rewards-progress">` +
+      `<div class="rewards-progress-top">` +
+        `<span>${t("rewards.progress", { a: rewards.lessonsCompleted, b: rewards.totalLessons })}</span>` +
+        `<b>${pct}%</b>` +
+      `</div>` +
+      `<div class="rewards-bar"><i style="width:${pct}%"></i></div>` +
+    `</div>` +
+    `<div class="rewards-items">` +
+      `<div class="rewards-item">` +
+        `<span class="rewards-item-ico">${iconSvg("timer")}</span>` +
+        `<span class="rewards-item-text">${t("rewards.perLesson", { x: perLessonPhrase(rewards), y: earnedPhrase(rewards) })}</span>` +
+      `</div>` +
+      `<div class="rewards-item${rewards.bonusEarned ? " rewards-item--earned" : ""}">` +
+        `<span class="rewards-item-ico">${iconSvg("gift")}</span>` +
+        `<span class="rewards-item-text">${bonusText}</span>` +
+      `</div>` +
+    `</div>`;
 
   card.hidden = false;
 }
