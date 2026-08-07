@@ -3365,34 +3365,61 @@ body[data-usertype="teen"] #screen-reading {
 .stats-fig--good b { color: var(--primary); }
 .stats-fig--learn b { color: #e08a2b; }
 .stats-fig--muted b { color: var(--text-faint); }
-.stats-mod-row {
+/* "Lessons per module" — a stack of premium mini-cards (same language as the
+   lesson accordion), not a flat list with divider lines. */
+.stats-modules { margin: 0 var(--sp-4) var(--sp-3); }
+.stats-section-heading {
+  display: flex; align-items: center; gap: 0.45em;
+  margin: 0 0 var(--sp-2);
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: var(--fs-md);
+  color: var(--text);
+}
+.stats-section-heading .icon { width: 1.1em; height: 1.1em; color: var(--primary); }
+.stats-mod-list { display: flex; flex-direction: column; gap: var(--sp-2); }
+.stats-mod-card {
   display: flex;
   align-items: center;
   gap: var(--sp-3);
-  padding: var(--sp-3) 0;
-  border-top: 1px solid var(--line);
-  font-weight: 600;
+  padding: var(--sp-3);
+  background: var(--surface-raised);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow-sm);
 }
-.stats-mod-row:first-of-type { border-top: none; padding-top: 0; }
+.stats-mod-card--done { border-color: rgba(13, 148, 136, 0.35); }
 .stats-mod-emoji {
   flex-shrink: 0;
-  width: 40px;
-  height: 40px;
+  width: 44px;
+  height: 44px;
   display: grid;
   place-items: center;
-  font-size: 1.35rem;
+  font-size: 1.4rem;
   line-height: 1;
-  background: var(--surface);
+  background: var(--primary-soft);
   border-radius: var(--r-md);
 }
-.stats-mod-row--done .stats-mod-emoji { background: var(--success-soft); }
+.stats-mod-card--done .stats-mod-emoji { background: var(--success-soft); }
 .stats-mod-main { flex: 1; min-width: 0; }
-.stats-mod-top { display: flex; align-items: center; justify-content: space-between; gap: var(--sp-2); }
-.stats-mod-row b { font-family: var(--font-display); }
-.stats-mod-row--done { color: var(--primary); }
+.stats-mod-top { display: flex; align-items: baseline; justify-content: space-between; gap: var(--sp-2); }
+.stats-mod-top span {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: var(--fs-base);
+  color: var(--text);
+}
+.stats-mod-card b {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: var(--fs-sm);
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+.stats-mod-card--done b { color: var(--primary); }
 .stats-mod-bar {
-  height: 6px;
-  margin-top: 6px;
+  height: 7px;
+  margin-top: 8px;
   border-radius: var(--r-pill);
   background: var(--line);
   overflow: hidden;
@@ -3403,7 +3430,7 @@ body[data-usertype="teen"] #screen-reading {
   border-radius: var(--r-pill);
   background: linear-gradient(90deg, var(--primary), #22c3ad);
 }
-.stats-mod-row--done .stats-mod-bar > i { background: var(--primary); }
+.stats-mod-card--done .stats-mod-bar > i { background: var(--primary); }
 
 /* ---------- Days-practised (streak) zone ---------- */
 .streak-card {

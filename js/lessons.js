@@ -990,14 +990,15 @@ function renderModulesProgress() {
   const card = el("stats-modules");
   if (!card) return;
   const bucket = currentStateBucket();
-  let rows = "";
+  card.className = "stats-modules"; // a plain section (its children are the cards), not one big card
+  let cards = "";
   for (const c of getCategories(session.profile.contentTier)) {
     const total = c.lessons.length;
     const done = c.lessons.filter((l) => bucket.completed[l.id]).length;
     const pct = total ? Math.round((done / total) * 100) : 0;
-    const cls = done === total ? " stats-mod-row--done" : "";
-    rows +=
-      `<div class="stats-mod-row${cls}">` +
+    const cls = done === total ? " stats-mod-card--done" : "";
+    cards +=
+      `<div class="stats-mod-card${cls}">` +
       `<span class="stats-mod-emoji">${c.emoji}</span>` +
       `<div class="stats-mod-main">` +
       `<div class="stats-mod-top"><span>${c.label}</span><b>${done}/${total}</b></div>` +
@@ -1005,7 +1006,9 @@ function renderModulesProgress() {
       `</div>` +
       `</div>`;
   }
-  card.innerHTML = `<p class="stats-card-heading">${iconSvg("clipboard-list")} ${t("stats.lessonsHeading")}</p>${rows}`;
+  card.innerHTML =
+    `<p class="stats-section-heading">${iconSvg("clipboard-list")} ${t("stats.lessonsHeading")}</p>` +
+    `<div class="stats-mod-list">${cards}</div>`;
   card.hidden = false;
 }
 

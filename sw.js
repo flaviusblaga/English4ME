@@ -97,7 +97,10 @@
 // v37: the illustrated backdrop was too heavily veiled to notice — lightened the
 //      veil on the kid/teen lesson, stats, parent, chat and reading screens so
 //      the sky and hills actually show behind the white cards.
-const CACHE_VERSION = "socatei-v37";
+// v38: stats "lessons per module" redesigned from a flat divider list into a
+//      stack of premium mini-cards (teal emoji tile, name, count, rounded
+//      progress bar) — same visual language as the lesson accordion.
+const CACHE_VERSION = "socatei-v38";
 
 self.addEventListener("install", (event) => {
   // Activate this new worker immediately instead of waiting for every old
