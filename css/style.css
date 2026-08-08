@@ -3708,3 +3708,152 @@ body.mascot-theme .mascot-avatar.antic-flip,
   border: 1px dashed var(--border, rgba(5, 135, 189, 0.35));
   border-radius: 14px;
 }
+
+/* ---------- "Did you know?" — fun facts about Romania ---------- */
+
+/* Home-screen entry button: a full-width tappable row, matching the category
+   cards' shape but tinted amber so it reads as a discovery zone, not a lesson. */
+.dyk-entry-btn {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  width: calc(100% - 2 * var(--sp-4));
+  margin: 0 var(--sp-4) var(--sp-4);
+  padding: var(--sp-3) var(--sp-4);
+  background: var(--chip-warm-bg);
+  border: 1px solid var(--highlight);
+  border-radius: var(--r-lg);
+  cursor: pointer;
+  text-align: left;
+  -webkit-tap-highlight-color: transparent;
+}
+.dyk-entry-btn:active { transform: translateY(1px); }
+.dyk-entry-emoji {
+  flex-shrink: 0;
+  width: 42px;
+  height: 42px;
+  display: grid;
+  place-items: center;
+  font-size: 1.5rem;
+  line-height: 1;
+  background: #fff;
+  border-radius: var(--r-md);
+}
+.dyk-entry-text { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.dyk-entry-text strong {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: var(--fs-md);
+  color: var(--chip-warm-text);
+}
+.dyk-entry-text small { font-size: var(--fs-xs); color: var(--chip-warm-text); opacity: 0.8; }
+.dyk-entry-chevron { flex-shrink: 0; color: var(--chip-warm-text); display: flex; }
+.dyk-entry-chevron svg { width: 18px; height: 18px; }
+
+/* The section view itself. */
+#lesson-didyouknow-view { padding-bottom: var(--sp-8); }
+.dyk-intro {
+  margin: 0 var(--sp-4) var(--sp-4);
+  font-size: var(--fs-sm);
+  color: var(--text-muted);
+  line-height: 1.5;
+}
+
+/* A single fact card. English on top, Romanian revealed by the toggle. */
+.dyk-card {
+  display: flex;
+  gap: var(--sp-3);
+  padding: var(--sp-4);
+  margin: 0 var(--sp-4) var(--sp-3);
+  background: var(--surface-raised);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow-sm);
+}
+.dyk-card-emoji {
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  font-size: 1.6rem;
+  line-height: 1;
+  background: var(--primary-tint);
+  border-radius: var(--r-md);
+}
+.dyk-card-body { flex: 1; min-width: 0; }
+.dyk-card-en {
+  margin: 0;
+  font-size: var(--fs-md);
+  line-height: 1.45;
+  color: var(--text);
+  font-weight: 600;
+}
+.dyk-card-ro {
+  margin: var(--sp-2) 0 0;
+  font-size: var(--fs-sm);
+  line-height: 1.45;
+  color: var(--text-muted);
+  font-style: italic;
+}
+.dyk-ro-toggle {
+  margin-top: var(--sp-2);
+  padding: 4px 10px;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: var(--fs-xs);
+  color: var(--primary);
+  background: var(--primary-soft);
+  border: none;
+  border-radius: var(--r-pill);
+  cursor: pointer;
+}
+.dyk-ro-toggle.is-open { background: var(--surface); color: var(--text-muted); }
+
+/* Featured card at the top — bigger, tinted, sits above the shuffle button. */
+.dyk-card--featured {
+  border: 2px solid var(--highlight);
+  background: linear-gradient(180deg, #fffdf5, var(--surface-raised));
+}
+.dyk-card--featured .dyk-card-en { font-size: var(--fs-lg); }
+.dyk-featured { margin-bottom: var(--sp-2); }
+.dyk-another-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4em;
+  width: calc(100% - 2 * var(--sp-4));
+  margin: 0 var(--sp-4) var(--sp-5);
+}
+.dyk-another-btn svg { width: 18px; height: 18px; }
+
+/* Domain filter chips. */
+.dyk-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-2);
+  padding: 0 var(--sp-4) var(--sp-3);
+}
+.dyk-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 12px;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: var(--fs-xs);
+  color: var(--text-muted);
+  background: var(--surface-raised);
+  border: 1px solid var(--line);
+  border-radius: var(--r-pill);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.dyk-chip.is-active {
+  color: #fff;
+  background: var(--primary);
+  border-color: var(--primary);
+}
+.dyk-chip:active { transform: translateY(1px); }
+
+.dyk-list { padding-top: var(--sp-1); }

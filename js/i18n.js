@@ -167,6 +167,19 @@ const STRINGS = {
     badgesHeading: "Insigne",
   },
 
+  didYouKnow: {
+    entry: "Știai că?",
+    entrySub: "Curiozități despre România",
+    title: "Știai că?",
+    intro: "Descoperă lucruri uimitoare despre România — și învață engleză în același timp!",
+    back: "Înapoi",
+    another: "Altă curiozitate",
+    allDomains: "Toate",
+    listHeading: "Răsfoiește pe domenii",
+    tapForRo: "🇷🇴 Vezi în română",
+    hideRo: "Ascunde traducerea",
+  },
+
   recap: {
     completeScore: "Ai reușit {s} din {t}! 🎉",
     newBadge: " Insignă nouă: {names}!",

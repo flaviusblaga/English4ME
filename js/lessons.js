@@ -70,6 +70,11 @@ import {
   buildGrammarExerciseQueue,
   GRAMMAR_STEM_LINES,
 } from "./grammar-client.js";
+import {
+  DOMAINS as DYK_DOMAINS,
+  getFactsByDomain,
+  randomFact,
+} from "./didyouknow.data.js";
 
 const MASCOT_AVATARS = {
   Bobo: { emoji: "🦫", img: "assets/socatei/bobo-face.png" },
@@ -460,6 +465,12 @@ export function initLessons({ accessToken, userEmail, displayName, fileId, state
   el("lesson-stats-back-btn").innerHTML = `${iconSvg("arrow-left")} ${t("stats.back")}`;
   el("lesson-stats-back-btn").onclick = showMenu;
 
+  // "Did you know?" — a fun-facts-about-Romania section, offered to the young
+  // mascot tiers alongside their lessons. The back button returns to the menu.
+  el("lesson-didyouknow-btn").onclick = showDidYouKnow;
+  el("lesson-dyk-back-btn").innerHTML = `${iconSvg("arrow-left")} ${t("didYouKnow.back")}`;
+  el("lesson-dyk-back-btn").onclick = showMenu;
+
   // Non-mascot tiers (Advanced/Expert) get a plain, grown-up presentation:
   // no mascot picker, no avatars anywhere on this screen.
   el("lesson-mascot-select-bar").hidden = !profile.features.mascots;
@@ -756,6 +767,7 @@ function showMenu() {
 
   el("lesson-menu-view").hidden = false;
   el("lesson-stats-view").hidden = true;
+  el("lesson-didyouknow-view").hidden = true;
   el("lesson-exercise-view").hidden = true;
   el("lesson-checkpoint-view").hidden = true;
   el("lesson-complete-view").hidden = true;
@@ -793,6 +805,20 @@ function showMenu() {
   // badges). Label set here so it stays in sync with the translations file.
   const statsBtn = el("lesson-stats-btn");
   if (statsBtn) statsBtn.innerHTML = `${iconSvg("chart-column")} ${t("home.seeStats")}`;
+
+  // "Did you know?" entry — shown to the young mascot tiers (Playroom…Mastery),
+  // whose home screen this is; the plain adult/expert surfaces don't get it.
+  const dykBtn = el("lesson-didyouknow-btn");
+  if (dykBtn) {
+    dykBtn.hidden = !session.profile.features.mascots;
+    dykBtn.innerHTML =
+      `<span class="dyk-entry-emoji">💡</span>` +
+      `<span class="dyk-entry-text">` +
+        `<strong>${t("didYouKnow.entry")}</strong>` +
+        `<small>${t("didYouKnow.entrySub")}</small>` +
+      `</span>` +
+      `<span class="dyk-entry-chevron">${iconSvg("arrow-right")}</span>`;
+  }
 
   // Heading over the lesson trail ("your lessons"), shown only for the mascot
   // tiers that actually have a trail below it.
@@ -947,6 +973,7 @@ function renderRewardsCard() {
 function showStats() {
   el("lesson-menu-view").hidden = true;
   el("lesson-stats-view").hidden = false;
+  el("lesson-didyouknow-view").hidden = true;
   el("lesson-exercise-view").hidden = true;
   el("lesson-checkpoint-view").hidden = true;
   el("lesson-complete-view").hidden = true;
@@ -957,6 +984,109 @@ function showStats() {
   renderRewardsCard();
   renderStatsBadges();
   el("lesson-stats-view").scrollTop = 0;
+}
+
+// ── "Did you know?" — fun facts about Romania ──────────────────────────────
+// A separate, browsable section reached from the home screen. It has three
+// parts: a featured fact card with a "random fact" button (invites tapping),
+// a row of domain chips that filter, and the filtered list below. Each fact is
+// English (reading practice) with the Romanian translation revealed on tap.
+
+let dykDomain = "all";       // active domain filter ("all" = every fact)
+let dykFeaturedId = null;    // id of the fact on the featured card (avoid repeats)
+
+function showDidYouKnow() {
+  el("lesson-menu-view").hidden = true;
+  el("lesson-stats-view").hidden = true;
+  el("lesson-didyouknow-view").hidden = false;
+  el("lesson-exercise-view").hidden = true;
+  el("lesson-checkpoint-view").hidden = true;
+  el("lesson-complete-view").hidden = true;
+  setNavVisible(true);
+
+  el("lesson-dyk-intro").textContent = t("didYouKnow.intro");
+  el("lesson-dyk-list-heading").textContent = t("didYouKnow.listHeading");
+
+  // Start fresh each visit: a new random featured fact and the "all" filter.
+  dykDomain = "all";
+  dykFeaturedId = null;
+  pickFeaturedFact();
+  renderDykChips();
+  renderDykList();
+  el("lesson-didyouknow-view").scrollTop = 0;
+}
+
+// One fact card's markup — English on top, Romanian revealed by a toggle. Used
+// for both the featured card and the list rows; `featured` enlarges the former.
+function dykFactCardHtml(fact, featured) {
+  return (
+    `<div class="dyk-card${featured ? " dyk-card--featured" : ""}">` +
+      `<span class="dyk-card-emoji">${fact.emoji}</span>` +
+      `<div class="dyk-card-body">` +
+        `<p class="dyk-card-en">${fact.en}</p>` +
+        `<p class="dyk-card-ro" hidden>${fact.ro}</p>` +
+        `<button type="button" class="dyk-ro-toggle" data-ro-toggle>${t("didYouKnow.tapForRo")}</button>` +
+      `</div>` +
+    `</div>`
+  );
+}
+
+// Wires the RO-translation toggle inside a rendered card container.
+function wireDykRoToggles(container) {
+  container.querySelectorAll("[data-ro-toggle]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const ro = btn.previousElementSibling; // the .dyk-card-ro <p>
+      const showing = !ro.hidden;
+      ro.hidden = showing;
+      btn.textContent = showing ? t("didYouKnow.tapForRo") : t("didYouKnow.hideRo");
+      btn.classList.toggle("is-open", !showing);
+    });
+  });
+}
+
+// Featured card: a random fact (from the active domain) plus the shuffle button.
+function pickFeaturedFact() {
+  const fact = randomFact(dykFeaturedId, dykDomain);
+  if (!fact) return;
+  dykFeaturedId = fact.id;
+  const box = el("lesson-dyk-featured");
+  box.innerHTML =
+    dykFactCardHtml(fact, true) +
+    `<button type="button" id="dyk-another-btn" class="btn btn-primary dyk-another-btn">` +
+      `${iconSvg("rotate-cw")} ${t("didYouKnow.another")}` +
+    `</button>`;
+  wireDykRoToggles(box);
+  el("dyk-another-btn").onclick = pickFeaturedFact;
+}
+
+// Domain filter chips ("All" + one per domain). The active chip is highlighted;
+// tapping one re-filters both the featured card and the list.
+function renderDykChips() {
+  const wrap = el("lesson-dyk-chips");
+  wrap.innerHTML = "";
+  const chips = [{ id: "all", emoji: "✨", label: t("didYouKnow.allDomains") }, ...DYK_DOMAINS];
+  for (const c of chips) {
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "dyk-chip" + (c.id === dykDomain ? " is-active" : "");
+    btn.innerHTML = `<span>${c.emoji}</span> ${c.label}`;
+    btn.onclick = () => {
+      dykDomain = c.id;
+      dykFeaturedId = null;
+      pickFeaturedFact();
+      renderDykChips();
+      renderDykList();
+    };
+    wrap.appendChild(btn);
+  }
+}
+
+// The browsable list of facts for the active domain.
+function renderDykList() {
+  const list = el("lesson-dyk-list");
+  const facts = getFactsByDomain(dykDomain);
+  list.innerHTML = facts.map((f) => dykFactCardHtml(f, false)).join("");
+  wireDykRoToggles(list);
 }
 
 function renderWordsCard() {
