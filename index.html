@@ -286,6 +286,7 @@
       <div id="home-progress" class="home-progress" hidden></div>
       <div id="lesson-achievements" class="home-achievements" hidden></div>
       <button id="lesson-stats-btn" type="button" class="stats-entry-btn"></button>
+      <button id="lesson-didyouknow-btn" type="button" class="dyk-entry-btn" hidden></button>
       <p id="lesson-list-heading" class="home-section-heading" hidden></p>
       <div id="lesson-menu-grid" class="lesson-menu-grid"></div>
     </div>
@@ -302,6 +303,22 @@
       <div id="lesson-streak-card" class="streak-card" hidden></div>
       <div id="lesson-rewards-card" class="rewards-card" hidden></div>
       <div id="stats-badges" class="stats-card" hidden></div>
+    </div>
+
+    <!-- "Did you know?" — a separate, browsable section of fun facts about
+         Romania. Each fact is shown in English (reading practice) with a
+         Romanian translation on tap. A "random fact" button on the featured
+         card invites exploration; the chips below filter the list by domain. -->
+    <div id="lesson-didyouknow-view" hidden>
+      <div class="stats-head">
+        <button id="lesson-dyk-back-btn" class="btn btn-small"></button>
+        <strong data-i18n="didYouKnow.title"></strong>
+      </div>
+      <p id="lesson-dyk-intro" class="dyk-intro"></p>
+      <div id="lesson-dyk-featured" class="dyk-featured"></div>
+      <p id="lesson-dyk-list-heading" class="home-section-heading"></p>
+      <div id="lesson-dyk-chips" class="dyk-chips"></div>
+      <div id="lesson-dyk-list" class="dyk-list"></div>
     </div>
 
     <div id="lesson-exercise-view" hidden>
