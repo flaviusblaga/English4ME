@@ -72,7 +72,6 @@ import {
 } from "./grammar-client.js";
 import {
   DOMAINS as DYK_DOMAINS,
-  getFactsByDomain,
   randomFact,
 } from "./didyouknow.data.js";
 
@@ -1012,12 +1011,11 @@ function showDidYouKnow() {
   dykFeaturedId = null;
   pickFeaturedFact();
   renderDykChips();
-  renderDykList();
   el("lesson-didyouknow-view").scrollTop = 0;
 }
 
-// One fact card's markup — English on top, Romanian revealed by a toggle. Used
-// for both the featured card and the list rows; `featured` enlarges the former.
+// The featured fact card's markup — English on top, Romanian revealed by a
+// toggle. `featured` enlarges and tints it (kept as a flag for flexibility).
 function dykFactCardHtml(fact, featured) {
   return (
     `<div class="dyk-card${featured ? " dyk-card--featured" : ""}">` +
@@ -1060,7 +1058,9 @@ function pickFeaturedFact() {
 }
 
 // Domain filter chips ("All" + one per domain). The active chip is highlighted;
-// tapping one re-filters both the featured card and the list.
+// tapping one picks a fresh featured fact from that domain, so "Another fact"
+// then keeps drawing from the chosen domain. There is no browsable list — the
+// child discovers facts one at a time via the shuffle button.
 function renderDykChips() {
   const wrap = el("lesson-dyk-chips");
   wrap.innerHTML = "";
@@ -1075,18 +1075,9 @@ function renderDykChips() {
       dykFeaturedId = null;
       pickFeaturedFact();
       renderDykChips();
-      renderDykList();
     };
     wrap.appendChild(btn);
   }
-}
-
-// The browsable list of facts for the active domain.
-function renderDykList() {
-  const list = el("lesson-dyk-list");
-  const facts = getFactsByDomain(dykDomain);
-  list.innerHTML = facts.map((f) => dykFactCardHtml(f, false)).join("");
-  wireDykRoToggles(list);
 }
 
 function renderWordsCard() {
