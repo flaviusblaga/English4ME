@@ -5,6 +5,22 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>English4ME — Invata engleza cu Bobo, Fizz si Sushi</title>
 
+  <!-- Set the theme before the stylesheet paints, so there is no flash: use the
+       saved choice if any, otherwise follow the system (prefers-color-scheme). -->
+  <script>
+    (function () {
+      try {
+        var saved = localStorage.getItem("e4me-theme");
+        var theme = (saved === "light" || saved === "dark")
+          ? saved
+          : (window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+        document.documentElement.setAttribute("data-theme", theme);
+      } catch (e) {
+        document.documentElement.setAttribute("data-theme", "light");
+      }
+    })();
+  </script>
+
   <!-- Installable-app (PWA) wiring -->
   <link rel="manifest" href="manifest.webmanifest" />
   <meta name="theme-color" content="#0D9488" />
@@ -163,6 +179,7 @@
       </select>
       <button id="tts-mute-btn" class="btn btn-small" aria-pressed="false"><span class="icon-slot" data-icon="volume-2"></span> <span data-i18n="settings.voiceOn">Voice on</span></button>
       <button id="debug-data-btn" class="btn btn-small" data-i18n="settings.showData">Show saved data</button>
+      <button class="btn btn-small theme-toggle" type="button" aria-pressed="false"></button>
       <button id="logout-btn" class="btn btn-small" data-i18n="settings.signOut">Sign out</button>
     </div>
 
@@ -246,6 +263,7 @@
     </header>
 
     <div id="lesson-settings-panel" class="settings-panel" hidden>
+      <button class="btn btn-small theme-toggle" type="button" aria-pressed="false"></button>
       <button id="lesson-logout-btn" class="btn btn-small">Sign out</button>
     </div>
 

@@ -90,51 +90,53 @@
 :root {
   --primary-text: var(--primary); /* light mode: accent text = the teal itself */
 }
-@media (prefers-color-scheme: dark) {
-  :root {
-    --backdrop: #060a12;         /* behind the phone column */
-    --surface: #0f172a;          /* screen canvas (slate-900) */
-    --surface-raised: #1b2536;   /* cards (slate-800-ish) */
-    --surface-tint: #1b2536;     /* panels */
-    --line: #2c3a4f;
-    --line-strong: #3d4d63;
-    --text: #f1f5f9;             /* slate-100 */
-    --text-muted: #a3b2c7;       /* brighter than light's muted, for dark bg */
-    --text-faint: #7183a0;       /* inactive nav / chevrons */
+/* Dark palette. Keyed off <html data-theme="dark">, which an inline <head>
+   script sets before first paint from the saved preference or, when there is
+   none, the system setting (prefers-color-scheme) — so the app follows the
+   phone by default but a manual toggle can override it. */
+:root[data-theme="dark"] {
+  --backdrop: #060a12;         /* behind the phone column */
+  --surface: #0f172a;          /* screen canvas (slate-900) */
+  --surface-raised: #1b2536;   /* cards (slate-800-ish) */
+  --surface-tint: #1b2536;     /* panels */
+  --line: #2c3a4f;
+  --line-strong: #3d4d63;
+  --text: #f1f5f9;             /* slate-100 */
+  --text-muted: #a3b2c7;       /* brighter than light's muted, for dark bg */
+  --text-faint: #7183a0;       /* inactive nav / chevrons */
 
-    /* Teal accents: buttons keep teal-600 (white text stays legible on them),
-       but teal TEXT on a dark surface needs to be brighter → --primary-text. */
-    --primary-text: #5eead4;     /* teal-300, for accent text on dark */
-    --primary-soft: #0f3d39;     /* dark teal chip bg */
-    --primary-tint: #12312e;     /* subtler dark teal panel */
+  /* Teal accents: buttons keep teal-600 (white text stays legible on them),
+     but teal TEXT on a dark surface needs to be brighter → --primary-text. */
+  --primary-text: #5eead4;     /* teal-300, for accent text on dark */
+  --primary-soft: #0f3d39;     /* dark teal chip bg */
+  --primary-tint: #12312e;     /* subtler dark teal panel */
 
-    --success-soft: #0b3b30;
-    --success-text: #6ee7b7;     /* green-300 */
-    --danger-soft: #45211f;
-    --danger-text: #fca5a5;      /* red-300 */
+  --success-soft: #0b3b30;
+  --success-text: #6ee7b7;     /* green-300 */
+  --danger-soft: #45211f;
+  --danger-text: #fca5a5;      /* red-300 */
 
-    /* warm status chips → dark bg + light text */
-    --chip-warm-bg: #3a2a0a;  --chip-warm-text: #fcd34d;   /* points  */
-    --chip-hot-bg: #3a1f0e;   --chip-hot-text: #fdba74;    /* streak  */
+  /* warm status chips → dark bg + light text */
+  --chip-warm-bg: #3a2a0a;  --chip-warm-text: #fcd34d;   /* points  */
+  --chip-hot-bg: #3a1f0e;   --chip-hot-text: #fdba74;    /* streak  */
 
-    /* round icon-tile tints, darkened */
-    --tile-coral: #3a2415; --tile-blue: #14304a; --tile-green: #0e3b2e; --tile-yellow: #3a2f10;
+  /* round icon-tile tints, darkened */
+  --tile-coral: #3a2415; --tile-blue: #14304a; --tile-green: #0e3b2e; --tile-yellow: #3a2f10;
 
-    /* shadows: slate-tinted ones vanish on dark — use deeper black */
-    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.45);
-    --shadow-md: 0 4px 14px rgba(0, 0, 0, 0.55);
-    --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.65);
-  }
-
-  /* A few cards use literal light gradients rather than tokens, so they need an
-     explicit dark counterpart to avoid staying bright. */
-  .streak-card {
-    background: linear-gradient(135deg, #33280f, #331f14);
-    border-color: #4a3a1a;
-  }
-  .streak-dot { background: #ffffff1f; border-color: #7a5a30; }
-  .dyk-card--featured { background: var(--surface-raised); }
+  /* shadows: slate-tinted ones vanish on dark — use deeper black */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.45);
+  --shadow-md: 0 4px 14px rgba(0, 0, 0, 0.55);
+  --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.65);
 }
+
+/* A few cards use literal light gradients rather than tokens, so they need an
+   explicit dark counterpart to avoid staying bright. */
+:root[data-theme="dark"] .streak-card {
+  background: linear-gradient(135deg, #33280f, #331f14);
+  border-color: #4a3a1a;
+}
+:root[data-theme="dark"] .streak-dot { background: #ffffff1f; border-color: #7a5a30; }
+:root[data-theme="dark"] .dyk-card--featured { background: var(--surface-raised); }
 
 /* Kept as a hook so JS that toggles body.mascot-theme still works; the visual
    system is now shared, so this only bumps the base type size for the little

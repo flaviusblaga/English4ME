@@ -941,9 +941,71 @@ function restoreOrShowLogin() {
   return false;
 }
 
+// ---------- Theme (light / dark) ----------
+// The inline <head> script has already set <html data-theme> for first paint
+// (from the saved choice, else the system setting). Here we keep it in sync,
+// label the toggle buttons, and follow the system live until the user picks.
+const THEME_KEY = "e4me-theme";
+
+function storedThemePref() {
+  try {
+    const v = localStorage.getItem(THEME_KEY);
+    return v === "light" || v === "dark" ? v : null;
+  } catch {
+    return null;
+  }
+}
+
+function systemPrefersDark() {
+  return !!(window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches);
+}
+
+function effectiveTheme() {
+  return document.documentElement.getAttribute("data-theme")
+    || storedThemePref()
+    || (systemPrefersDark() ? "dark" : "light");
+}
+
+// Each toggle button offers the OPPOSITE of the current theme (what a tap does).
+function updateThemeToggleLabels(theme) {
+  const dark = theme === "dark";
+  const label = dark
+    ? `${iconSvg("sun")} ${t("settings.themeLight")}`
+    : `${iconSvg("moon")} ${t("settings.themeDark")}`;
+  document.querySelectorAll(".theme-toggle").forEach((btn) => {
+    btn.innerHTML = label;
+    btn.setAttribute("aria-pressed", dark ? "true" : "false");
+  });
+}
+
+function applyTheme(theme) {
+  document.documentElement.setAttribute("data-theme", theme);
+  const meta = document.querySelector('meta[name="theme-color"]');
+  if (meta) meta.setAttribute("content", theme === "dark" ? "#0f172a" : "#0d9488");
+  updateThemeToggleLabels(theme);
+}
+
+function toggleTheme() {
+  const next = effectiveTheme() === "dark" ? "light" : "dark";
+  try { localStorage.setItem(THEME_KEY, next); } catch { /* private mode: session only */ }
+  applyTheme(next);
+}
+
+function initTheme() {
+  applyTheme(effectiveTheme());
+  document.querySelectorAll(".theme-toggle").forEach((btn) => btn.addEventListener("click", toggleTheme));
+  // Follow the system live, but only while the user hasn't made an explicit choice.
+  if (window.matchMedia) {
+    window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", (e) => {
+      if (!storedThemePref()) applyTheme(e.matches ? "dark" : "light");
+    });
+  }
+}
+
 window.addEventListener("DOMContentLoaded", async () => {
   hydrateIcons(); // swap every data-icon placeholder in the static markup for its SVG
   hydrateStrings(); // fill every data-i18n label in the static markup
+  initTheme(); // label + wire the light/dark toggle; theme itself is already set
   el("login-btn").addEventListener("click", handleLogin);
   el("logout-btn").addEventListener("click", handleLogout);
   el("avatar-picker-close").addEventListener("click", () => {
