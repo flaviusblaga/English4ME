@@ -81,6 +81,8 @@ const STRINGS = {
     voiceOff: "Sunet oprit",
     showData: "Arată datele salvate",
     signOut: "Deconectare",
+    themeLight: "Mod luminos",
+    themeDark: "Mod întunecat",
   },
 
   mascotSel: {
