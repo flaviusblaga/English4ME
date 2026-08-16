@@ -101,6 +101,15 @@ h1, h2, h3, h4 {
   font-weight: 700;
 }
 
+/* Keyboard focus: one clear, consistent ring for every interactive element.
+   Pointer users never see it (:focus-visible only matches keyboard/AT focus),
+   keyboard and switch-access users always do. Elements that set their own
+   focus style (e.g. #chat-input) override this via higher specificity. */
+:focus-visible {
+  outline: 3px solid var(--primary);
+  outline-offset: 2px;
+}
+
 /* Every screen is a centred phone-width column. On a wide screen it floats as
    a rounded "app" card on the purple backdrop; on a phone it fills the view. */
 .screen {
@@ -175,12 +184,12 @@ h1, h2, h3, h4 {
 .btn-primary {
   background: var(--primary);
   color: #fff;
-  box-shadow: 0 6px 16px rgba(18, 165, 212, 0.34);
+  box-shadow: 0 6px 16px rgba(13, 148, 136, 0.34);
 }
 
 .btn-primary:not(:disabled):active {
   transform: translateY(1px) scale(0.98);
-  box-shadow: 0 3px 10px rgba(18, 165, 212, 0.30);
+  box-shadow: 0 3px 10px rgba(13, 148, 136, 0.30);
 }
 
 .btn-primary:disabled {
@@ -299,7 +308,9 @@ body.mascot-theme .btn-primary {
   gap: 2px;
   padding: 6px 4px;
   border-radius: var(--r-md);
-  color: var(--text-faint);
+  /* --text-muted (#64748b), not --text-faint (#94a3b8): the label is real text
+     and must clear WCAG AA (4.5:1) on white; faint only ~2.9:1. */
+  color: var(--text-muted);
   transition: color 120ms var(--ease-out), background 120ms var(--ease-out), transform 120ms var(--ease-out);
 }
 
@@ -718,13 +729,13 @@ body.mascot-theme .btn-primary {
   background: var(--primary);
   color: #fff;
   outline-color: var(--primary-soft);
-  box-shadow: 0 0 0 6px rgba(18, 165, 212, 0.18), var(--shadow-md);
+  box-shadow: 0 0 0 6px rgba(13, 148, 136, 0.18), var(--shadow-md);
   animation: node-pulse 1.8s var(--ease-out) infinite;
 }
 
 @keyframes node-pulse {
-  0%, 100% { box-shadow: 0 0 0 6px rgba(18, 165, 212, 0.18), var(--shadow-md); }
-  50%      { box-shadow: 0 0 0 13px rgba(18, 165, 212, 0.07), var(--shadow-md); }
+  0%, 100% { box-shadow: 0 0 0 6px rgba(13, 148, 136, 0.18), var(--shadow-md); }
+  50%      { box-shadow: 0 0 0 13px rgba(13, 148, 136, 0.07), var(--shadow-md); }
 }
 
 .lesson-node-label {
@@ -2865,7 +2876,7 @@ body.mascot-theme .chat-bubble--assistant {
   cursor: pointer;
   color: #fff;
   background: var(--primary);
-  box-shadow: 0 6px 16px rgba(18, 165, 212, 0.34);
+  box-shadow: 0 6px 16px rgba(13, 148, 136, 0.34);
   transition: transform 120ms var(--ease-out);
 }
 
