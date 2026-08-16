@@ -43,11 +43,12 @@
 
   --primary: #0d9488;         /* teal-600 */
   --primary-dark: #0b7c71;
+  --primary-bright: #22c3ad;  /* lighter teal — the far end of teal gradients */
   --primary-soft: #ccfbf1;
   --primary-tint: #f0fdfa;
-  --accent: #0d9488;          /* kept == primary (many rules use it as such) */
   --secondary: #f59e0b;       /* amber-500 */
   --highlight: #fbbf24;       /* amber-400 */
+  --star-gold: #f4b400;       /* filled reward stars */
 
   --success: #10b981;
   --success-soft: #d1fae5;
@@ -1046,7 +1047,7 @@ body[data-usertype="adult"] .budget-indicator { display: none; }
 .usage-card .usage-val b { font-family: var(--font-display); font-weight: 700; font-size: 1.5rem; color: var(--text); }
 .usage-card .usage-val small { color: var(--text-muted); font-weight: 500; font-size: 0.95rem; }
 .usage-card .usage-bar { height: 6px; background: var(--line); border-radius: 6px; overflow: hidden; }
-.usage-card .usage-bar > i { display: block; height: 100%; width: 0%; background: linear-gradient(90deg, var(--primary), #22c3ad); transition: width 400ms var(--ease-out); }
+.usage-card .usage-bar > i { display: block; height: 100%; width: 0%; background: linear-gradient(90deg, var(--primary), var(--primary-bright)); transition: width 400ms var(--ease-out); }
 /* the percent ring — conic fill driven by --pct set in JS */
 .usage-card .usage-ring {
   width: 66px; height: 66px; border-radius: 50%; flex-shrink: 0;
@@ -1509,7 +1510,7 @@ body[data-usertype="adult"] .budget-indicator { display: none; }
   width: 64px; height: 64px; border-radius: 18px; flex-shrink: 0;
   display: grid; place-items: center; color: #fff;
   font-family: var(--font-display); font-weight: 800; font-size: 1.6rem;
-  background: linear-gradient(135deg, var(--primary), #22c3ad);
+  background: linear-gradient(135deg, var(--primary), var(--primary-bright));
   box-shadow: 0 6px 16px rgba(13, 148, 136, 0.3);
   overflow: hidden;
 }
@@ -1537,10 +1538,10 @@ body[data-usertype="adult"] .budget-indicator { display: none; }
    colours, cards and illustrated backdrop are shared. */
 body[data-usertype="teen"] {
   --kid-purple: var(--primary);  /* the map's "current" accent → teal now */
-  --kid-teal: #22c3ad;
+  --kid-teal: var(--primary-bright);
 }
 body[data-usertype="teen"] .app-header { border-bottom: 3px solid var(--primary); }
-body[data-usertype="teen"] .identity-avatar { border-radius: 14px; background: linear-gradient(135deg, var(--primary), #22c3ad); }
+body[data-usertype="teen"] .identity-avatar { border-radius: 14px; background: linear-gradient(135deg, var(--primary), var(--primary-bright)); }
 
 /* ===================== Module cards (level picker) ===================== */
 .module-list { display: flex; flex-direction: column; gap: 14px; }
@@ -2187,7 +2188,7 @@ body.mascot-theme .chat-bubble--assistant {
 }
 
 .lesson-card:hover {
-  border-color: var(--kid-blue, var(--accent));
+  border-color: var(--kid-blue, var(--primary));
 }
 
 .lesson-card:active {
@@ -2240,7 +2241,7 @@ body.mascot-theme .chat-bubble--assistant {
   height: 100%;
   width: 0;
   border-radius: var(--r-pill);
-  background: linear-gradient(90deg, var(--primary), #22c3ad);
+  background: linear-gradient(90deg, var(--primary), var(--primary-bright));
   transition: width 240ms var(--ease-out);
 }
 
@@ -2462,7 +2463,7 @@ body.mascot-theme .chat-bubble--assistant {
 /* Empty vs earned: the Lucide star is an outline, so "earned" fills it gold
    (both fill and stroke) while the base stays a faint outline. */
 .star .icon { color: var(--text-faint); }
-.star--filled .icon { color: #f4b400; fill: #f4b400; }
+.star--filled .icon { color: var(--star-gold); fill: var(--star-gold); }
 
 .star--filled {
   filter: none;
@@ -3176,7 +3177,7 @@ body.mascot-theme .chat-bubble--assistant {
   display: block;
   height: 100%;
   border-radius: var(--r-pill);
-  background: linear-gradient(90deg, var(--primary), #22c3ad);
+  background: linear-gradient(90deg, var(--primary), var(--primary-bright));
 }
 .continue-foot {
   display: flex;
@@ -3302,7 +3303,7 @@ body.mascot-theme .chat-bubble--assistant {
   display: block;
   height: 100%;
   border-radius: var(--r-pill);
-  background: linear-gradient(90deg, var(--primary), #22c3ad);
+  background: linear-gradient(90deg, var(--primary), var(--primary-bright));
 }
 .lesson-cat--done .lesson-cat-bar > i { background: var(--primary); }
 .lesson-cat-chevron {
@@ -3362,8 +3363,8 @@ body.mascot-theme .chat-bubble--assistant {
   color: #fff;
 }
 .lesson-row-play .icon { width: 0.95em; height: 0.95em; fill: currentColor; stroke: currentColor; }
-.lesson-row-stars { gap: 1px; color: #f4b400; }
-.lesson-row-stars .icon { width: 1em; height: 1em; fill: #f4b400; color: #f4b400; }
+.lesson-row-stars { gap: 1px; color: var(--star-gold); }
+.lesson-row-stars .icon { width: 1em; height: 1em; fill: var(--star-gold); color: var(--star-gold); }
 .lesson-row--current { border-color: var(--primary-text); box-shadow: 0 0 0 2px rgba(13, 148, 136, 0.15); }
 .lesson-row--current .lesson-row-icon { border-color: var(--primary-text); }
 .lesson-row--done .lesson-row-label { color: var(--text-muted); }
@@ -3497,7 +3498,7 @@ body[data-usertype="teen"] #screen-reading {
   display: block;
   height: 100%;
   border-radius: var(--r-pill);
-  background: linear-gradient(90deg, var(--primary), #22c3ad);
+  background: linear-gradient(90deg, var(--primary), var(--primary-bright));
 }
 .stats-mod-card--done .stats-mod-bar > i { background: var(--primary); }
 
@@ -3616,7 +3617,7 @@ body[data-usertype="teen"] #screen-reading {
   display: block;
   height: 100%;
   border-radius: var(--r-pill);
-  background: linear-gradient(90deg, var(--primary), #22c3ad);
+  background: linear-gradient(90deg, var(--primary), var(--primary-bright));
 }
 .rewards-items { display: flex; flex-direction: column; gap: var(--sp-2); }
 .rewards-item {
