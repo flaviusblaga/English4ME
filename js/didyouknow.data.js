@@ -20,18 +20,12 @@
 //   getDomain          — a domain's metadata by id
 
 export const DOMAINS = [
-  { id: "history",    emoji: "🏛️", label: "Istorie & monumente",
-    emojis: ["🏛️", "🏰", "🗿", "⚔️", "👑", "📜", "🕍", "🏺", "🛡️", "🏟️"] },
-  { id: "science",    emoji: "🔬", label: "Știință & invenții",
-    emojis: ["🔬", "✈️", "🚀", "💡", "⚗️", "🧬", "🧮", "🖊️", "⚙️", "🔭"] },
-  { id: "nature",     emoji: "🌍", label: "Natură & geografie",
-    emojis: ["🌍", "🐻", "🌲", "🏔️", "🌊", "🦅", "🕳️", "🦌", "🌿", "🐟"] },
-  { id: "sport",      emoji: "⚽", label: "Sport",
-    emojis: ["⚽", "🤸", "🎾", "🥇", "🛶", "🏆", "🤾", "♟️", "🏊", "🏃"] },
-  { id: "culture",    emoji: "🎨", label: "Cultură & artă",
-    emojis: ["🎨", "🎻", "🗿", "📚", "🎬", "🖼️", "🎭", "🎶", "✍️", "🏛️"] },
-  { id: "traditions", emoji: "🍲", label: "Tradiții & mâncare",
-    emojis: ["🍲", "🥬", "🌷", "🥚", "👚", "🌽", "🎄", "🐑", "🎻", "🕯️"] },
+  { id: "history",    emoji: "🏛️", label: "Istorie & monumente" },
+  { id: "science",    emoji: "🔬", label: "Știință & invenții" },
+  { id: "nature",     emoji: "🌍", label: "Natură & geografie" },
+  { id: "sport",      emoji: "⚽", label: "Sport" },
+  { id: "culture",    emoji: "🎨", label: "Cultură & artă" },
+  { id: "traditions", emoji: "🍲", label: "Tradiții & mâncare" },
 ];
 
 // Each entry: ["English fact", "Fapt în română"].
@@ -667,6 +661,150 @@ const RAW = {
   traditions: TRADITIONS,
 };
 
+// Emoji is chosen by matching keywords in the English fact (first rule wins),
+// so the little icon actually relates to what the fact is about. When nothing
+// matches, it falls back to the domain's own emoji — a neutral marker that is
+// never *wrong*. Order matters: more specific / higher-priority rules first
+// (e.g. a gymnastics fact should get 🤸 before the generic 🥇). Short or
+// ambiguous words use \b boundaries to avoid false hits (e.g. "row" vs "brown").
+const EMOJI_RULES = [
+  // — food & drink (traditions) —
+  [/garlic/i, "🧄"],
+  [/sarmale|cabbage/i, "🥬"],
+  [/mămăligă|cornmeal|polenta/i, "🌽"],
+  [/cozonac|\bbread\b|\bloaf\b|pască/i, "🍞"],
+  [/papanași|doughnut|gogoși/i, "🍩"],
+  [/covrigi|pretzel/i, "🥨"],
+  [/\bmici\b|mititei|grill|barbecue/i, "🍢"],
+  [/cheese|brânză|telemea|cașcaval/i, "🧀"],
+  [/\bpie\b|plăcintă|poale-n brâu/i, "🥧"],
+  [/tochitură|\bstew\b|ciorbă|\bsoup\b/i, "🍲"],
+  [/honey/i, "🍯"],
+  [/\bjam\b|dulceață|magiun/i, "🍓"],
+  [/\bwine\b|grape|vineyard/i, "🍇"],
+  [/\begg\b|\beggs\b/i, "🥚"],
+  [/mărțișor/i, "🌷"],
+  [/sânziene|wreath/i, "🌼"],
+  [/colinde|\bcarol|christmas|crăciun/i, "🎄"],
+  [/easter|paște/i, "🐣"],
+  [/st\.? nicholas|nicholas|gift/i, "🎁"],
+  [/wedding|bride/i, "💒"],
+  [/godparent|\bnași\b/i, "👼"],
+  [/name day|onomastic|birthday/i, "🎂"],
+  [/\bsalt\b/i, "🧂"],
+  [/wool|weav|carpet|\brug\b|spinning|thread|embroider/i, "🧶"],
+  [/wooden spoon|wood carv|carved|wooden gate/i, "🪵"],
+  [/\bhat\b|căciulă/i, "🎩"],
+  [/blouse|folk costume|folk dress/i, "👚"],
+  [/mask/i, "🎭"],
+  [/sneez/i, "🤧"],
+  [/harvest|wheat|\bfield/i, "🌾"],
+  [/sunflower/i, "🌻"],
+
+  // — culture & art —
+  [/brâncuși|sculpt|endless column|statue/i, "🗿"],
+  [/enescu|composer|symphony|orchestra|lipatti|celibidache|porumbescu|violin/i, "🎻"],
+  [/pan flute|\bnai\b|doina|ballad|miorița|\bsong\b|carol/i, "🎶"],
+  [/paint|grigorescu|tonitza|luchian|\baman\b|brauner|andreescu|corneliu baba/i, "🎨"],
+  [/\bpoet|eminescu|\bpoem|luceafărul|bacovia|arghezi|blaga|stănescu|alecsandri/i, "✍️"],
+  [/fairy tale|legend|făt-frumos|zmeu|dragon|ileana|ispirescu|harap/i, "🐉"],
+  [/writer|novel|rebreanu|sadoveanu|eliade|cioran|ionesco|müller|istrati|caragiale|creangă|\bstory|\btale/i, "📖"],
+  [/\bfilm\b|movie|cinema|director|mungiu|puiu|gopo|nicolaescu|cannes/i, "🎬"],
+  [/opera|gheorghiu|\bsing/i, "🎤"],
+  [/theatre|theater|\bactor|beligan|caramitru|pellea/i, "🎭"],
+  [/pottery|ceramic|horezu|marginea/i, "🏺"],
+  [/museum/i, "🏛️"],
+  [/nobel/i, "🏅"],
+  [/language|alphabet|\bword\b/i, "🔤"],
+
+  // — sport (specific before generic medal) —
+  [/gymnast|comăneci|\bnadia\b|perfect 10|vault|balance beam|drăgulescu|ponor|izbașa|miloșovici|răducan|szabó/i, "🤸"],
+  [/football|footballer|hagi|steaua|dinamo|\brapid\b|world cup|duckadam|chivu|goal\b/i, "⚽"],
+  [/tennis|halep|năstase|ruzici|davis cup|țiriac|wimbledon|grand slam|roland|french open/i, "🎾"],
+  [/swim|popovici|freestyle|mocanu|potec/i, "🏊"],
+  [/canoe|kayak|patzaichin/i, "🛶"],
+  [/\brow(ing|ed|s)?\b|lipă|damian/i, "🚣"],
+  [/handball|neagu|gruia/i, "🤾"],
+  [/fenc|épée|scrim/i, "🤺"],
+  [/weightlift|\bhalter/i, "🏋️"],
+  [/\bchess\b/i, "♟️"],
+  [/\bski\b|\bsled\b|snowboard|poiana braşov|ski resort/i, "⛷️"],
+  [/rugby|\boaks\b/i, "🏉"],
+  [/cycling|\bbike\b/i, "🚴"],
+  [/marathon|\brun\b|\bran\b|runner|athlet|discus|high jump|balaș|manoliu|diță|puică|paula ivan|melinte|1500|3000|5000/i, "🏃"],
+  [/medal|olympic|champion|world record|trophy/i, "🥇"],
+
+  // — science & inventions —
+  [/airplane|aircraft|\bplane\b|\bflew\b|\bfly\b|flight|aviation|pilot|\bjet\b|coandă|vlaicu|\bvuia\b|carafoli/i, "✈️"],
+  [/rocket|\bspace\b|satellite|orbit|oberth|prunariu|goliat/i, "🚀"],
+  [/insulin|diabetes|medicine|vaccine|paulescu|aslan|cantacuzino|marinescu/i, "💉"],
+  [/bacteria|microbe|microbio|babeș|disease|virus/i, "🦠"],
+  [/fountain pen|\bpen\b|poenaru/i, "🖊️"],
+  [/\boil\b|refine|petroleum|kerosene|ploiești/i, "🛢️"],
+  [/computer|cybernetic|odobleja|moisil|toma/i, "💻"],
+  [/math|geometry|equation|olympiad|țițeica|mihăilescu|lalescu|onicescu|stoilow|foias|barbu/i, "🧮"],
+  [/laser|eli-np/i, "🔦"],
+  [/battery|karpen/i, "🔋"],
+  [/dacia cars?|automobile/i, "🚗"],
+  [/burner|chemical|chemist|reaction|nenițescu|teclu|edeleanu/i, "⚗️"],
+  [/telescope|astronom|observatory/i, "🔭"],
+  [/parachute|brăescu/i, "🪂"],
+  [/palade|\bcell|nobel/i, "🧬"],
+  [/university|academy/i, "🎓"],
+  [/\bdam\b|canal|\broad\b|engineer|railway|concrete|transfăgărășan|saligny/i, "🛣️"],
+  [/electric|\blamp|\blight/i, "💡"],
+
+  // — nature & geography —
+  [/glacier|\bice\b/i, "🧊"],
+  [/\bcave\b|underground|movile|scărișoara|speleo/i, "🕳️"],
+  [/\bbear|urs/i, "🐻"],
+  [/wolf|wolves/i, "🐺"],
+  [/lynx|wildcat/i, "🐆"],
+  [/bison|zimbru/i, "🦬"],
+  [/chamois|\bdeer\b|roe deer/i, "🦌"],
+  [/\bboar\b/i, "🐗"],
+  [/\bfox\b|badger/i, "🦊"],
+  [/dolphin/i, "🐬"],
+  [/eagle/i, "🦅"],
+  [/stork|pelican|\bbird|owl|hawk|falcon/i, "🐦"],
+  [/salmon|sturgeon|trout|\bfish\b|lostriț/i, "🐟"],
+  [/horse/i, "🐴"],
+  [/butterfly/i, "🦋"],
+  [/salamander|lizard/i, "🦎"],
+  [/edelweiss|peony|snowdrop|daffodil|\bbloom|\bflower/i, "🌸"],
+  [/danube|delta|\briver\b|black sea|\bsea\b/i, "🌊"],
+  [/\blake\b|razim|bâlea|red lake/i, "🏞️"],
+  [/mud volcano|volcan/i, "🌋"],
+  [/living fire|flame/i, "🔥"],
+  [/mountain|\bpeak\b|carpath|făgăraș|retezat|bucegi|apuseni|ridge|\balps\b|\bcliff/i, "⛰️"],
+  [/forest|\btree|beech|\boak\b|\bwoods?\b|woodland/i, "🌲"],
+  [/\bsnow\b|winter/i, "❄️"],
+
+  // — history & monuments —
+  [/dracula|vlad|impaler/i, "🧛"],
+  [/castle|fortress|citadel|peleș|bran\b|corvin|râșnov|poenari|deva|fagaraș|alba carolina/i, "🏰"],
+  [/monaster|\bchurch|cathedral|voroneț|putna|horezu|biertan|painted monasteries|icon/i, "⛪"],
+  [/dacian|decebalus|sarmizegetusa|zalmoxis|zamolxis/i, "🗿"],
+  [/\bking\b|queen|crown|reign|\bprince|\bruler|royal|ferdinand|carol i|michael i|marie/i, "👑"],
+  [/revolution|uprising|1989|1848|1821/i, "✊"],
+  [/treasure|golden|gold bracelet/i, "💰"],
+  [/bridge/i, "🌉"],
+  [/salt mine|salt has been/i, "🧂"],
+  [/clock tower/i, "🕰️"],
+  [/\btower\b/i, "🗼"],
+  [/letter|document|printed|\btext\b|manuscript/i, "📜"],
+  [/\bflag\b|tricolor/i, "🇷🇴"],
+  [/\bromans?\b|trajan|ovid|\btomis\b|ulpia/i, "🏛️"],
+  [/battle|\bwar\b|soldier|army|hunyadi|iancu|vladimirescu|mircea|ștefan|stephen the great/i, "⚔️"],
+];
+
+function pickEmoji(text, fallback) {
+  for (const [re, emoji] of EMOJI_RULES) {
+    if (re.test(text)) return emoji;
+  }
+  return fallback;
+}
+
 // Flatten the per-domain pairs into the public FACTS array.
 export const FACTS = [];
 for (const d of DOMAINS) {
@@ -675,7 +813,7 @@ for (const d of DOMAINS) {
     FACTS.push({
       id: `${d.id}-${i + 1}`,
       domain: d.id,
-      emoji: d.emojis[i % d.emojis.length],
+      emoji: pickEmoji(row[0], d.emoji),
       en: row[0],
       ro: row[1],
     });
