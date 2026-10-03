@@ -162,7 +162,7 @@ export function initChat({ accessToken, userEmail, displayName, fileId, state, p
     });
     // "My documents" header button — opens the (already-visible) documents
     // manager's upload panel, reusing its existing toggle.
-    el("documents-btn").addEventListener("click", () => {
+    const openDocuments = () => {
       const docPanel = el("scenario-documents-panel");
       if (docPanel.hidden) {
         el("scenario-documents-manage-btn").click();
@@ -170,6 +170,39 @@ export function initChat({ accessToken, userEmail, displayName, fileId, state, p
       } else {
         el("scenario-documents-cancel-btn").click();
       }
+    };
+    el("documents-btn").addEventListener("click", openDocuments);
+
+    // Mobile "Tools" drop-down: the same four actions as the header buttons,
+    // collapsed behind one button so the phone header stays minimal. Each item
+    // runs the action and closes the menu.
+    const closeTools = () => {
+      el("tools-menu").hidden = true;
+      el("tools-btn").setAttribute("aria-expanded", "false");
+    };
+    el("tools-btn").addEventListener("click", () => {
+      const m = el("tools-menu");
+      m.hidden = !m.hidden;
+      el("tools-btn").setAttribute("aria-expanded", String(!m.hidden));
+    });
+    el("tools-phrases").addEventListener("click", () => {
+      closeTools();
+      const p = el("phrasebank-panel");
+      p.hidden = !p.hidden;
+    });
+    el("tools-progress").addEventListener("click", () => {
+      closeTools();
+      const p = el("progress-pro-panel");
+      if (p.hidden) renderProgressPro();
+      p.hidden = !p.hidden;
+    });
+    el("tools-documents").addEventListener("click", () => {
+      closeTools();
+      openDocuments();
+    });
+    el("tools-debrief").addEventListener("click", () => {
+      closeTools();
+      handleDebrief();
     });
     el("debug-data-btn").addEventListener("click", () => {
       const output = el("debug-data-output");
@@ -219,6 +252,7 @@ export function initChat({ accessToken, userEmail, displayName, fileId, state, p
     el("chat-mode-toggle").hidden = false;
     el("phrasebank-btn").hidden = false; // useful in both role-play and writing
     el("progress-pro-btn").hidden = false;
+    el("tools-btn").hidden = false; // mobile: collapses the tool buttons
     el("scenario-select-wrap").hidden = false;
     initScenarioSelect();
     // Always start a (re)entered chat in role-play mode, never stuck in a
@@ -236,6 +270,8 @@ export function initChat({ accessToken, userEmail, displayName, fileId, state, p
     el("phrasebank-panel").hidden = true;
     el("progress-pro-btn").hidden = true;
     el("progress-pro-panel").hidden = true;
+    el("tools-btn").hidden = true;
+    el("tools-menu").hidden = true;
     currentScenarioId = null;
     writingMode = false;
   }
@@ -720,6 +756,7 @@ function setWritingMode(on) {
   const scenarioCapable = !!(session && session.profile.features.scenarios);
   el("scenario-select-wrap").hidden = on || !scenarioCapable;
   el("debrief-btn").hidden = on || !scenarioCapable;
+  el("tools-debrief").hidden = on; // Debrief reviews a role-play, not writing
   if (session && session.profile.features.documents) {
     el("scenario-documents").hidden = on;
   }

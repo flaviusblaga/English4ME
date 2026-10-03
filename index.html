@@ -170,6 +170,7 @@
             <option value="">Free conversation</option>
           </select>
         </div>
+        <button id="tools-btn" class="btn btn-small" hidden aria-haspopup="true" aria-expanded="false">Tools <span class="icon-slot" data-icon="chevron-down"></span></button>
         <button id="documents-btn" class="btn btn-small" hidden><span class="icon-slot" data-icon="folder"></span> Documents</button>
         <button id="progress-pro-btn" class="btn btn-small" hidden><span class="icon-slot" data-icon="chart-column"></span> Progress</button>
         <button id="phrasebank-btn" class="btn btn-small" hidden><span class="icon-slot" data-icon="message-circle"></span> Phrases</button>
@@ -191,6 +192,17 @@
       <button id="debug-data-btn" class="btn btn-small" data-i18n="settings.showData">Show saved data</button>
       <button class="btn btn-small theme-toggle" type="button" aria-pressed="false"></button>
       <button id="logout-btn" class="btn btn-small" data-i18n="settings.signOut">Sign out</button>
+    </div>
+
+    <!-- Mobile "Tools" menu (adult only): on phones the Phrases / Progress /
+         Documents / Debrief controls collapse behind the header "Tools" button
+         into this drop-down, so the header stays minimal. On desktop the Tools
+         button and this menu are hidden — those live in the always-open rail. -->
+    <div id="tools-menu" class="tools-menu" hidden>
+      <button id="tools-phrases" class="btn btn-small"><span class="icon-slot" data-icon="message-circle"></span> Phrases</button>
+      <button id="tools-progress" class="btn btn-small"><span class="icon-slot" data-icon="chart-column"></span> Progress</button>
+      <button id="tools-documents" class="btn btn-small"><span class="icon-slot" data-icon="folder"></span> Documents</button>
+      <button id="tools-debrief" class="btn btn-small"><span class="icon-slot" data-icon="clipboard-list"></span> Debrief</button>
     </div>
 
     <div id="gamification-badges-panel" class="gamification-badges-panel" hidden></div>
