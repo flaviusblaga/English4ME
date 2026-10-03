@@ -157,7 +157,9 @@
 //      with a ✕ close. Fixes overlapping/stuck panels. Scenario <select> wired
 //      once (no stacked handlers). All adult show/hide is null-safe (elHidden)
 //      so a stale cached HTML can no longer crash the app.
-const CACHE_VERSION = "socatei-v59";
+// v60: mobile adult tool panels open as a clean bottom-sheet overlay (dimmed
+//      backdrop + ✕) instead of an inline block that fought the chat for space.
+const CACHE_VERSION = "socatei-v60";
 
 // Critical, visible assets pre-cached on install (before `activate` deletes the
 // previous cache). Without this, a CACHE_VERSION bump left a window with no
