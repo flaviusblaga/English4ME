@@ -110,7 +110,24 @@
 // v48: adult chat gains a "Debrief" button — a stateless coaching review of the
 //      current role-play transcript (strengths / top fixes / try-next). Same
 //      no-Worker, nothing-persisted pattern as writing mode.
-const CACHE_VERSION = "socatei-v48";
+// v49: adult chat gains a "Phrases" button — a curated Business English
+//      phrasebank (collapsible groups, copy-to-clipboard). Static content in
+//      js/phrasebank.data.js; no Worker, no cost.
+// v50: adult chat gains a "Progress" panel — a professional progress view
+//      (practice turns, scenarios practised X/Y, days practised, month usage,
+//      scenario-coverage checklist). Real counters only; new progress fields
+//      scenariosPracticed/activeDays tracked per role-play turn. No Worker.
+// v51: desktop responsive pass for the adult Business surface — on wide screens
+//      #screen-chat becomes a two-column layout (chat + persistent toolkit rail
+//      with Phrasebank/Progress/Documents always open). Pure CSS + an aside
+//      wrapper that is display:contents on phones/tablets, so mobile and the
+//      kids/teen screens are unchanged.
+// v52: gentle daily-activity for kids/teen — the headline "streak" now shows
+//      cumulative days practised (totalActiveDays, never resets) instead of the
+//      breakable days-in-a-row count. No reminders, no streak loss. Week strip
+//      kept as a friendly "X of the last 7 days". Header flames, home tile,
+//      stats card, parent view and the progress export all reworded to match.
+const CACHE_VERSION = "socatei-v52";
 
 // Critical, visible assets pre-cached on install (before `activate` deletes the
 // previous cache). Without this, a CACHE_VERSION bump left a window with no

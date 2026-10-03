@@ -1265,6 +1265,219 @@ body[data-usertype="adult"] .budget-indicator { display: none; }
   border-bottom: none;
 }
 
+/* ===================== Phrasebank panel (adult) ===================== */
+.phrasebank-panel {
+  padding: var(--sp-2) var(--sp-4) var(--sp-3);
+  background: var(--surface);
+  border-bottom: 1px solid var(--line);
+  max-height: 55vh;
+  overflow-y: auto;
+}
+.phrasebank-group {
+  border-bottom: 1px solid var(--line);
+}
+.phrasebank-group:last-child {
+  border-bottom: none;
+}
+.phrasebank-group-head {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-2);
+  padding: 0.7rem 0.2rem;
+  border: none;
+  background: transparent;
+  color: var(--text);
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: var(--fs-sm);
+  cursor: pointer;
+  text-align: left;
+}
+.phrasebank-group-head svg {
+  width: 18px;
+  height: 18px;
+  color: var(--text-muted);
+  transition: transform 0.15s ease;
+  flex-shrink: 0;
+}
+.phrasebank-group--open .phrasebank-group-head svg {
+  transform: rotate(180deg);
+}
+.phrasebank-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 0 0 0.6rem;
+}
+.phrasebank-phrase {
+  text-align: left;
+  padding: 0.5rem 0.75rem;
+  border-radius: var(--r-sm);
+  border: 1px solid var(--line);
+  background: var(--surface-raised);
+  color: var(--text);
+  font: inherit;
+  font-size: var(--fs-sm);
+  cursor: pointer;
+  transition: background 0.12s ease, border-color 0.12s ease;
+}
+.phrasebank-phrase:hover {
+  border-color: var(--primary);
+  background: var(--primary-tint);
+}
+.phrasebank-phrase--copied {
+  border-color: var(--primary);
+  background: var(--primary);
+  color: #fff;
+  font-weight: 600;
+}
+body[data-usertype="adult"] .phrasebank-phrase--copied {
+  background: var(--primary-bright);
+  color: #04232a;
+}
+
+/* ===================== Progress panel (adult) ===================== */
+.progress-pro-panel {
+  padding: var(--sp-3) var(--sp-4);
+  background: var(--surface);
+  border-bottom: 1px solid var(--line);
+  max-height: 60vh;
+  overflow-y: auto;
+}
+.progress-pro-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--sp-2);
+}
+.progress-pro-tile {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 0.7rem 0.85rem;
+  border-radius: var(--r-md);
+  border: 1px solid var(--line);
+  background: var(--surface-raised);
+}
+.progress-pro-value {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: var(--fs-lg);
+  color: var(--primary-text, var(--primary-dark));
+}
+.progress-pro-label {
+  font-size: var(--fs-xs);
+  color: var(--text-muted);
+}
+.progress-pro-since {
+  margin: var(--sp-2) 0 0;
+  font-size: var(--fs-xs);
+  color: var(--text-faint);
+}
+.progress-pro-head {
+  margin: var(--sp-3) 0 var(--sp-2);
+  font-family: var(--font-display);
+  font-size: var(--fs-sm);
+  color: var(--text);
+}
+.progress-pro-coverage {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.progress-pro-cov {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0.4rem 0.2rem;
+  font-size: var(--fs-sm);
+  color: var(--text-muted);
+  border-bottom: 1px solid var(--line);
+}
+.progress-pro-cov:last-child { border-bottom: none; }
+.progress-pro-cov svg { width: 18px; height: 18px; color: var(--primary); flex-shrink: 0; }
+.progress-pro-cov--done { color: var(--text); font-weight: 600; }
+body[data-usertype="adult"] .progress-pro-cov--done svg { color: var(--primary-bright); }
+
+/* The adult toolkit wrapper is a layout no-op everywhere EXCEPT the desktop
+   adult layout below. display:contents means the <aside> box isn't rendered —
+   its children (the panels) lay out exactly as if it weren't there — so phones,
+   tablets and the kids/teen screens are completely unaffected. */
+.adult-rail { display: contents; }
+
+/* =============================================================
+   Desktop adult layout (Peers-style) — Business profile only, wide viewports.
+   #screen-chat becomes a two-column grid: a main chat column (header on top,
+   scrolling log, pinned input) and a persistent right-hand toolkit rail with
+   the Phrasebank / Progress / Documents panels always open. Scoped to
+   body[data-usertype="adult"] + min-width:900px, so kids/teen and all
+   phones/tablets keep the single-column shell untouched.
+   ============================================================= */
+@media (min-width: 900px) {
+  body[data-usertype="adult"] #screen-chat {
+    max-width: 1140px;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 344px;
+    grid-template-rows: auto auto auto 1fr auto;
+    grid-template-areas:
+      "header  header"
+      "settings rail"
+      "warn    rail"
+      "log     rail"
+      "input   rail";
+    column-gap: var(--sp-5, 24px);
+    padding-left: var(--sp-5, 24px);
+    padding-right: var(--sp-5, 24px);
+    padding-bottom: 0; /* no fixed bottom nav on desktop adult (hidden below) */
+  }
+  body[data-usertype="adult"] #screen-chat > .app-header { grid-area: header; }
+  body[data-usertype="adult"] #screen-chat > #settings-panel { grid-area: settings; }
+  body[data-usertype="adult"] #screen-chat > #budget-warning { grid-area: warn; }
+  body[data-usertype="adult"] #screen-chat > .chat-log { grid-area: log; min-height: 0; }
+  body[data-usertype="adult"] #screen-chat > .chat-input-row { grid-area: input; }
+
+  body[data-usertype="adult"] #adult-rail {
+    grid-area: rail;
+    display: flex;
+    flex-direction: column;
+    gap: var(--sp-3);
+    overflow-y: auto;
+    min-height: 0;
+    padding: var(--sp-3) 2px var(--sp-4);
+  }
+  /* Panels are always open in the rail — override their hidden attribute and
+     re-chrome them as standalone cards (not full-width inline drawers).
+     display:block !important is needed to beat the global `[hidden]{display:none
+     !important}` killer; this selector is far more specific, so it wins. */
+  body[data-usertype="adult"] #adult-rail > .phrasebank-panel,
+  body[data-usertype="adult"] #adult-rail > .progress-pro-panel,
+  body[data-usertype="adult"] #adult-rail > .scenario-documents {
+    display: block !important;
+    max-height: none;
+    border: 1px solid var(--line);
+    border-radius: var(--r-lg);
+    background: var(--surface-raised);
+    overflow: visible;
+  }
+  body[data-usertype="adult"] #adult-rail > .scenario-documents {
+    padding: var(--sp-3) var(--sp-4);
+  }
+  /* The header toggle buttons are redundant when the rail is always visible. */
+  body[data-usertype="adult"] #phrasebank-btn,
+  body[data-usertype="adult"] #progress-pro-btn { display: none; }
+
+  /* A centred 460px phone nav under a 1140px layout looks broken — drop the
+     bottom nav on the desktop adult surface. */
+  body[data-usertype="adult"] #screen-chat .app-nav { display: none; }
+
+  /* Give the conversation room to breathe on a wide column. */
+  body[data-usertype="adult"] #screen-chat .chat-bubble { max-width: 72%; }
+}
+
 .banner {
   margin: 0;
   padding: 0.6rem var(--sp-4);

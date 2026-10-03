@@ -78,9 +78,7 @@ export function buildReportHtml({ state, memberName, profileId }) {
 
   const rows = [
     ["Nivel", LEVEL_LABEL[profileId] || profileId || "—"],
-    ["Zile la rând", `${game.currentStreak || 0}`],
-    ["Cel mai lung șir", `${game.longestStreak || 0}`],
-    ["Zile active în total", `${game.totalActiveDays || 0}`],
+    ["Zile de practică", `${game.totalActiveDays || 0}`],
     ["Puncte", `${game.points || 0}`],
     ["Lecții terminate", `${progress.sessionsCompleted || 0}`],
     ["Cuvinte întâlnite", `${srs.seen}`],

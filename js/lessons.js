@@ -506,7 +506,8 @@ export function initLessons({ accessToken, userEmail, displayName, fileId, state
 function renderGamificationBar() {
   const g = session.state.gamification;
   el("lesson-gamification-points").innerHTML = `${iconSvg("star")} ${g.points}`;
-  el("lesson-gamification-streak").innerHTML = `${iconSvg("flame")} ${g.currentStreak}`;
+  // Cumulative days practised (never resets) — gentle, not a breakable streak.
+  el("lesson-gamification-streak").innerHTML = `${iconSvg("flame")} ${g.totalActiveDays || 0}`;
 }
 
 // The bottom tab bar shows on the adventure-path home, but hides during an
@@ -542,23 +543,29 @@ function renderStreakCard() {
   const initials = ["D", "L", "Ma", "Mi", "J", "V", "S"]; // getDay(): 0=Sun..6=Sat
   const today = new Date();
 
+  // Gentle daily-activity, NOT a Duolingo streak: the headline is the total
+  // number of days practised (cumulative, it never resets), and the 7-day strip
+  // simply shows which recent days were active. No "days in a row", no streak
+  // loss, no guilt — missing a day costs nothing.
   let strip = "";
+  let weekCount = 0;
   for (let i = 6; i >= 0; i--) {
     const d = new Date(today);
     d.setDate(today.getDate() - i);
     const done = practiced.has(localDateKey(d));
+    if (done) weekCount += 1;
     const cls = `streak-day${done ? " streak-day--done" : ""}${i === 0 ? " streak-day--today" : ""}`;
     strip += `<div class="${cls}"><span class="streak-dot"></span><span class="streak-day-label">${initials[d.getDay()]}</span></div>`;
   }
 
-  const streak = g.currentStreak || 0;
-  const countLine = streak === 1 ? t("stats.streakCountOne") : t("stats.streakCount", { n: streak });
+  const totalDays = g.totalActiveDays || 0;
+  const countLine = totalDays === 1 ? t("stats.streakCountOne") : t("stats.streakCount", { n: totalDays });
   card.innerHTML =
     `<div class="streak-head">` +
     `<span class="streak-flame">${iconSvg("flame")}</span>` +
     `<div class="streak-headtext">` +
     `<div class="streak-count">${countLine}</div>` +
-    `<div class="streak-sub">${iconSvg("calendar")} ${t("stats.streakSub", { d: g.totalActiveDays || 0, r: g.longestStreak || 0 })}</div>` +
+    `<div class="streak-sub">${iconSvg("calendar")} ${t("stats.streakSub", { w: weekCount })}</div>` +
     `</div></div>` +
     `<div class="streak-week">${strip}</div>`;
   card.hidden = false;
@@ -646,7 +653,7 @@ function renderHomeProgress() {
   const labels = tier.pool.map(tier.itemLabel);
   const s = srsStats(session.state, session.profile.contentTier, labels);
   const lessonsDone = bucket && bucket.completed ? Object.keys(bucket.completed).length : 0;
-  const streak = g.currentStreak || 0;
+  const activeDays = g.totalActiveDays || 0; // cumulative days practised, never resets
 
   const tile = (icon, num, label) =>
     `<div class="home-tile"><span class="home-tile-ico">${icon}</span>` +
@@ -657,7 +664,7 @@ function renderHomeProgress() {
     `<div class="home-progress-tiles">` +
     tile(iconSvg("book-open"), s.mastered, t("home.tileWords")) +
     tile(iconSvg("circle-check"), lessonsDone, t("home.tileLessons")) +
-    tile(iconSvg("flame"), streak, t("home.tileStreak")) +
+    tile(iconSvg("flame"), activeDays, t("home.tileStreak")) +
     `</div>`;
   cont.hidden = false;
 }

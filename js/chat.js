@@ -1,6 +1,7 @@
 import { sendChatMessage, syncProgress } from "./worker-client.js";
 import { saveState } from "./drive.js";
 import { SCENARIOS } from "./scenarios-client.js";
+import { PHRASEBANK } from "./phrasebank.data.js";
 import { initDocumentsUi, refreshDocumentsSummary } from "./documents-ui.js";
 import { BADGES, updateGamificationAfterTurn, badgeLabel } from "./gamification.js";
 import { gamificationWithRewards } from "./rewards.js";
@@ -148,6 +149,17 @@ export function initChat({ accessToken, userEmail, displayName, fileId, state, p
     el("chat-mode-roleplay").addEventListener("click", () => setWritingMode(false));
     el("chat-mode-writing").addEventListener("click", () => setWritingMode(true));
     el("debrief-btn").addEventListener("click", handleDebrief);
+    renderPhrasebank();
+    el("phrasebank-btn").addEventListener("click", () => {
+      const panel = el("phrasebank-panel");
+      panel.hidden = !panel.hidden;
+    });
+    el("progress-pro-btn").addEventListener("click", () => {
+      const panel = el("progress-pro-panel");
+      // Re-render on each open — the numbers change as the member practises.
+      if (panel.hidden) renderProgressPro();
+      panel.hidden = !panel.hidden;
+    });
     el("debug-data-btn").addEventListener("click", () => {
       const output = el("debug-data-output");
       if (!output.hidden) {
@@ -194,16 +206,25 @@ export function initChat({ accessToken, userEmail, displayName, fileId, state, p
 
   if (profile.features.scenarios) {
     el("chat-mode-toggle").hidden = false;
+    el("phrasebank-btn").hidden = false; // useful in both role-play and writing
+    el("progress-pro-btn").hidden = false;
     el("scenario-select-wrap").hidden = false;
     initScenarioSelect();
     // Always start a (re)entered chat in role-play mode, never stuck in a
     // leftover writing session from a previous visit. (setWritingMode also
     // sets the Debrief button's visibility.)
     setWritingMode(false);
+    // Populate the Progress panel up front — on desktop it's always visible in
+    // the toolkit rail, so it must not start empty.
+    renderProgressPro();
   } else {
     el("chat-mode-toggle").hidden = true;
     el("scenario-select-wrap").hidden = true;
     el("debrief-btn").hidden = true;
+    el("phrasebank-btn").hidden = true;
+    el("phrasebank-panel").hidden = true;
+    el("progress-pro-btn").hidden = true;
+    el("progress-pro-panel").hidden = true;
     currentScenarioId = null;
     writingMode = false;
   }
@@ -459,7 +480,8 @@ function renderBudgetIndicator() {
 function renderGamificationBar() {
   const g = session.state.gamification;
   el("gamification-points").innerHTML = `${iconSvg("star")} ${g.points}`;
-  el("gamification-streak").innerHTML = `${iconSvg("flame")} ${g.currentStreak}`;
+  // Cumulative days practised (never resets) — gentle, not a breakable streak.
+  el("gamification-streak").innerHTML = `${iconSvg("flame")} ${g.totalActiveDays || 0}`;
 }
 
 function renderBadgesPanel() {
@@ -472,6 +494,118 @@ function renderBadgesPanel() {
     chip.textContent = `${badge.emoji} ${badgeLabel(badge.id)}`;
     panel.appendChild(chip);
   }
+}
+
+// Phrasebank — static, curated Business English phrases grouped by situation.
+// Built once (content never changes at runtime); each group is a collapsible
+// header and each phrase a copy-to-clipboard row.
+function renderPhrasebank() {
+  const panel = el("phrasebank-panel");
+  panel.innerHTML = "";
+  for (const group of PHRASEBANK) {
+    const section = document.createElement("div");
+    section.className = "phrasebank-group";
+
+    const head = document.createElement("button");
+    head.type = "button";
+    head.className = "phrasebank-group-head";
+    head.innerHTML = `<span>${group.category}</span> ${iconSvg("chevron-down")}`;
+
+    const list = document.createElement("div");
+    list.className = "phrasebank-list";
+    list.hidden = true;
+
+    head.addEventListener("click", () => {
+      list.hidden = !list.hidden;
+      section.classList.toggle("phrasebank-group--open", !list.hidden);
+    });
+
+    for (const phrase of group.phrases) {
+      const row = document.createElement("button");
+      row.type = "button";
+      row.className = "phrasebank-phrase";
+      row.textContent = phrase;
+      row.addEventListener("click", () => copyPhrase(phrase, row));
+      list.appendChild(row);
+    }
+
+    section.appendChild(head);
+    section.appendChild(list);
+    panel.appendChild(section);
+  }
+}
+
+// "Progress" — a professional progress panel for the adult (Business) profile.
+// Every number here is a real counter the app actually records; nothing is
+// estimated or fabricated. No streak/minutes figures because the app doesn't
+// track session time — only distinct active days, which it does.
+function renderProgressPro() {
+  const panel = el("progress-pro-panel");
+  const p = session.state.progress || {};
+  const turns = p.totalTurns || 0;
+  const practiced = new Set(p.scenariosPracticed || []);
+  const scenariosTotal = SCENARIOS.length;
+  const days = (p.activeDays || []).length;
+  const snap = session.state.usageSnapshot || {};
+  const spent = snap.estimatedCostUsd || 0;
+  const budget = snap.budgetUsd || 10;
+  const since = session.state.createdAt
+    ? new Date(session.state.createdAt).toLocaleDateString(undefined, { month: "short", year: "numeric" })
+    : "—";
+
+  const tile = (value, label) =>
+    `<div class="progress-pro-tile"><span class="progress-pro-value">${value}</span><span class="progress-pro-label">${label}</span></div>`;
+
+  const coverage = SCENARIOS.map((s) => {
+    const done = practiced.has(s.id);
+    return `<li class="progress-pro-cov${done ? " progress-pro-cov--done" : ""}">${
+      done ? iconSvg("circle-check") : ""
+    }<span>${s.label}</span></li>`;
+  }).join("");
+
+  panel.innerHTML = `
+    <div class="progress-pro-grid">
+      ${tile(turns, "Practice turns")}
+      ${tile(`${practiced.size}/${scenariosTotal}`, "Scenarios practised")}
+      ${tile(days, days === 1 ? "Day practised" : "Days practised")}
+      ${tile(`$${spent.toFixed(2)}`, `used of $${budget.toFixed(0)} this month`)}
+    </div>
+    <p class="progress-pro-since">Practising since ${since}</p>
+    <h4 class="progress-pro-head">Scenario coverage</h4>
+    <ul class="progress-pro-coverage">${coverage}</ul>`;
+}
+
+function copyPhrase(text, rowEl) {
+  const flash = () => {
+    const prev = rowEl.textContent;
+    rowEl.classList.add("phrasebank-phrase--copied");
+    rowEl.textContent = "Copied ✓";
+    setTimeout(() => {
+      rowEl.textContent = prev;
+      rowEl.classList.remove("phrasebank-phrase--copied");
+    }, 900);
+  };
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text).then(flash).catch(() => fallbackCopy(text, flash));
+  } else {
+    fallbackCopy(text, flash);
+  }
+}
+
+// execCommand fallback for insecure contexts / older WebViews where the async
+// Clipboard API is unavailable or blocked.
+function fallbackCopy(text, onDone) {
+  try {
+    const ta = document.createElement("textarea");
+    ta.value = text;
+    ta.style.position = "fixed";
+    ta.style.opacity = "0";
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand("copy");
+    document.body.removeChild(ta);
+    onDone();
+  } catch { /* clipboard blocked; fail silently rather than disrupt the chat */ }
 }
 
 function showBanner(message) {
@@ -588,6 +722,22 @@ async function handleSend() {
       session.state.conversation.recentTurns.push(assistantTurn);
       recordTurnForParentSync(session.state, assistantTurn);
       session.state.progress.totalTurns += 1;
+
+      // Adult "Progress" metrics — real counters only (no fabricated numbers):
+      // which scenarios have actually been practiced, and which calendar days
+      // the member was active. Both tolerate older saved states without them.
+      if (session.profile.features.scenarios) {
+        const p = session.state.progress;
+        p.scenariosPracticed = p.scenariosPracticed || [];
+        if (currentScenarioId && !p.scenariosPracticed.includes(currentScenarioId)) {
+          p.scenariosPracticed.push(currentScenarioId);
+        }
+        p.activeDays = p.activeDays || [];
+        const today = todayLocalDateString();
+        if (!p.activeDays.includes(today)) p.activeDays.push(today);
+        // Keep the (always-visible on desktop) Progress panel in sync.
+        renderProgressPro();
+      }
 
       if (session.profile.features.gamification) {
         const newlyUnlocked = updateGamificationAfterTurn(session.state);
