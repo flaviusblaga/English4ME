@@ -107,7 +107,10 @@
 //      in the header) — a stateless Business English editor that polishes a
 //      pasted draft and returns notes, separate from role-play history. No
 //      Worker change. New chat.js handleWritingSend + index.html/CSS toggle.
-const CACHE_VERSION = "socatei-v47";
+// v48: adult chat gains a "Debrief" button — a stateless coaching review of the
+//      current role-play transcript (strengths / top fixes / try-next). Same
+//      no-Worker, nothing-persisted pattern as writing mode.
+const CACHE_VERSION = "socatei-v48";
 
 // Critical, visible assets pre-cached on install (before `activate` deletes the
 // previous cache). Without this, a CACHE_VERSION bump left a window with no

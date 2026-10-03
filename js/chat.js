@@ -112,6 +112,12 @@ let defaultChatPlaceholder = ""; // captured from the i18n'd input so toggling b
 const WRITING_EDITOR_PROMPT = (draft) =>
   `You are a professional Business English editor. Improve the text below for a work context: fix grammar and spelling, make the tone professional and natural, and keep it concise. Do not invent facts or add content the writer did not imply.\n\nReply in exactly this plain-text format, with no markdown symbols:\n\nPOLISHED VERSION\n<the improved text, ready to paste>\n\nNOTES\n- <one short note on a key change>\n- <another>\n- <another, only if useful>\n\nText to improve:\n"""\n${draft}\n"""`;
 
+// Debrief: a coaching review of the learner's English across a finished
+// role-play. Sent the same stateless way — the transcript is embedded in one
+// message; the Worker needs no awareness of the feature.
+const DEBRIEF_PROMPT = (transcript) =>
+  `You are a supportive Business English coach. Below is a transcript of a role-play practice conversation between the learner ("You") and a practice partner ("Partner"). Review ONLY the learner's English — the "You" lines — using the Partner lines just as context.\n\nReply in exactly this plain-text format, with no markdown symbols:\n\nSTRENGTHS\n- <one or two things the learner did well>\n\nTOP FIXES\n- <an awkward or incorrect phrase> -> <a better, natural version>\n- <another> (two to four total)\n\nTRY NEXT TIME\n- <one useful phrase or structure for this kind of conversation>\n\nKeep it concise and encouraging. Transcript:\n"""\n${transcript}\n"""`;
+
 function el(id) {
   return document.getElementById(id);
 }
@@ -141,6 +147,7 @@ export function initChat({ accessToken, userEmail, displayName, fileId, state, p
     });
     el("chat-mode-roleplay").addEventListener("click", () => setWritingMode(false));
     el("chat-mode-writing").addEventListener("click", () => setWritingMode(true));
+    el("debrief-btn").addEventListener("click", handleDebrief);
     el("debug-data-btn").addEventListener("click", () => {
       const output = el("debug-data-output");
       if (!output.hidden) {
@@ -190,11 +197,13 @@ export function initChat({ accessToken, userEmail, displayName, fileId, state, p
     el("scenario-select-wrap").hidden = false;
     initScenarioSelect();
     // Always start a (re)entered chat in role-play mode, never stuck in a
-    // leftover writing session from a previous visit.
+    // leftover writing session from a previous visit. (setWritingMode also
+    // sets the Debrief button's visibility.)
     setWritingMode(false);
   } else {
     el("chat-mode-toggle").hidden = true;
     el("scenario-select-wrap").hidden = true;
+    el("debrief-btn").hidden = true;
     currentScenarioId = null;
     writingMode = false;
   }
@@ -508,10 +517,11 @@ function setWritingMode(on) {
   el("chat-mode-roleplay").setAttribute("aria-pressed", String(!on));
   el("chat-mode-writing").setAttribute("aria-pressed", String(on));
 
-  // The scenario picker and its documents are role-play concepts — hide them
-  // in writing mode (and only ever show them for a scenario-capable profile).
+  // The scenario picker, its documents and Debrief are role-play concepts —
+  // hide them in writing mode (and only ever for a scenario-capable profile).
   const scenarioCapable = !!(session && session.profile.features.scenarios);
   el("scenario-select-wrap").hidden = on || !scenarioCapable;
+  el("debrief-btn").hidden = on || !scenarioCapable;
   if (session && session.profile.features.documents) {
     el("scenario-documents").hidden = on;
   }
@@ -660,23 +670,77 @@ async function handleWritingSend(draft) {
     }
 
     appendMessageToLog("assistant", result.reply, session.profile);
-
-    session.state.usageSnapshot = {
-      ...session.state.usageSnapshot,
-      monthKey: new Date().toISOString().slice(0, 7),
-      estimatedCostUsd: result.costUsd.monthToDateForUser,
-      lastSyncedAt: new Date().toISOString(),
-    };
-    renderBudgetIndicator();
-
-    if (result.budgetStatus === "warn") {
-      showBanner("Heads up — you're close to your $10 practice budget for this month.");
-    } else {
-      hideBanner();
-    }
+    applyUsageSnapshot(result);
   } catch (err) {
     showBanner(`Something went wrong: ${err.message}`);
   } finally {
+    el("chat-send").disabled = false;
+  }
+}
+
+// Shared usage/budget update for the stateless adult tools (writing, debrief):
+// roll the month-to-date cost from the Worker into the snapshot, refresh the
+// indicator, and surface the budget-warning banner.
+function applyUsageSnapshot(result) {
+  session.state.usageSnapshot = {
+    ...session.state.usageSnapshot,
+    monthKey: new Date().toISOString().slice(0, 7),
+    estimatedCostUsd: result.costUsd.monthToDateForUser,
+    lastSyncedAt: new Date().toISOString(),
+  };
+  renderBudgetIndicator();
+  if (result.budgetStatus === "warn") {
+    showBanner("Heads up — you're close to your $10 practice budget for this month.");
+  } else {
+    hideBanner();
+  }
+}
+
+// Debrief the current role-play: send the transcript to the coach in one
+// stateless request and show the review. Nothing is written to history.
+async function handleDebrief() {
+  const turns = (session.state.conversation.recentTurns || []).filter(
+    (turn) => turn.role === "user" || turn.role === "assistant"
+  );
+  const learnerTurns = turns.filter((turn) => turn.role === "user");
+  if (learnerTurns.length < 2) {
+    appendSystemNotice(
+      "Have a short conversation first — a few of your own messages — then tap Debrief and I'll review your English."
+    );
+    return;
+  }
+
+  const transcript = turns
+    .map((turn) => `${turn.role === "user" ? "You" : "Partner"}: ${turn.text}`)
+    .join("\n");
+
+  el("debrief-btn").disabled = true;
+  el("chat-send").disabled = true;
+  appendSystemNotice("Reviewing your conversation…");
+
+  try {
+    const result = await sendChatMessage({
+      userEmail: session.userEmail,
+      profileId: session.profile.id,
+      messages: [{ role: "user", content: DEBRIEF_PROMPT(transcript) }],
+      conversationSummary: null,
+      scenarioId: null,
+      documentContext: null,
+      lessonWordList: null,
+      mascotPreference: getMascotPreference(),
+    });
+
+    if (result.budgetStatus === "soft_block") {
+      showBanner(result.message);
+      return;
+    }
+
+    appendMessageToLog("assistant", result.reply, session.profile);
+    applyUsageSnapshot(result);
+  } catch (err) {
+    showBanner(`Something went wrong: ${err.message}`);
+  } finally {
+    el("debrief-btn").disabled = false;
     el("chat-send").disabled = false;
   }
 }
