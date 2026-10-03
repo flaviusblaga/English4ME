@@ -103,13 +103,50 @@
 // v39: stats "My rewards" card redesigned — a prominent progress bar with a
 //      percent, then the reward terms (screen-time per lesson + end-of-module
 //      bonus) as teal icon-tile rows; the earned bonus turns green.
-const CACHE_VERSION = "socatei-v42";
+const CACHE_VERSION = "socatei-v43";
+
+// Critical, visible assets pre-cached on install (before `activate` deletes the
+// previous cache). Without this, a CACHE_VERSION bump left a window with no
+// cached fallback: if a large image's network fetch hiccuped on the first
+// reload, its onerror permanently swapped it for an emoji. Pre-caching closes
+// that gap — the fetch handler's offline branch can serve these immediately.
+const PRECACHE = [
+  "./",
+  "index.html",
+  "css/style.css",
+  "js/app.js",
+  "manifest.webmanifest",
+  "assets/socatei/logo-e4me.png",
+  "assets/socatei/bobo-sticker.png",
+  "assets/socatei/sushi-sticker.png",
+  "assets/socatei/fizz-sticker.png",
+  "assets/socatei/maki-sticker.png",
+  "assets/socatei/bobo-face.png",
+  "assets/socatei/fizz-face.png",
+  "assets/socatei/sushi-face.png",
+  "assets/socatei/login-scene.svg",
+];
 
 self.addEventListener("install", (event) => {
   // Activate this new worker immediately instead of waiting for every old
   // tab to close — so an updated worker (e.g. a new CACHE_VERSION) takes
   // over as soon as the app is reopened.
   self.skipWaiting();
+  // Warm the new cache with the critical assets up front. allSettled + per-item
+  // try/catch so one slow/failed asset never aborts the whole pre-cache.
+  event.waitUntil(
+    (async () => {
+      const cache = await caches.open(CACHE_VERSION);
+      await Promise.allSettled(
+        PRECACHE.map(async (url) => {
+          try {
+            const res = await fetch(url, { cache: "reload" });
+            if (res && res.ok) await cache.put(url, res);
+          } catch { /* best-effort; the fetch handler still tries the network */ }
+        })
+      );
+    })()
+  );
 });
 
 self.addEventListener("activate", (event) => {
