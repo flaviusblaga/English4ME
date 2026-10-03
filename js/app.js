@@ -981,7 +981,7 @@ function updateThemeToggleLabels(theme) {
 function applyTheme(theme) {
   document.documentElement.setAttribute("data-theme", theme);
   const meta = document.querySelector('meta[name="theme-color"]');
-  if (meta) meta.setAttribute("content", theme === "dark" ? "#0f172a" : "#0d9488");
+  if (meta) meta.setAttribute("content", theme === "dark" ? "#0f172a" : "#0a8fc4");
   updateThemeToggleLabels(theme);
 }
 
