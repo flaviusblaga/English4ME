@@ -103,7 +103,7 @@
 // v39: stats "My rewards" card redesigned — a prominent progress bar with a
 //      percent, then the reward terms (screen-time per lesson + end-of-module
 //      bonus) as teal icon-tile rows; the earned bonus turns green.
-const CACHE_VERSION = "socatei-v43";
+const CACHE_VERSION = "socatei-v44";
 
 // Critical, visible assets pre-cached on install (before `activate` deletes the
 // previous cache). Without this, a CACHE_VERSION bump left a window with no
@@ -152,8 +152,19 @@ self.addEventListener("install", (event) => {
 self.addEventListener("activate", (event) => {
   event.waitUntil(
     (async () => {
-      const keys = await caches.keys();
-      await Promise.all(keys.filter((k) => k !== CACHE_VERSION).map((k) => caches.delete(k)));
+      // Clean up old caches. If the new cache is warm (the install pre-cache
+      // succeeded) drop every old one. If it is cold — e.g. the app was reopened
+      // offline — keep only the single most-recent old cache as a fallback and
+      // drop the rest, so assets still load from the previous version without old
+      // caches ever accumulating. caches.match() in the fetch handler searches
+      // all caches, so a retained older cache still serves.
+      const cache = await caches.open(CACHE_VERSION);
+      const warm = await cache.match("js/app.js");
+      const others = (await caches.keys()).filter((k) => k !== CACHE_VERSION);
+      const ver = (k) => parseInt((k.match(/\d+/) || [0])[0], 10);
+      others.sort((a, b) => ver(a) - ver(b)); // oldest first, newest last
+      const toDelete = warm ? others : others.slice(0, -1); // cold: keep newest as fallback
+      await Promise.all(toDelete.map((k) => caches.delete(k)));
       await self.clients.claim();
     })()
   );
