@@ -207,14 +207,17 @@
 
     <div id="gamification-badges-panel" class="gamification-badges-panel" hidden></div>
 
-    <!-- Adult "toolkit". On phones/tablets this <aside> is display:contents — a
-         layout no-op, so each panel flows exactly where it did before and the
-         header toggle buttons reveal them inline. On desktop (min-width:900px)
-         for the Business profile it becomes a persistent right-hand rail with
-         the panels always open (Peers-style multi-column). Kids/teen never see
-         it: the panels inside are hidden for them and the rail styling is
-         scoped to body[data-usertype="adult"]. -->
+    <!-- Adult "toolkit" (Business profile only). Exactly ONE panel open at a
+         time, driven by setActivePanel. Desktop (min-width:900px): a persistent
+         right-hand rail showing the active panel, switched by the header tab
+         buttons. Phones: the aside is display:contents and the active panel
+         opens as an overlay with the close (✕) button below. Kids/teen never
+         see it — the panels inside stay hidden and the styling is scoped to
+         body[data-usertype="adult"]. -->
     <aside id="adult-rail" class="adult-rail">
+      <button id="rail-close" class="rail-close" hidden aria-label="Close">
+        <span class="icon-slot" data-icon="x"></span>
+      </button>
       <div id="phrasebank-panel" class="phrasebank-panel" hidden></div>
       <div id="progress-pro-panel" class="progress-pro-panel" hidden></div>
       <div id="scenario-documents" class="scenario-documents" hidden>

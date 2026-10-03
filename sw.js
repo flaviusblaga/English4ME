@@ -151,7 +151,13 @@
 // v58: Phrasebank rewritten for a mid-level manager (the Peers audience) —
 //      aligning, influencing, pushing back, managing up, delegating, negotiating
 //      — replacing the generic textbook phrases. 11 groups, senior-grade.
-const CACHE_VERSION = "socatei-v58";
+// v59: adult toolkit audit/reconfigure — exactly ONE tool panel open at a time
+//      (setActivePanel): desktop rail shows the active panel with the header
+//      Phrases/Progress/Documents acting as tabs; phones open it as an overlay
+//      with a ✕ close. Fixes overlapping/stuck panels. Scenario <select> wired
+//      once (no stacked handlers). All adult show/hide is null-safe (elHidden)
+//      so a stale cached HTML can no longer crash the app.
+const CACHE_VERSION = "socatei-v59";
 
 // Critical, visible assets pre-cached on install (before `activate` deletes the
 // previous cache). Without this, a CACHE_VERSION bump left a window with no
