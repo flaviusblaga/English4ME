@@ -127,7 +127,11 @@
 //      breakable days-in-a-row count. No reminders, no streak loss. Week strip
 //      kept as a friendly "X of the last 7 days". Header flames, home tile,
 //      stats card, parent view and the progress export all reworded to match.
-const CACHE_VERSION = "socatei-v52";
+// v53: dark-mode fix — the kid/teen lesson, chat, reading and parent screens
+//      kept their light illustrated-scene veil in dark mode, so near-white text
+//      painted on them (notably the lesson question stem) was invisible. Add the
+//      dark scrim those screens were missing, matching the login/picker screens.
+const CACHE_VERSION = "socatei-v53";
 
 // Critical, visible assets pre-cached on install (before `activate` deletes the
 // previous cache). Without this, a CACHE_VERSION bump left a window with no

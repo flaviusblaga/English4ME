@@ -3699,6 +3699,23 @@ body[data-usertype="teen"] #screen-reading {
     var(--surface);
 }
 
+/* Dark mode: the light veil above would keep these kid/teen backdrops bright,
+   so the near-white dark-mode text painted directly on them (e.g. the lesson
+   question stem) is invisible. Swap in a near-opaque dark scrim — the same one
+   the login/picker screens use — so a hint of the scene remains but text keeps
+   full contrast. (Teen parent-view/reading already get this scrim earlier.) */
+:root[data-theme="dark"] body[data-usertype="child"] #screen-lesson,
+:root[data-theme="dark"] body[data-usertype="child"] #screen-chat,
+:root[data-theme="dark"] body[data-usertype="child"] #screen-reading,
+:root[data-theme="dark"] body[data-usertype="child"] #screen-parent-view,
+:root[data-theme="dark"] body[data-usertype="teen"] #screen-lesson,
+:root[data-theme="dark"] body[data-usertype="teen"] #screen-chat {
+  background:
+    linear-gradient(rgba(6, 10, 18, 0.90), rgba(6, 10, 18, 0.96)),
+    url("../assets/socatei/login-scene.svg") center top / cover no-repeat fixed,
+    var(--surface);
+}
+
 /* De-emphasise everything below the hero on the home screen so the blue card
    clearly leads. Scoped to the menu view so the same elements elsewhere keep
    their normal weight. */
