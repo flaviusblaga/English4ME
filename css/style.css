@@ -1125,6 +1125,31 @@ body[data-usertype="adult"] #documents-btn { margin-left: var(--sp-2); }
 /* Exit sits apart, far right. */
 body[data-usertype="adult"] #home-btn { margin-left: auto; }
 
+/* ---- Mobile "Tools" drop-down (adult) ----
+   On phones the header stays minimal: Practice (scenario + Role-play/Writing)
+   plus one "Tools" button. The four tool controls collapse into #tools-menu.
+   On desktop the Tools button/menu are hidden (those live in the rail), and the
+   individual buttons behave as before. */
+.tools-menu {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: var(--sp-2) var(--sp-4) var(--sp-3);
+  background: var(--surface);
+  border-bottom: 1px solid var(--line);
+}
+.tools-menu .btn { justify-content: flex-start; }
+#tools-btn { display: inline-flex; align-items: center; gap: 4px; }
+#tools-btn svg { width: 16px; height: 16px; }
+
+@media (max-width: 899px) {
+  /* Collapse the four tool buttons behind "Tools" on phones/tablets. */
+  body[data-usertype="adult"] #phrasebank-btn,
+  body[data-usertype="adult"] #progress-pro-btn,
+  body[data-usertype="adult"] #documents-btn,
+  body[data-usertype="adult"] #debrief-btn { display: none; }
+}
+
 /* neutral, premium body beneath the header */
 body[data-usertype="adult"] #screen-chat { background: var(--surface); }
 
@@ -1536,7 +1561,9 @@ body[data-usertype="adult"] .progress-pro-comp-bar i { background: var(--primary
   /* The header toggle buttons are redundant when the rail is always visible. */
   body[data-usertype="adult"] #phrasebank-btn,
   body[data-usertype="adult"] #documents-btn,
-  body[data-usertype="adult"] #progress-pro-btn { display: none; }
+  body[data-usertype="adult"] #progress-pro-btn,
+  body[data-usertype="adult"] #tools-btn,
+  body[data-usertype="adult"] #tools-menu { display: none; }
 
   /* A centred 460px phone nav under a 1140px layout looks broken — drop the
      bottom nav on the desktop adult surface. */
