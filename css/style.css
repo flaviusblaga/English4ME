@@ -1493,6 +1493,7 @@ body[data-usertype="adult"] .budget-indicator { display: none; }
 .kid-card--bobo  { --kc: var(--kid-blue); --kc-soft: #d9f0fb; }
 .kid-card--fizz  { --kc: var(--kid-teal); --kc-soft: #d4f1fb; }
 .kid-card--sushi { --kc: var(--kid-pink); --kc-soft: #ffe0f0; }
+.kid-card--maki  { --kc: var(--kid-coral); --kc-soft: #ffe8d6; }
 .kid-card.is-remembered { box-shadow: 0 0 0 2px var(--kc), var(--shadow-sm); }
 .kid-card::after {
   content:""; position: absolute; top: -18px; right: -18px; width: 58px; height: 58px;

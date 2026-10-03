@@ -103,7 +103,7 @@
 // v39: stats "My rewards" card redesigned — a prominent progress bar with a
 //      percent, then the reward terms (screen-time per lesson + end-of-module
 //      bonus) as teal icon-tile rows; the earned bonus turns green.
-const CACHE_VERSION = "socatei-v43";
+const CACHE_VERSION = "socatei-v44";
 
 // Critical, visible assets pre-cached on install (before `activate` deletes the
 // previous cache). Without this, a CACHE_VERSION bump left a window with no
@@ -152,8 +152,18 @@ self.addEventListener("install", (event) => {
 self.addEventListener("activate", (event) => {
   event.waitUntil(
     (async () => {
-      const keys = await caches.keys();
-      await Promise.all(keys.filter((k) => k !== CACHE_VERSION).map((k) => caches.delete(k)));
+      // Only drop the old caches once the new one is actually warm (the install
+      // pre-cache succeeded). If it failed — e.g. the app was reopened offline —
+      // keep the old caches as a fallback rather than leaving an empty one, so
+      // assets still load from the previous version until the network is back
+      // and a later activate cleans up. caches.match() in the fetch handler
+      // searches all caches, so a kept older cache still serves.
+      const cache = await caches.open(CACHE_VERSION);
+      const warm = await cache.match("js/app.js");
+      if (warm) {
+        const keys = await caches.keys();
+        await Promise.all(keys.filter((k) => k !== CACHE_VERSION).map((k) => caches.delete(k)));
+      }
       await self.clients.claim();
     })()
   );

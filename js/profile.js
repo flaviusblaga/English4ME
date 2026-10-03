@@ -160,6 +160,7 @@ const MASCOTS_FULL = [
   { id: "spike", name: "Spike", img: "assets/socatei/spike-sticker.png" },
   { id: "rex", name: "Rex", img: "assets/socatei/rex-sticker.png" },
   { id: "otto", name: "Otto", img: "assets/socatei/otto-sticker.png" },
+  { id: "maki", name: "Maki", img: "assets/socatei/maki-sticker.png" },
 ];
 
 export const AVATARS = {
