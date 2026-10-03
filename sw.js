@@ -117,7 +117,12 @@
 //      (practice turns, scenarios practised X/Y, days practised, month usage,
 //      scenario-coverage checklist). Real counters only; new progress fields
 //      scenariosPracticed/activeDays tracked per role-play turn. No Worker.
-const CACHE_VERSION = "socatei-v50";
+// v51: desktop responsive pass for the adult Business surface — on wide screens
+//      #screen-chat becomes a two-column layout (chat + persistent toolkit rail
+//      with Phrasebank/Progress/Documents always open). Pure CSS + an aside
+//      wrapper that is display:contents on phones/tablets, so mobile and the
+//      kids/teen screens are unchanged.
+const CACHE_VERSION = "socatei-v51";
 
 // Critical, visible assets pre-cached on install (before `activate` deletes the
 // previous cache). Without this, a CACHE_VERSION bump left a window with no

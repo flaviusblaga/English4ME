@@ -1403,6 +1403,81 @@ body[data-usertype="adult"] .phrasebank-phrase--copied {
 .progress-pro-cov--done { color: var(--text); font-weight: 600; }
 body[data-usertype="adult"] .progress-pro-cov--done svg { color: var(--primary-bright); }
 
+/* The adult toolkit wrapper is a layout no-op everywhere EXCEPT the desktop
+   adult layout below. display:contents means the <aside> box isn't rendered —
+   its children (the panels) lay out exactly as if it weren't there — so phones,
+   tablets and the kids/teen screens are completely unaffected. */
+.adult-rail { display: contents; }
+
+/* =============================================================
+   Desktop adult layout (Peers-style) — Business profile only, wide viewports.
+   #screen-chat becomes a two-column grid: a main chat column (header on top,
+   scrolling log, pinned input) and a persistent right-hand toolkit rail with
+   the Phrasebank / Progress / Documents panels always open. Scoped to
+   body[data-usertype="adult"] + min-width:900px, so kids/teen and all
+   phones/tablets keep the single-column shell untouched.
+   ============================================================= */
+@media (min-width: 900px) {
+  body[data-usertype="adult"] #screen-chat {
+    max-width: 1140px;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 344px;
+    grid-template-rows: auto auto auto 1fr auto;
+    grid-template-areas:
+      "header  header"
+      "settings rail"
+      "warn    rail"
+      "log     rail"
+      "input   rail";
+    column-gap: var(--sp-5, 24px);
+    padding-left: var(--sp-5, 24px);
+    padding-right: var(--sp-5, 24px);
+    padding-bottom: 0; /* no fixed bottom nav on desktop adult (hidden below) */
+  }
+  body[data-usertype="adult"] #screen-chat > .app-header { grid-area: header; }
+  body[data-usertype="adult"] #screen-chat > #settings-panel { grid-area: settings; }
+  body[data-usertype="adult"] #screen-chat > #budget-warning { grid-area: warn; }
+  body[data-usertype="adult"] #screen-chat > .chat-log { grid-area: log; min-height: 0; }
+  body[data-usertype="adult"] #screen-chat > .chat-input-row { grid-area: input; }
+
+  body[data-usertype="adult"] #adult-rail {
+    grid-area: rail;
+    display: flex;
+    flex-direction: column;
+    gap: var(--sp-3);
+    overflow-y: auto;
+    min-height: 0;
+    padding: var(--sp-3) 2px var(--sp-4);
+  }
+  /* Panels are always open in the rail — override their hidden attribute and
+     re-chrome them as standalone cards (not full-width inline drawers).
+     display:block !important is needed to beat the global `[hidden]{display:none
+     !important}` killer; this selector is far more specific, so it wins. */
+  body[data-usertype="adult"] #adult-rail > .phrasebank-panel,
+  body[data-usertype="adult"] #adult-rail > .progress-pro-panel,
+  body[data-usertype="adult"] #adult-rail > .scenario-documents {
+    display: block !important;
+    max-height: none;
+    border: 1px solid var(--line);
+    border-radius: var(--r-lg);
+    background: var(--surface-raised);
+    overflow: visible;
+  }
+  body[data-usertype="adult"] #adult-rail > .scenario-documents {
+    padding: var(--sp-3) var(--sp-4);
+  }
+  /* The header toggle buttons are redundant when the rail is always visible. */
+  body[data-usertype="adult"] #phrasebank-btn,
+  body[data-usertype="adult"] #progress-pro-btn { display: none; }
+
+  /* A centred 460px phone nav under a 1140px layout looks broken — drop the
+     bottom nav on the desktop adult surface. */
+  body[data-usertype="adult"] #screen-chat .app-nav { display: none; }
+
+  /* Give the conversation room to breathe on a wide column. */
+  body[data-usertype="adult"] #screen-chat .chat-bubble { max-width: 72%; }
+}
+
 .banner {
   margin: 0;
   padding: 0.6rem var(--sp-4);

@@ -194,9 +194,36 @@
 
     <div id="gamification-badges-panel" class="gamification-badges-panel" hidden></div>
 
-    <div id="phrasebank-panel" class="phrasebank-panel" hidden></div>
+    <!-- Adult "toolkit". On phones/tablets this <aside> is display:contents — a
+         layout no-op, so each panel flows exactly where it did before and the
+         header toggle buttons reveal them inline. On desktop (min-width:900px)
+         for the Business profile it becomes a persistent right-hand rail with
+         the panels always open (Peers-style multi-column). Kids/teen never see
+         it: the panels inside are hidden for them and the rail styling is
+         scoped to body[data-usertype="adult"]. -->
+    <aside id="adult-rail" class="adult-rail">
+      <div id="phrasebank-panel" class="phrasebank-panel" hidden></div>
+      <div id="progress-pro-panel" class="progress-pro-panel" hidden></div>
+      <div id="scenario-documents" class="scenario-documents" hidden>
+        <div class="scenario-documents-summary">
+          <span id="scenario-documents-label"></span>
+          <button id="scenario-documents-manage-btn" class="btn btn-small">Manage documents</button>
+        </div>
 
-    <div id="progress-pro-panel" class="progress-pro-panel" hidden></div>
+        <div id="scenario-documents-panel" class="scenario-documents-panel" hidden>
+          <ul id="scenario-documents-list" class="scenario-documents-list"></ul>
+          <input id="scenario-documents-file-input" type="file" multiple
+                 accept=".pdf,.png,.jpg,.jpeg,.webp,.txt" />
+          <p class="hint">PDF, photos/screenshots, or .txt only — up to 4 files, 4 MB each.
+             Word docs: please save as PDF first (File → Save As → PDF in Word).</p>
+          <div class="scenario-documents-actions">
+            <button id="scenario-documents-save-btn" class="btn btn-primary">Save documents</button>
+            <button id="scenario-documents-cancel-btn" class="btn btn-small">Cancel</button>
+          </div>
+          <p id="scenario-documents-status" class="hint" hidden></p>
+        </div>
+      </div>
+    </aside>
 
     <div id="mascot-select-bar" class="mascot-select-bar" hidden>
       <span class="mascot-select-label" data-i18n="mascotSel.talkTo">Talk to:</span>
@@ -216,26 +243,6 @@
         Sushi
       </button>
       <button id="mascot-select-both" type="button" class="mascot-select-btn">👥 <span data-i18n="mascotSel.all">All</span></button>
-    </div>
-
-    <div id="scenario-documents" class="scenario-documents" hidden>
-      <div class="scenario-documents-summary">
-        <span id="scenario-documents-label"></span>
-        <button id="scenario-documents-manage-btn" class="btn btn-small">Manage documents</button>
-      </div>
-
-      <div id="scenario-documents-panel" class="scenario-documents-panel" hidden>
-        <ul id="scenario-documents-list" class="scenario-documents-list"></ul>
-        <input id="scenario-documents-file-input" type="file" multiple
-               accept=".pdf,.png,.jpg,.jpeg,.webp,.txt" />
-        <p class="hint">PDF, photos/screenshots, or .txt only — up to 4 files, 4 MB each.
-           Word docs: please save as PDF first (File → Save As → PDF in Word).</p>
-        <div class="scenario-documents-actions">
-          <button id="scenario-documents-save-btn" class="btn btn-primary">Save documents</button>
-          <button id="scenario-documents-cancel-btn" class="btn btn-small">Cancel</button>
-        </div>
-        <p id="scenario-documents-status" class="hint" hidden></p>
-      </div>
     </div>
 
     <p id="budget-warning" class="banner banner-warn" hidden></p>

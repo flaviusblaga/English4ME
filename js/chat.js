@@ -214,6 +214,9 @@ export function initChat({ accessToken, userEmail, displayName, fileId, state, p
     // leftover writing session from a previous visit. (setWritingMode also
     // sets the Debrief button's visibility.)
     setWritingMode(false);
+    // Populate the Progress panel up front — on desktop it's always visible in
+    // the toolkit rail, so it must not start empty.
+    renderProgressPro();
   } else {
     el("chat-mode-toggle").hidden = true;
     el("scenario-select-wrap").hidden = true;
@@ -731,6 +734,8 @@ async function handleSend() {
         p.activeDays = p.activeDays || [];
         const today = todayLocalDateString();
         if (!p.activeDays.includes(today)) p.activeDays.push(today);
+        // Keep the (always-visible on desktop) Progress panel in sync.
+        renderProgressPro();
       }
 
       if (session.profile.features.gamification) {
