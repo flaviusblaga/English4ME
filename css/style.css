@@ -1338,6 +1338,71 @@ body[data-usertype="adult"] .phrasebank-phrase--copied {
   color: #04232a;
 }
 
+/* ===================== Progress panel (adult) ===================== */
+.progress-pro-panel {
+  padding: var(--sp-3) var(--sp-4);
+  background: var(--surface);
+  border-bottom: 1px solid var(--line);
+  max-height: 60vh;
+  overflow-y: auto;
+}
+.progress-pro-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--sp-2);
+}
+.progress-pro-tile {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 0.7rem 0.85rem;
+  border-radius: var(--r-md);
+  border: 1px solid var(--line);
+  background: var(--surface-raised);
+}
+.progress-pro-value {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: var(--fs-lg);
+  color: var(--primary-text, var(--primary-dark));
+}
+.progress-pro-label {
+  font-size: var(--fs-xs);
+  color: var(--text-muted);
+}
+.progress-pro-since {
+  margin: var(--sp-2) 0 0;
+  font-size: var(--fs-xs);
+  color: var(--text-faint);
+}
+.progress-pro-head {
+  margin: var(--sp-3) 0 var(--sp-2);
+  font-family: var(--font-display);
+  font-size: var(--fs-sm);
+  color: var(--text);
+}
+.progress-pro-coverage {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.progress-pro-cov {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0.4rem 0.2rem;
+  font-size: var(--fs-sm);
+  color: var(--text-muted);
+  border-bottom: 1px solid var(--line);
+}
+.progress-pro-cov:last-child { border-bottom: none; }
+.progress-pro-cov svg { width: 18px; height: 18px; color: var(--primary); flex-shrink: 0; }
+.progress-pro-cov--done { color: var(--text); font-weight: 600; }
+body[data-usertype="adult"] .progress-pro-cov--done svg { color: var(--primary-bright); }
+
 .banner {
   margin: 0;
   padding: 0.6rem var(--sp-4);

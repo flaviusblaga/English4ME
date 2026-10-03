@@ -113,7 +113,11 @@
 // v49: adult chat gains a "Phrases" button — a curated Business English
 //      phrasebank (collapsible groups, copy-to-clipboard). Static content in
 //      js/phrasebank.data.js; no Worker, no cost.
-const CACHE_VERSION = "socatei-v49";
+// v50: adult chat gains a "Progress" panel — a professional progress view
+//      (practice turns, scenarios practised X/Y, days practised, month usage,
+//      scenario-coverage checklist). Real counters only; new progress fields
+//      scenariosPracticed/activeDays tracked per role-play turn. No Worker.
+const CACHE_VERSION = "socatei-v50";
 
 // Critical, visible assets pre-cached on install (before `activate` deletes the
 // previous cache). Without this, a CACHE_VERSION bump left a window with no

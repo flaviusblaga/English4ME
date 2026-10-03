@@ -126,6 +126,8 @@ function defaultState({ profileId, userEmail, displayName, level, features }) {
       totalTurns: 0,
       topicsPracticed: [],
       recurringCorrections: [],
+      scenariosPracticed: [], // adult "Progress" panel: distinct scenario ids practiced
+      activeDays: [],         // adult "Progress" panel: distinct YYYY-MM-DD active days
     },
     usageSnapshot: {
       note: "Best-effort mirror of server-side usage tracking; not authoritative for budget enforcement.",

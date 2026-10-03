@@ -154,6 +154,12 @@ export function initChat({ accessToken, userEmail, displayName, fileId, state, p
       const panel = el("phrasebank-panel");
       panel.hidden = !panel.hidden;
     });
+    el("progress-pro-btn").addEventListener("click", () => {
+      const panel = el("progress-pro-panel");
+      // Re-render on each open — the numbers change as the member practises.
+      if (panel.hidden) renderProgressPro();
+      panel.hidden = !panel.hidden;
+    });
     el("debug-data-btn").addEventListener("click", () => {
       const output = el("debug-data-output");
       if (!output.hidden) {
@@ -201,6 +207,7 @@ export function initChat({ accessToken, userEmail, displayName, fileId, state, p
   if (profile.features.scenarios) {
     el("chat-mode-toggle").hidden = false;
     el("phrasebank-btn").hidden = false; // useful in both role-play and writing
+    el("progress-pro-btn").hidden = false;
     el("scenario-select-wrap").hidden = false;
     initScenarioSelect();
     // Always start a (re)entered chat in role-play mode, never stuck in a
@@ -213,6 +220,8 @@ export function initChat({ accessToken, userEmail, displayName, fileId, state, p
     el("debrief-btn").hidden = true;
     el("phrasebank-btn").hidden = true;
     el("phrasebank-panel").hidden = true;
+    el("progress-pro-btn").hidden = true;
+    el("progress-pro-panel").hidden = true;
     currentScenarioId = null;
     writingMode = false;
   }
@@ -522,6 +531,46 @@ function renderPhrasebank() {
   }
 }
 
+// "Progress" — a professional progress panel for the adult (Business) profile.
+// Every number here is a real counter the app actually records; nothing is
+// estimated or fabricated. No streak/minutes figures because the app doesn't
+// track session time — only distinct active days, which it does.
+function renderProgressPro() {
+  const panel = el("progress-pro-panel");
+  const p = session.state.progress || {};
+  const turns = p.totalTurns || 0;
+  const practiced = new Set(p.scenariosPracticed || []);
+  const scenariosTotal = SCENARIOS.length;
+  const days = (p.activeDays || []).length;
+  const snap = session.state.usageSnapshot || {};
+  const spent = snap.estimatedCostUsd || 0;
+  const budget = snap.budgetUsd || 10;
+  const since = session.state.createdAt
+    ? new Date(session.state.createdAt).toLocaleDateString(undefined, { month: "short", year: "numeric" })
+    : "—";
+
+  const tile = (value, label) =>
+    `<div class="progress-pro-tile"><span class="progress-pro-value">${value}</span><span class="progress-pro-label">${label}</span></div>`;
+
+  const coverage = SCENARIOS.map((s) => {
+    const done = practiced.has(s.id);
+    return `<li class="progress-pro-cov${done ? " progress-pro-cov--done" : ""}">${
+      done ? iconSvg("circle-check") : ""
+    }<span>${s.label}</span></li>`;
+  }).join("");
+
+  panel.innerHTML = `
+    <div class="progress-pro-grid">
+      ${tile(turns, "Practice turns")}
+      ${tile(`${practiced.size}/${scenariosTotal}`, "Scenarios practised")}
+      ${tile(days, days === 1 ? "Day practised" : "Days practised")}
+      ${tile(`$${spent.toFixed(2)}`, `used of $${budget.toFixed(0)} this month`)}
+    </div>
+    <p class="progress-pro-since">Practising since ${since}</p>
+    <h4 class="progress-pro-head">Scenario coverage</h4>
+    <ul class="progress-pro-coverage">${coverage}</ul>`;
+}
+
 function copyPhrase(text, rowEl) {
   const flash = () => {
     const prev = rowEl.textContent;
@@ -669,6 +718,20 @@ async function handleSend() {
       session.state.conversation.recentTurns.push(assistantTurn);
       recordTurnForParentSync(session.state, assistantTurn);
       session.state.progress.totalTurns += 1;
+
+      // Adult "Progress" metrics — real counters only (no fabricated numbers):
+      // which scenarios have actually been practiced, and which calendar days
+      // the member was active. Both tolerate older saved states without them.
+      if (session.profile.features.scenarios) {
+        const p = session.state.progress;
+        p.scenariosPracticed = p.scenariosPracticed || [];
+        if (currentScenarioId && !p.scenariosPracticed.includes(currentScenarioId)) {
+          p.scenariosPracticed.push(currentScenarioId);
+        }
+        p.activeDays = p.activeDays || [];
+        const today = todayLocalDateString();
+        if (!p.activeDays.includes(today)) p.activeDays.push(today);
+      }
 
       if (session.profile.features.gamification) {
         const newlyUnlocked = updateGamificationAfterTurn(session.state);
