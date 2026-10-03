@@ -136,7 +136,12 @@
 //      promotes the docs manager; the redundant "View child's progress" is
 //      dropped (it's already the "Părinte" bottom tab) and the kid "Levels"
 //      exit is relabelled "Profiles". Scoped to adult; kids/teen unchanged.
-const CACHE_VERSION = "socatei-v54";
+// v55: expanded Business scenario library — the Practice picker now lists the
+//      full set grouped in 6 categories (Networking & intros, Meetings &
+//      leadership, Negotiation, Pitch & presentation, Hiring & interviews,
+//      Difficult conversations). Client list only; the new ids need matching
+//      Worker prompts (docs/worker-scenarios-pack.md) to role-play in character.
+const CACHE_VERSION = "socatei-v55";
 
 // Critical, visible assets pre-cached on install (before `activate` deletes the
 // previous cache). Without this, a CACHE_VERSION bump left a window with no
