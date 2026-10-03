@@ -1306,8 +1306,8 @@ body[data-usertype="adult"] .budget-indicator { display: none; }
 /* The three die-cut stickers standing on the CSS grass mound. Sushi slightly
    larger and overlapping in the middle. */
 .login-mascots {
-  /* soft grassy mound so the stickers look grounded, not floating on white */
-  background: radial-gradient(125% 82% at 50% 100%, #b4e5c6 0%, #d7f1e0 46%, transparent 72%);
+  /* soft cyan mound so the stickers look grounded, not floating on white */
+  background: radial-gradient(125% 82% at 50% 100%, #a9ddf2 0%, #d2eefb 46%, transparent 72%);
   padding: var(--sp-4) 0 var(--sp-2);
   display: flex;
   justify-content: center;
@@ -1317,13 +1317,13 @@ body[data-usertype="adult"] .budget-indicator { display: none; }
   margin: var(--sp-5) 0;
 }
 .mascot-sticker-hero {
-  width: 31%;
+  width: 24%;
   height: auto;
   filter: drop-shadow(0 10px 16px rgba(15, 23, 42, 0.12));
 }
 .mascot-sticker-hero.mid {
-  width: 34%;
-  margin: 0 -6px;
+  width: 26%;
+  margin: 0 -4px;
   z-index: 1;
 }
 .login-mascots .mascot-avatar--emoji-fallback {
@@ -1491,7 +1491,7 @@ body[data-usertype="adult"] .budget-indicator { display: none; }
 }
 .kid-card:active { transform: scale(0.97); }
 .kid-card--bobo  { --kc: var(--kid-blue); --kc-soft: #d9f0fb; }
-.kid-card--fizz  { --kc: var(--kid-teal); --kc-soft: #d4f6e8; }
+.kid-card--fizz  { --kc: var(--kid-teal); --kc-soft: #d4f1fb; }
 .kid-card--sushi { --kc: var(--kid-pink); --kc-soft: #ffe0f0; }
 .kid-card.is-remembered { box-shadow: 0 0 0 2px var(--kc), var(--shadow-sm); }
 .kid-card::after {
