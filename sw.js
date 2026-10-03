@@ -148,7 +148,10 @@
 // v57: mobile adult menu — the four tool controls (Phrases / Progress /
 //      Documents / Debrief) collapse behind one "Tools" drop-down on phones, so
 //      the header stays minimal (Practice + Tools). Desktop unchanged (rail).
-const CACHE_VERSION = "socatei-v57";
+// v58: Phrasebank rewritten for a mid-level manager (the Peers audience) —
+//      aligning, influencing, pushing back, managing up, delegating, negotiating
+//      — replacing the generic textbook phrases. 11 groups, senior-grade.
+const CACHE_VERSION = "socatei-v58";
 
 // Critical, visible assets pre-cached on install (before `activate` deletes the
 // previous cache). Without this, a CACHE_VERSION bump left a window with no
