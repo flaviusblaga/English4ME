@@ -1265,6 +1265,79 @@ body[data-usertype="adult"] .budget-indicator { display: none; }
   border-bottom: none;
 }
 
+/* ===================== Phrasebank panel (adult) ===================== */
+.phrasebank-panel {
+  padding: var(--sp-2) var(--sp-4) var(--sp-3);
+  background: var(--surface);
+  border-bottom: 1px solid var(--line);
+  max-height: 55vh;
+  overflow-y: auto;
+}
+.phrasebank-group {
+  border-bottom: 1px solid var(--line);
+}
+.phrasebank-group:last-child {
+  border-bottom: none;
+}
+.phrasebank-group-head {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-2);
+  padding: 0.7rem 0.2rem;
+  border: none;
+  background: transparent;
+  color: var(--text);
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: var(--fs-sm);
+  cursor: pointer;
+  text-align: left;
+}
+.phrasebank-group-head svg {
+  width: 18px;
+  height: 18px;
+  color: var(--text-muted);
+  transition: transform 0.15s ease;
+  flex-shrink: 0;
+}
+.phrasebank-group--open .phrasebank-group-head svg {
+  transform: rotate(180deg);
+}
+.phrasebank-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 0 0 0.6rem;
+}
+.phrasebank-phrase {
+  text-align: left;
+  padding: 0.5rem 0.75rem;
+  border-radius: var(--r-sm);
+  border: 1px solid var(--line);
+  background: var(--surface-raised);
+  color: var(--text);
+  font: inherit;
+  font-size: var(--fs-sm);
+  cursor: pointer;
+  transition: background 0.12s ease, border-color 0.12s ease;
+}
+.phrasebank-phrase:hover {
+  border-color: var(--primary);
+  background: var(--primary-tint);
+}
+.phrasebank-phrase--copied {
+  border-color: var(--primary);
+  background: var(--primary);
+  color: #fff;
+  font-weight: 600;
+}
+body[data-usertype="adult"] .phrasebank-phrase--copied {
+  background: var(--primary-bright);
+  color: #04232a;
+}
+
 .banner {
   margin: 0;
   padding: 0.6rem var(--sp-4);

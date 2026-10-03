@@ -1,6 +1,7 @@
 import { sendChatMessage, syncProgress } from "./worker-client.js";
 import { saveState } from "./drive.js";
 import { SCENARIOS } from "./scenarios-client.js";
+import { PHRASEBANK } from "./phrasebank.data.js";
 import { initDocumentsUi, refreshDocumentsSummary } from "./documents-ui.js";
 import { BADGES, updateGamificationAfterTurn, badgeLabel } from "./gamification.js";
 import { gamificationWithRewards } from "./rewards.js";
@@ -148,6 +149,11 @@ export function initChat({ accessToken, userEmail, displayName, fileId, state, p
     el("chat-mode-roleplay").addEventListener("click", () => setWritingMode(false));
     el("chat-mode-writing").addEventListener("click", () => setWritingMode(true));
     el("debrief-btn").addEventListener("click", handleDebrief);
+    renderPhrasebank();
+    el("phrasebank-btn").addEventListener("click", () => {
+      const panel = el("phrasebank-panel");
+      panel.hidden = !panel.hidden;
+    });
     el("debug-data-btn").addEventListener("click", () => {
       const output = el("debug-data-output");
       if (!output.hidden) {
@@ -194,6 +200,7 @@ export function initChat({ accessToken, userEmail, displayName, fileId, state, p
 
   if (profile.features.scenarios) {
     el("chat-mode-toggle").hidden = false;
+    el("phrasebank-btn").hidden = false; // useful in both role-play and writing
     el("scenario-select-wrap").hidden = false;
     initScenarioSelect();
     // Always start a (re)entered chat in role-play mode, never stuck in a
@@ -204,6 +211,8 @@ export function initChat({ accessToken, userEmail, displayName, fileId, state, p
     el("chat-mode-toggle").hidden = true;
     el("scenario-select-wrap").hidden = true;
     el("debrief-btn").hidden = true;
+    el("phrasebank-btn").hidden = true;
+    el("phrasebank-panel").hidden = true;
     currentScenarioId = null;
     writingMode = false;
   }
@@ -472,6 +481,78 @@ function renderBadgesPanel() {
     chip.textContent = `${badge.emoji} ${badgeLabel(badge.id)}`;
     panel.appendChild(chip);
   }
+}
+
+// Phrasebank — static, curated Business English phrases grouped by situation.
+// Built once (content never changes at runtime); each group is a collapsible
+// header and each phrase a copy-to-clipboard row.
+function renderPhrasebank() {
+  const panel = el("phrasebank-panel");
+  panel.innerHTML = "";
+  for (const group of PHRASEBANK) {
+    const section = document.createElement("div");
+    section.className = "phrasebank-group";
+
+    const head = document.createElement("button");
+    head.type = "button";
+    head.className = "phrasebank-group-head";
+    head.innerHTML = `<span>${group.category}</span> ${iconSvg("chevron-down")}`;
+
+    const list = document.createElement("div");
+    list.className = "phrasebank-list";
+    list.hidden = true;
+
+    head.addEventListener("click", () => {
+      list.hidden = !list.hidden;
+      section.classList.toggle("phrasebank-group--open", !list.hidden);
+    });
+
+    for (const phrase of group.phrases) {
+      const row = document.createElement("button");
+      row.type = "button";
+      row.className = "phrasebank-phrase";
+      row.textContent = phrase;
+      row.addEventListener("click", () => copyPhrase(phrase, row));
+      list.appendChild(row);
+    }
+
+    section.appendChild(head);
+    section.appendChild(list);
+    panel.appendChild(section);
+  }
+}
+
+function copyPhrase(text, rowEl) {
+  const flash = () => {
+    const prev = rowEl.textContent;
+    rowEl.classList.add("phrasebank-phrase--copied");
+    rowEl.textContent = "Copied ✓";
+    setTimeout(() => {
+      rowEl.textContent = prev;
+      rowEl.classList.remove("phrasebank-phrase--copied");
+    }, 900);
+  };
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text).then(flash).catch(() => fallbackCopy(text, flash));
+  } else {
+    fallbackCopy(text, flash);
+  }
+}
+
+// execCommand fallback for insecure contexts / older WebViews where the async
+// Clipboard API is unavailable or blocked.
+function fallbackCopy(text, onDone) {
+  try {
+    const ta = document.createElement("textarea");
+    ta.value = text;
+    ta.style.position = "fixed";
+    ta.style.opacity = "0";
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand("copy");
+    document.body.removeChild(ta);
+    onDone();
+  } catch { /* clipboard blocked; fail silently rather than disrupt the chat */ }
 }
 
 function showBanner(message) {
