@@ -23,7 +23,7 @@
 
   <!-- Installable-app (PWA) wiring -->
   <link rel="manifest" href="manifest.webmanifest" />
-  <meta name="theme-color" content="#0096b3" />
+  <meta name="theme-color" content="#0a8fc4" />
   <link rel="icon" href="assets/socatei/favicon.ico?v=3" sizes="16x16 32x32 48x48" />
   <link rel="icon" href="assets/socatei/favicon-32.png?v=3" type="image/png" sizes="32x32" />
   <link rel="icon" href="assets/socatei/icon-192.png?v=3" type="image/png" sizes="192x192" />
@@ -160,12 +160,17 @@
            only), not on the learning header — the parent's own learning zone
            stays free of admin clutter. See #screen-control-panel. -->
       <div class="app-header-actions">
+        <div id="chat-mode-toggle" class="chat-mode-toggle" hidden role="group" aria-label="Chat mode">
+          <button id="chat-mode-roleplay" type="button" class="chat-mode-btn chat-mode-btn--active" aria-pressed="true">Role-play</button>
+          <button id="chat-mode-writing" type="button" class="chat-mode-btn" aria-pressed="false">Writing</button>
+        </div>
         <div id="scenario-select-wrap" class="chat-header-center" hidden>
           <label for="scenario-select" class="scenario-label">Practice:</label>
           <select id="scenario-select">
             <option value="">Free conversation</option>
           </select>
         </div>
+        <button id="debrief-btn" class="btn btn-small" hidden><span class="icon-slot" data-icon="clipboard-list"></span> Debrief</button>
         <button id="gamification-badges-btn" class="btn btn-small" hidden><span class="icon-slot" data-icon="award"></span> <span data-i18n="header.badges">Badges</span></button>
         <button id="back-to-lessons-btn" class="btn btn-small" hidden><span class="icon-slot" data-icon="notebook-pen"></span> <span data-i18n="header.exercises">Exercises</span></button>
         <button id="reading-btn" class="btn btn-small" hidden><span class="icon-slot" data-icon="book-open"></span> <span data-i18n="header.reading">Reading</span></button>
