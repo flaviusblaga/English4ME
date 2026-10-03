@@ -210,11 +210,24 @@ export function initChat({ accessToken, userEmail, displayName, fileId, state, p
 function initScenarioSelect() {
   const select = el("scenario-select");
   select.innerHTML = '<option value="">Free conversation</option>';
+  // Group scenarios under their category as <optgroup> headers, in first-seen
+  // order, so the picker reads as a library of professional moments.
+  const byCategory = new Map();
   for (const scenario of SCENARIOS) {
-    const opt = document.createElement("option");
-    opt.value = scenario.id;
-    opt.textContent = scenario.label;
-    select.appendChild(opt);
+    const cat = scenario.category || "Other";
+    if (!byCategory.has(cat)) byCategory.set(cat, []);
+    byCategory.get(cat).push(scenario);
+  }
+  for (const [category, list] of byCategory) {
+    const group = document.createElement("optgroup");
+    group.label = category;
+    for (const scenario of list) {
+      const opt = document.createElement("option");
+      opt.value = scenario.id;
+      opt.textContent = scenario.label;
+      group.appendChild(opt);
+    }
+    select.appendChild(group);
   }
   select.value = session.state.lastScenarioId || "";
   currentScenarioId = select.value || null;

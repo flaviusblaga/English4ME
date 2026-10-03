@@ -103,7 +103,7 @@
 // v39: stats "My rewards" card redesigned — a prominent progress bar with a
 //      percent, then the reward terms (screen-time per lesson + end-of-module
 //      bonus) as teal icon-tile rows; the earned bonus turns green.
-const CACHE_VERSION = "socatei-v44";
+const CACHE_VERSION = "socatei-v45";
 
 // Critical, visible assets pre-cached on install (before `activate` deletes the
 // previous cache). Without this, a CACHE_VERSION bump left a window with no
