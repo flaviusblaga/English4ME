@@ -28,9 +28,9 @@
   /* motion */
   --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
 
-  /* colour system — premium EdTech (mockup): teal primary, amber accents,
-     slate neutrals on a near-white canvas. Variable NAMES are unchanged so no
-     selector or JS reference breaks; only the values move. */
+  /* colour system — English4ME brand: cyan primary + orange accent on slate
+     neutrals (matches the E4ME logo: cyan "Me", orange "4", on black/white).
+     Variable NAMES are unchanged so no selector or JS reference breaks. */
   --backdrop: #eef2f7;        /* behind the phone column (neutral slate) */
   --surface: #f8fafc;         /* screen canvas */
   --surface-raised: #ffffff;  /* cards */
@@ -41,13 +41,13 @@
   --text-muted: #64748b;
   --text-faint: #94a3b8;      /* inactive nav / chevrons */
 
-  --primary: #0d9488;         /* teal-600 */
-  --primary-dark: #0b7c71;
-  --primary-bright: #22c3ad;  /* lighter teal — the far end of teal gradients */
-  --primary-soft: #ccfbf1;
-  --primary-tint: #f0fdfa;
-  --secondary: #f59e0b;       /* amber-500 */
-  --highlight: #fbbf24;       /* amber-400 */
+  --primary: #0a8fc4;         /* brand cyan (button-safe, white text) */
+  --primary-dark: #0773a0;
+  --primary-bright: #1ac3f5;  /* logo cyan — the far end of cyan gradients + accents */
+  --primary-soft: #cceffb;    /* light cyan chip bg */
+  --primary-tint: #eefaff;
+  --secondary: #f97316;       /* brand orange (accent) */
+  --highlight: #fb923c;       /* orange-400 — featured borders, warm highlights */
   --star-gold: #f4b400;       /* filled reward stars */
 
   --success: #10b981;
@@ -63,13 +63,12 @@
   --chip-hot-bg: #ffedd5;     /* streak */
   --chip-hot-text: #c2410c;
 
-  /* accents — profile-card tints, confetti, lesson nodes. Retuned toward the
-     mockup (teal / amber / green / soft neutrals) instead of the old rainbow.
-     --kid-purple keeps its NAME but carries the teal primary, so every
-     "current/primary" accent that referenced it turns teal. */
-  --kid-purple: #0d9488; --kid-purple-dark: #0b7c71;
+  /* accents — profile-card tints, confetti, lesson nodes. --kid-purple keeps its
+     NAME but carries the brand cyan primary, so every "current/primary" accent
+     that referenced it turns cyan; coral already carries the brand orange. */
+  --kid-purple: #0a8fc4; --kid-purple-dark: #0773a0;
   --kid-coral: #f97316;  --kid-coral-dark: #ea580c;
-  --kid-teal: #10b981;   --kid-teal-dark: #059669;
+  --kid-teal: #1ac3f5;   --kid-teal-dark: #0ea5e9;
   --kid-yellow: #fbbf24; --kid-yellow-dark: #f59e0b;
   --kid-pink: #f472b6;   --kid-pink-dark: #ec4899;
   --kid-blue: #38bdf8;   --kid-blue-dark: #0ea5e9;
@@ -105,11 +104,11 @@
   --text-muted: #a3b2c7;       /* brighter than light's muted, for dark bg */
   --text-faint: #7183a0;       /* inactive nav / chevrons */
 
-  /* Teal accents: buttons keep teal-600 (white text stays legible on them),
-     but teal TEXT on a dark surface needs to be brighter → --primary-text. */
-  --primary-text: #5eead4;     /* teal-300, for accent text on dark */
-  --primary-soft: #0f3d39;     /* dark teal chip bg */
-  --primary-tint: #12312e;     /* subtler dark teal panel */
+  /* Cyan accents: buttons keep the mid cyan (white text stays legible on them),
+     but cyan TEXT on a dark surface needs to be brighter → --primary-text. */
+  --primary-text: #5fd3f5;     /* bright cyan, for accent text on dark */
+  --primary-soft: #0b3a4d;     /* dark cyan chip bg */
+  --primary-tint: #0c2f3e;     /* subtler dark cyan panel */
 
   --success-soft: #0b3b30;
   --success-text: #6ee7b7;     /* green-300 */
@@ -137,6 +136,26 @@
 }
 :root[data-theme="dark"] .streak-dot { background: #ffffff1f; border-color: #7a5a30; }
 :root[data-theme="dark"] .dyk-card--featured { background: var(--surface-raised); }
+
+/* The illustrated light scene (sky + hills) would stay bright under white
+   dark-mode text, making the login/picker headings unreadable. Dim it behind a
+   near-opaque dark scrim on every screen that paints it, so a faint hint of the
+   scene remains but text keeps full contrast. */
+:root[data-theme="dark"] #screen-login,
+:root[data-theme="dark"] #screen-level-picker,
+:root[data-theme="dark"] #screen-placement {
+  background:
+    linear-gradient(rgba(6, 10, 18, 0.88), rgba(6, 10, 18, 0.95)),
+    url("../assets/socatei/login-scene.svg") center bottom / cover no-repeat,
+    var(--surface);
+}
+:root[data-theme="dark"] body[data-usertype="teen"] #screen-parent-view,
+:root[data-theme="dark"] body[data-usertype="teen"] #screen-reading {
+  background:
+    linear-gradient(rgba(6, 10, 18, 0.88), rgba(6, 10, 18, 0.95)),
+    url("../assets/socatei/login-scene.svg") center top / cover no-repeat fixed,
+    var(--surface);
+}
 
 /* Kept as a hook so JS that toggles body.mascot-theme still works; the visual
    system is now shared, so this only bumps the base type size for the little
@@ -245,12 +264,12 @@ h1, h2, h3, h4 {
 .btn-primary {
   background: var(--primary);
   color: #fff;
-  box-shadow: 0 6px 16px rgba(13, 148, 136, 0.34);
+  box-shadow: 0 6px 16px rgba(10, 143, 196, 0.34);
 }
 
 .btn-primary:not(:disabled):active {
   transform: translateY(1px) scale(0.98);
-  box-shadow: 0 3px 10px rgba(13, 148, 136, 0.30);
+  box-shadow: 0 3px 10px rgba(10, 143, 196, 0.30);
 }
 
 .btn-primary:disabled {
@@ -790,13 +809,13 @@ body.mascot-theme .btn-primary {
   background: var(--primary);
   color: #fff;
   outline-color: var(--primary-soft);
-  box-shadow: 0 0 0 6px rgba(13, 148, 136, 0.18), var(--shadow-md);
+  box-shadow: 0 0 0 6px rgba(10, 143, 196, 0.18), var(--shadow-md);
   animation: node-pulse 1.8s var(--ease-out) infinite;
 }
 
 @keyframes node-pulse {
-  0%, 100% { box-shadow: 0 0 0 6px rgba(13, 148, 136, 0.18), var(--shadow-md); }
-  50%      { box-shadow: 0 0 0 13px rgba(13, 148, 136, 0.07), var(--shadow-md); }
+  0%, 100% { box-shadow: 0 0 0 6px rgba(10, 143, 196, 0.18), var(--shadow-md); }
+  50%      { box-shadow: 0 0 0 13px rgba(10, 143, 196, 0.07), var(--shadow-md); }
 }
 
 .lesson-node-label {
@@ -978,7 +997,7 @@ body[data-usertype="adult"] .app-identity { gap: var(--sp-3); }
 body[data-usertype="adult"] .identity-avatar {
   width: 54px; height: 54px; overflow: hidden;
   background: radial-gradient(circle at 50% 35%, #d5f2ee, #b9e8e1);
-  box-shadow: 0 0 0 2px rgba(13, 148, 136, 0.35), var(--shadow-sm);
+  box-shadow: 0 0 0 2px rgba(10, 143, 196, 0.35), var(--shadow-sm);
 }
 body[data-usertype="adult"] .identity-avatar img {
   width: 100%; height: 100%; object-fit: cover; object-position: top center;
@@ -989,8 +1008,8 @@ body[data-usertype="adult"] .profile-tag { color: var(--text-muted); }
 /* usage read-out as a soft teal pill */
 body[data-usertype="adult"] .budget-indicator {
   color: var(--primary-dark);
-  background: rgba(13, 148, 136, 0.08);
-  border: 1px solid rgba(13, 148, 136, 0.25);
+  background: rgba(10, 143, 196, 0.08);
+  border: 1px solid rgba(10, 143, 196, 0.25);
   border-radius: 999px;
   padding: 6px 12px;
   font-weight: 600;
@@ -1152,8 +1171,8 @@ body[data-usertype="adult"] .budget-indicator { display: none; }
 .gamification-badge-chip {
   padding: 0.35rem 0.75rem;
   border-radius: var(--r-pill);
-  background: rgba(13, 148, 136, 0.08);
-  border: 1px solid rgba(13, 148, 136, 0.28);
+  background: rgba(10, 143, 196, 0.08);
+  border: 1px solid rgba(10, 143, 196, 0.28);
   color: var(--text);
   font-size: var(--fs-xs);
   font-weight: 700;
@@ -1240,7 +1259,7 @@ body[data-usertype="adult"] .budget-indicator { display: none; }
   box-shadow: var(--shadow-md);
 }
 
-/* Wordmark: English (slate) · 4 (amber) · ME (teal) — echoes the app icon. */
+/* Wordmark: English (text) · 4 (orange) · ME (cyan) — echoes the app icon. */
 .login-card h1.wordmark {
   font-family: var(--font-display);
   font-weight: 700;
@@ -1513,7 +1532,7 @@ body[data-usertype="adult"] .budget-indicator { display: none; }
   display: grid; place-items: center; color: #fff;
   font-family: var(--font-display); font-weight: 800; font-size: 1.6rem;
   background: linear-gradient(135deg, var(--primary), var(--primary-bright));
-  box-shadow: 0 6px 16px rgba(13, 148, 136, 0.3);
+  box-shadow: 0 6px 16px rgba(10, 143, 196, 0.3);
   overflow: hidden;
 }
 /* when a teen sticker is chosen, it fills the tile (head-and-shoulders crop) */
@@ -2937,7 +2956,7 @@ body.mascot-theme .chat-bubble--assistant {
   cursor: pointer;
   color: #fff;
   background: var(--primary);
-  box-shadow: 0 6px 16px rgba(13, 148, 136, 0.34);
+  box-shadow: 0 6px 16px rgba(10, 143, 196, 0.34);
   transition: transform 120ms var(--ease-out);
 }
 
@@ -3367,7 +3386,7 @@ body.mascot-theme .chat-bubble--assistant {
 .lesson-row-play .icon { width: 0.95em; height: 0.95em; fill: currentColor; stroke: currentColor; }
 .lesson-row-stars { gap: 1px; color: var(--star-gold); }
 .lesson-row-stars .icon { width: 1em; height: 1em; fill: var(--star-gold); color: var(--star-gold); }
-.lesson-row--current { border-color: var(--primary-text); box-shadow: 0 0 0 2px rgba(13, 148, 136, 0.15); }
+.lesson-row--current { border-color: var(--primary-text); box-shadow: 0 0 0 2px rgba(10, 143, 196, 0.15); }
 .lesson-row--current .lesson-row-icon { border-color: var(--primary-text); }
 .lesson-row--done .lesson-row-label { color: var(--text-muted); }
 
@@ -3460,7 +3479,7 @@ body[data-usertype="teen"] #screen-reading {
   border-radius: var(--r-lg);
   box-shadow: var(--shadow-sm);
 }
-.stats-mod-card--done { border-color: rgba(13, 148, 136, 0.35); }
+.stats-mod-card--done { border-color: rgba(10, 143, 196, 0.35); }
 .stats-mod-emoji {
   flex-shrink: 0;
   width: 44px;
