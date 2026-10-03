@@ -1501,6 +1501,32 @@ body[data-usertype="adult"] .progress-pro-comp-bar i { background: var(--primary
    tablets and the kids/teen screens are completely unaffected. */
 .adult-rail { display: contents; }
 
+/* Overlay close (✕) for the active tool panel on phones. Hidden on desktop
+   (the rail always shows one panel, so there's nothing to close). */
+.rail-close {
+  align-self: flex-end;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  margin: 6px var(--sp-4) 0 auto;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--surface-raised);
+  color: var(--text-muted);
+  cursor: pointer;
+}
+.rail-close svg { width: 18px; height: 18px; }
+
+/* Active tab (desktop header Phrases/Progress/Documents) — shows which panel
+   the rail is currently displaying. */
+body[data-usertype="adult"] .tool-tab--active {
+  background: var(--primary-bright);
+  color: #04232a;
+  border-color: var(--primary-bright);
+}
+
 /* =============================================================
    Desktop adult layout (Peers-style) — Business profile only, wide viewports.
    #screen-chat becomes a two-column grid: a main chat column (header on top,
@@ -1541,14 +1567,12 @@ body[data-usertype="adult"] .progress-pro-comp-bar i { background: var(--primary
     min-height: 0;
     padding: var(--sp-3) 2px var(--sp-4);
   }
-  /* Panels are always open in the rail — override their hidden attribute and
-     re-chrome them as standalone cards (not full-width inline drawers).
-     display:block !important is needed to beat the global `[hidden]{display:none
-     !important}` killer; this selector is far more specific, so it wins. */
+  /* ONE panel shown at a time (setActivePanel toggles `hidden`); the visible one
+     is re-chromed as a standalone card. No display:block override — the global
+     `[hidden]{display:none}` correctly hides the inactive panels. */
   body[data-usertype="adult"] #adult-rail > .phrasebank-panel,
   body[data-usertype="adult"] #adult-rail > .progress-pro-panel,
   body[data-usertype="adult"] #adult-rail > .scenario-documents {
-    display: block !important;
     max-height: none;
     border: 1px solid var(--line);
     border-radius: var(--r-lg);
@@ -1558,12 +1582,11 @@ body[data-usertype="adult"] .progress-pro-comp-bar i { background: var(--primary
   body[data-usertype="adult"] #adult-rail > .scenario-documents {
     padding: var(--sp-3) var(--sp-4);
   }
-  /* The header toggle buttons are redundant when the rail is always visible. */
-  body[data-usertype="adult"] #phrasebank-btn,
-  body[data-usertype="adult"] #documents-btn,
-  body[data-usertype="adult"] #progress-pro-btn,
+  /* On desktop the Phrases/Progress/Documents buttons are the rail's TABS;
+     the mobile "Tools" menu and the overlay close button are not used. */
   body[data-usertype="adult"] #tools-btn,
-  body[data-usertype="adult"] #tools-menu { display: none; }
+  body[data-usertype="adult"] #tools-menu,
+  body[data-usertype="adult"] #rail-close { display: none; }
 
   /* A centred 460px phone nav under a 1140px layout looks broken — drop the
      bottom nav on the desktop adult surface. */

@@ -108,6 +108,14 @@ let listenersInitialized = false; // guards one-time listener attachment across 
 let writingMode = false;
 let defaultChatPlaceholder = ""; // captured from the i18n'd input so toggling back restores it
 
+// Adult toolkit: exactly ONE panel is open at a time (phrases / progress /
+// documents), never several stacked over the chat. On desktop it shows in the
+// side rail (header buttons act as tabs); on phones it opens as an overlay with
+// a close button. `null` = nothing open.
+let activePanel = null;
+const ADULT_PANELS = { phrases: "phrasebank-panel", progress: "progress-pro-panel", documents: "scenario-documents" };
+const ADULT_TAB_BTNS = { phrases: "phrasebank-btn", progress: "progress-pro-btn", documents: "documents-btn" };
+
 // Keep this as a single user message (the Worker takes no system override from
 // the client). Explicit output shape so the reply is consistent and copyable.
 const WRITING_EDITOR_PROMPT = (draft) =>
@@ -121,6 +129,49 @@ const DEBRIEF_PROMPT = (transcript) =>
 
 function el(id) {
   return document.getElementById(id);
+}
+
+// Null-safe visibility toggle. A stale cached index.html (old HTML + newer JS)
+// must never crash the whole app by setting `.hidden` on a missing element —
+// that was the "Cannot set properties of null" failure. Everything that shows/
+// hides an optional adult control goes through this.
+function elHidden(id, hidden) {
+  const e = el(id);
+  if (e) e.hidden = hidden;
+}
+
+// Open one adult tool panel (or close it). Guarantees a single panel at a time:
+// opening one hides the others, tapping the active one again closes it. Keeps
+// the header tab buttons and the mobile overlay/close button in sync.
+function setActivePanel(name) {
+  activePanel = activePanel === name ? null : name;
+
+  if (activePanel === "progress") renderProgressPro(); // refresh live numbers on open
+
+  for (const [key, panelId] of Object.entries(ADULT_PANELS)) {
+    elHidden(panelId, key !== activePanel);
+  }
+  // The documents manager's own upload sub-panel: open it with the panel, so
+  // "Documents" lands straight on the uploader rather than a bare summary.
+  if (activePanel === "documents") {
+    const dp = el("scenario-documents-panel");
+    const manage = el("scenario-documents-manage-btn");
+    if (dp && dp.hidden && manage) manage.click();
+  }
+
+  for (const [key, btnId] of Object.entries(ADULT_TAB_BTNS)) {
+    const b = el(btnId);
+    if (b) b.classList.toggle("tool-tab--active", key === activePanel);
+  }
+
+  const rail = el("adult-rail");
+  if (rail) rail.classList.toggle("adult-rail--open", activePanel !== null);
+  elHidden("rail-close", activePanel === null);
+
+  // Always collapse the mobile Tools menu after a choice.
+  elHidden("tools-menu", true);
+  const tb = el("tools-btn");
+  if (tb) tb.setAttribute("aria-expanded", "false");
 }
 
 export function initChat({ accessToken, userEmail, displayName, fileId, state, profile, lessonWordList, onBackToLessons }) {
@@ -150,59 +201,26 @@ export function initChat({ accessToken, userEmail, displayName, fileId, state, p
     el("chat-mode-writing").addEventListener("click", () => setWritingMode(true));
     el("debrief-btn").addEventListener("click", handleDebrief);
     renderPhrasebank();
-    el("phrasebank-btn").addEventListener("click", () => {
-      const panel = el("phrasebank-panel");
-      panel.hidden = !panel.hidden;
+    // Header tab buttons (desktop) and the mobile Tools items all open the SAME
+    // single panel through setActivePanel — one open at a time, no overlap.
+    el("phrasebank-btn").addEventListener("click", () => setActivePanel("phrases"));
+    el("progress-pro-btn").addEventListener("click", () => setActivePanel("progress"));
+    el("documents-btn").addEventListener("click", () => setActivePanel("documents"));
+    el("tools-phrases").addEventListener("click", () => setActivePanel("phrases"));
+    el("tools-progress").addEventListener("click", () => setActivePanel("progress"));
+    el("tools-documents").addEventListener("click", () => setActivePanel("documents"));
+    el("tools-debrief").addEventListener("click", () => {
+      elHidden("tools-menu", true);
+      handleDebrief();
     });
-    el("progress-pro-btn").addEventListener("click", () => {
-      const panel = el("progress-pro-panel");
-      // Re-render on each open — the numbers change as the member practises.
-      if (panel.hidden) renderProgressPro();
-      panel.hidden = !panel.hidden;
-    });
-    // "My documents" header button — opens the (already-visible) documents
-    // manager's upload panel, reusing its existing toggle.
-    const openDocuments = () => {
-      const docPanel = el("scenario-documents-panel");
-      if (docPanel.hidden) {
-        el("scenario-documents-manage-btn").click();
-        el("scenario-documents").scrollIntoView({ behavior: "smooth", block: "nearest" });
-      } else {
-        el("scenario-documents-cancel-btn").click();
-      }
-    };
-    el("documents-btn").addEventListener("click", openDocuments);
+    // The overlay close button (mobile) closes whatever panel is open.
+    el("rail-close").addEventListener("click", () => { if (activePanel) setActivePanel(activePanel); });
 
-    // Mobile "Tools" drop-down: the same four actions as the header buttons,
-    // collapsed behind one button so the phone header stays minimal. Each item
-    // runs the action and closes the menu.
-    const closeTools = () => {
-      el("tools-menu").hidden = true;
-      el("tools-btn").setAttribute("aria-expanded", "false");
-    };
+    // Mobile "Tools" drop-down toggle.
     el("tools-btn").addEventListener("click", () => {
       const m = el("tools-menu");
       m.hidden = !m.hidden;
       el("tools-btn").setAttribute("aria-expanded", String(!m.hidden));
-    });
-    el("tools-phrases").addEventListener("click", () => {
-      closeTools();
-      const p = el("phrasebank-panel");
-      p.hidden = !p.hidden;
-    });
-    el("tools-progress").addEventListener("click", () => {
-      closeTools();
-      const p = el("progress-pro-panel");
-      if (p.hidden) renderProgressPro();
-      p.hidden = !p.hidden;
-    });
-    el("tools-documents").addEventListener("click", () => {
-      closeTools();
-      openDocuments();
-    });
-    el("tools-debrief").addEventListener("click", () => {
-      closeTools();
-      handleDebrief();
     });
     el("debug-data-btn").addEventListener("click", () => {
       const output = el("debug-data-output");
@@ -249,36 +267,43 @@ export function initChat({ accessToken, userEmail, displayName, fileId, state, p
   el("debug-data-btn").hidden = profile.features.mascots;
 
   if (profile.features.scenarios) {
-    el("chat-mode-toggle").hidden = false;
-    el("phrasebank-btn").hidden = false; // useful in both role-play and writing
-    el("progress-pro-btn").hidden = false;
-    el("tools-btn").hidden = false; // mobile: collapses the tool buttons
-    el("scenario-select-wrap").hidden = false;
+    elHidden("chat-mode-toggle", false);
+    elHidden("phrasebank-btn", false); // desktop tab; hidden on mobile via CSS
+    elHidden("progress-pro-btn", false);
+    elHidden("tools-btn", false); // mobile: collapses the tool buttons
+    elHidden("scenario-select-wrap", false);
     initScenarioSelect();
     // Always start a (re)entered chat in role-play mode, never stuck in a
     // leftover writing session from a previous visit. (setWritingMode also
     // sets the Debrief button's visibility.)
     setWritingMode(false);
-    // Populate the Progress panel up front — on desktop it's always visible in
-    // the toolkit rail, so it must not start empty.
     renderProgressPro();
+    // One panel at a time. On desktop the rail shows Phrases by default (so it
+    // isn't empty); on phones nothing opens until the member taps a tool.
+    activePanel = null;
+    const wideLayout = window.matchMedia && window.matchMedia("(min-width: 900px)").matches;
+    setActivePanel(wideLayout ? "phrases" : null);
   } else {
-    el("chat-mode-toggle").hidden = true;
-    el("scenario-select-wrap").hidden = true;
-    el("debrief-btn").hidden = true;
-    el("phrasebank-btn").hidden = true;
-    el("phrasebank-panel").hidden = true;
-    el("progress-pro-btn").hidden = true;
-    el("progress-pro-panel").hidden = true;
-    el("tools-btn").hidden = true;
-    el("tools-menu").hidden = true;
+    elHidden("chat-mode-toggle", true);
+    elHidden("scenario-select-wrap", true);
+    elHidden("debrief-btn", true);
+    elHidden("phrasebank-btn", true);
+    elHidden("phrasebank-panel", true);
+    elHidden("progress-pro-btn", true);
+    elHidden("progress-pro-panel", true);
+    elHidden("documents-btn", true);
+    elHidden("tools-btn", true);
+    elHidden("tools-menu", true);
+    elHidden("rail-close", true);
+    activePanel = null;
     currentScenarioId = null;
     writingMode = false;
   }
 
   if (profile.features.documents) {
-    el("scenario-documents").hidden = false;
-    el("documents-btn").hidden = false; // "My documents", promoted in the header
+    // The documents panel's visibility is owned by setActivePanel (one panel at
+    // a time) — only the tab button is shown here.
+    elHidden("documents-btn", false);
     initDocumentsUi({
       userEmail: session.userEmail,
       getScenarioId: () => currentScenarioId,
@@ -294,8 +319,8 @@ export function initChat({ accessToken, userEmail, displayName, fileId, state, p
     });
     refreshDocumentsSummary((session.state.documentContext || {})[currentScenarioId]);
   } else {
-    el("scenario-documents").hidden = true;
-    el("documents-btn").hidden = true;
+    elHidden("scenario-documents", true);
+    elHidden("documents-btn", true);
   }
 
   // Adult (Business) menu tidy-up: the parent-only "View child's progress" is
@@ -303,7 +328,8 @@ export function initChat({ accessToken, userEmail, displayName, fileId, state, p
   // the exit to "Profiles" so the adult header reads as a pro tool, not a
   // kid's. Scoped to the adult profile; kids/teen keep their own labels.
   if (profile.features.scenarios) {
-    el("home-btn").innerHTML = `${iconSvg("home")} Profiles`;
+    const hb = el("home-btn");
+    if (hb) hb.innerHTML = `${iconSvg("home")} Profiles`;
   }
 
   if (profile.features.gamification) {
@@ -343,9 +369,9 @@ function initScenarioSelect() {
   select.value = session.state.lastScenarioId || "";
   currentScenarioId = select.value || null;
 
-  select.addEventListener("change", () => {
-    handleScenarioChange(select.value || null);
-  });
+  // Assign (not addEventListener) so re-entering the chat doesn't stack a new
+  // handler each time — that fired handleScenarioChange several times per change.
+  select.onchange = () => handleScenarioChange(select.value || null);
 }
 
 function handleScenarioChange(scenarioId) {
@@ -751,15 +777,13 @@ function setWritingMode(on) {
   el("chat-mode-roleplay").setAttribute("aria-pressed", String(!on));
   el("chat-mode-writing").setAttribute("aria-pressed", String(on));
 
-  // The scenario picker, its documents and Debrief are role-play concepts —
-  // hide them in writing mode (and only ever for a scenario-capable profile).
+  // The scenario picker and Debrief are role-play concepts — hide them in
+  // writing mode (and only ever for a scenario-capable profile). Panel
+  // visibility stays owned by setActivePanel.
   const scenarioCapable = !!(session && session.profile.features.scenarios);
-  el("scenario-select-wrap").hidden = on || !scenarioCapable;
-  el("debrief-btn").hidden = on || !scenarioCapable;
-  el("tools-debrief").hidden = on; // Debrief reviews a role-play, not writing
-  if (session && session.profile.features.documents) {
-    el("scenario-documents").hidden = on;
-  }
+  elHidden("scenario-select-wrap", on || !scenarioCapable);
+  elHidden("debrief-btn", on || !scenarioCapable);
+  elHidden("tools-debrief", on); // Debrief reviews a role-play, not writing
 
   el("chat-input").placeholder = on
     ? "Paste an email, message or paragraph and I'll polish it…"
