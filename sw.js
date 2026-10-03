@@ -131,7 +131,12 @@
 //      kept their light illustrated-scene veil in dark mode, so near-white text
 //      painted on them (notably the lesson question stem) was invisible. Add the
 //      dark scrim those screens were missing, matching the login/picker screens.
-const CACHE_VERSION = "socatei-v53";
+// v54: adult menu tidy-up — the Business header is regrouped into clear sections
+//      (Practice · Documents · Progress · Settings). New "Documents" button
+//      promotes the docs manager; the redundant "View child's progress" is
+//      dropped (it's already the "Părinte" bottom tab) and the kid "Levels"
+//      exit is relabelled "Profiles". Scoped to adult; kids/teen unchanged.
+const CACHE_VERSION = "socatei-v54";
 
 // Critical, visible assets pre-cached on install (before `activate` deletes the
 // previous cache). Without this, a CACHE_VERSION bump left a window with no

@@ -160,6 +160,17 @@ export function initChat({ accessToken, userEmail, displayName, fileId, state, p
       if (panel.hidden) renderProgressPro();
       panel.hidden = !panel.hidden;
     });
+    // "My documents" header button — opens the (already-visible) documents
+    // manager's upload panel, reusing its existing toggle.
+    el("documents-btn").addEventListener("click", () => {
+      const docPanel = el("scenario-documents-panel");
+      if (docPanel.hidden) {
+        el("scenario-documents-manage-btn").click();
+        el("scenario-documents").scrollIntoView({ behavior: "smooth", block: "nearest" });
+      } else {
+        el("scenario-documents-cancel-btn").click();
+      }
+    });
     el("debug-data-btn").addEventListener("click", () => {
       const output = el("debug-data-output");
       if (!output.hidden) {
@@ -231,6 +242,7 @@ export function initChat({ accessToken, userEmail, displayName, fileId, state, p
 
   if (profile.features.documents) {
     el("scenario-documents").hidden = false;
+    el("documents-btn").hidden = false; // "My documents", promoted in the header
     initDocumentsUi({
       userEmail: session.userEmail,
       getScenarioId: () => currentScenarioId,
@@ -247,6 +259,15 @@ export function initChat({ accessToken, userEmail, displayName, fileId, state, p
     refreshDocumentsSummary((session.state.documentContext || {})[currentScenarioId]);
   } else {
     el("scenario-documents").hidden = true;
+    el("documents-btn").hidden = true;
+  }
+
+  // Adult (Business) menu tidy-up: the parent-only "View child's progress" is
+  // already a bottom-nav tab ("Părinte"), and "Levels" is kid wording — relabel
+  // the exit to "Profiles" so the adult header reads as a pro tool, not a
+  // kid's. Scoped to the adult profile; kids/teen keep their own labels.
+  if (profile.features.scenarios) {
+    el("home-btn").innerHTML = `${iconSvg("home")} Profiles`;
   }
 
   if (profile.features.gamification) {

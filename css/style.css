@@ -1112,6 +1112,19 @@ body[data-usertype="adult"] .chat-mode-btn--active {
   color: #04232a;
 }
 
+/* ---- Adult header tidy-up: from a "morman" to clear sections ----
+   Practice (scenario picker + Role-play/Writing toggle) · Documents · Progress
+   · Settings (the gear). The parent-only "View child's progress" is dropped
+   here — it's already a bottom-nav tab ("Părinte") — and the exit ("Profiles",
+   relabelled from the kid "Levels" in JS) is pushed to the far right so it
+   reads as navigation, not another tool. Scoped to adult; kids/teen unchanged. */
+body[data-usertype="adult"] #view-child-progress-btn { display: none; }
+body[data-usertype="adult"] .app-header-actions { flex-wrap: wrap; row-gap: var(--sp-2); }
+/* A small gap opens between the Practice cluster and the tool buttons. */
+body[data-usertype="adult"] #documents-btn { margin-left: var(--sp-2); }
+/* Exit sits apart, far right. */
+body[data-usertype="adult"] #home-btn { margin-left: auto; }
+
 /* neutral, premium body beneath the header */
 body[data-usertype="adult"] #screen-chat { background: var(--surface); }
 
@@ -1468,6 +1481,7 @@ body[data-usertype="adult"] .progress-pro-cov--done svg { color: var(--primary-b
   }
   /* The header toggle buttons are redundant when the rail is always visible. */
   body[data-usertype="adult"] #phrasebank-btn,
+  body[data-usertype="adult"] #documents-btn,
   body[data-usertype="adult"] #progress-pro-btn { display: none; }
 
   /* A centred 460px phone nav under a 1140px layout looks broken — drop the
