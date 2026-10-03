@@ -480,7 +480,8 @@ function renderBudgetIndicator() {
 function renderGamificationBar() {
   const g = session.state.gamification;
   el("gamification-points").innerHTML = `${iconSvg("star")} ${g.points}`;
-  el("gamification-streak").innerHTML = `${iconSvg("flame")} ${g.currentStreak}`;
+  // Cumulative days practised (never resets) — gentle, not a breakable streak.
+  el("gamification-streak").innerHTML = `${iconSvg("flame")} ${g.totalActiveDays || 0}`;
 }
 
 function renderBadgesPanel() {

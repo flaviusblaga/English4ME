@@ -122,7 +122,12 @@
 //      with Phrasebank/Progress/Documents always open). Pure CSS + an aside
 //      wrapper that is display:contents on phones/tablets, so mobile and the
 //      kids/teen screens are unchanged.
-const CACHE_VERSION = "socatei-v51";
+// v52: gentle daily-activity for kids/teen — the headline "streak" now shows
+//      cumulative days practised (totalActiveDays, never resets) instead of the
+//      breakable days-in-a-row count. No reminders, no streak loss. Week strip
+//      kept as a friendly "X of the last 7 days". Header flames, home tile,
+//      stats card, parent view and the progress export all reworded to match.
+const CACHE_VERSION = "socatei-v52";
 
 // Critical, visible assets pre-cached on install (before `activate` deletes the
 // previous cache). Without this, a CACHE_VERSION bump left a window with no

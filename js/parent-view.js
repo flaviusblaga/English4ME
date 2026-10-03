@@ -294,7 +294,9 @@ function renderRecord(record) {
   nameEl.innerHTML = iconSvg("eye");
   nameEl.append(t("parent.progressTitle", { name: record.displayName || record.userEmail }));
   el("parent-view-points").textContent = record.gamification ? record.gamification.points : 0;
-  el("parent-view-streak").textContent = record.gamification ? record.gamification.currentStreak : 0;
+  // Gentle cumulative days practised (never resets), matching the child's own
+  // view — not a breakable "days in a row" streak.
+  el("parent-view-streak").textContent = record.gamification ? (record.gamification.totalActiveDays || 0) : 0;
   el("parent-view-turns").textContent = record.progress ? record.progress.totalTurns : 0;
 
   renderRewards(record.gamification && record.gamification.rewards);
