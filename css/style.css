@@ -41,13 +41,13 @@
   --text-muted: #64748b;
   --text-faint: #94a3b8;      /* inactive nav / chevrons */
 
-  --primary: #0a8fc4;         /* brand cyan (button-safe, white text) */
-  --primary-dark: #0773a0;
-  --primary-bright: #1ac3f5;  /* logo cyan — the far end of cyan gradients + accents */
-  --primary-soft: #cceffb;    /* light cyan chip bg */
-  --primary-tint: #eefaff;
-  --secondary: #f97316;       /* brand orange (accent) */
-  --highlight: #fb923c;       /* orange-400 — featured borders, warm highlights */
+  --primary: #0096b3;         /* brand cyan (button-safe, white text) */
+  --primary-dark: #00768f;
+  --primary-bright: #00bcd4;  /* logo cyan — the far end of cyan gradients + accents */
+  --primary-soft: #cceef3;    /* light cyan chip bg */
+  --primary-tint: #effbfd;
+  --secondary: #e86c2c;       /* brand orange (accent) */
+  --highlight: #f0864a;       /* orange-400 — featured borders, warm highlights */
   --star-gold: #f4b400;       /* filled reward stars */
 
   --success: #10b981;
@@ -66,9 +66,9 @@
   /* accents — profile-card tints, confetti, lesson nodes. --kid-purple keeps its
      NAME but carries the brand cyan primary, so every "current/primary" accent
      that referenced it turns cyan; coral already carries the brand orange. */
-  --kid-purple: #0a8fc4; --kid-purple-dark: #0773a0;
-  --kid-coral: #f97316;  --kid-coral-dark: #ea580c;
-  --kid-teal: #1ac3f5;   --kid-teal-dark: #0ea5e9;
+  --kid-purple: #0096b3; --kid-purple-dark: #00768f;
+  --kid-coral: #e86c2c;  --kid-coral-dark: #c85a21;
+  --kid-teal: #00bcd4;   --kid-teal-dark: #0097b2;
   --kid-yellow: #fbbf24; --kid-yellow-dark: #f59e0b;
   --kid-pink: #f472b6;   --kid-pink-dark: #ec4899;
   --kid-blue: #38bdf8;   --kid-blue-dark: #0ea5e9;
@@ -94,21 +94,21 @@
    none, the system setting (prefers-color-scheme) — so the app follows the
    phone by default but a manual toggle can override it. */
 :root[data-theme="dark"] {
-  --backdrop: #060a12;         /* behind the phone column */
-  --surface: #0f172a;          /* screen canvas (slate-900) */
-  --surface-raised: #1b2536;   /* cards (slate-800-ish) */
-  --surface-tint: #1b2536;     /* panels */
-  --line: #2c3a4f;
-  --line-strong: #3d4d63;
-  --text: #f1f5f9;             /* slate-100 */
-  --text-muted: #a3b2c7;       /* brighter than light's muted, for dark bg */
-  --text-faint: #7183a0;       /* inactive nav / chevrons */
+  --backdrop: #000000;         /* behind the phone column */
+  --surface: #0a0a0a;          /* screen canvas (slate-900) */
+  --surface-raised: #161616;   /* cards (slate-800-ish) */
+  --surface-tint: #161616;     /* panels */
+  --line: #262626;
+  --line-strong: #3a3a3a;
+  --text: #f4f4f5;             /* slate-100 */
+  --text-muted: #a1a1aa;       /* brighter than light's muted, for dark bg */
+  --text-faint: #71717a;       /* inactive nav / chevrons */
 
   /* Cyan accents: buttons keep the mid cyan (white text stays legible on them),
      but cyan TEXT on a dark surface needs to be brighter → --primary-text. */
-  --primary-text: #5fd3f5;     /* bright cyan, for accent text on dark */
-  --primary-soft: #0b3a4d;     /* dark cyan chip bg */
-  --primary-tint: #0c2f3e;     /* subtler dark cyan panel */
+  --primary-text: #2ad6ea;     /* bright cyan, for accent text on dark */
+  --primary-soft: #06343b;     /* dark cyan chip bg */
+  --primary-tint: #082a30;     /* subtler dark cyan panel */
 
   --success-soft: #0b3b30;
   --success-text: #6ee7b7;     /* green-300 */
@@ -145,14 +145,14 @@
 :root[data-theme="dark"] #screen-level-picker,
 :root[data-theme="dark"] #screen-placement {
   background:
-    linear-gradient(rgba(6, 10, 18, 0.88), rgba(6, 10, 18, 0.95)),
+    linear-gradient(rgba(6, 6, 6, 0.88), rgba(6, 6, 6, 0.95)),
     url("../assets/socatei/login-scene.svg") center bottom / cover no-repeat,
     var(--surface);
 }
 :root[data-theme="dark"] body[data-usertype="teen"] #screen-parent-view,
 :root[data-theme="dark"] body[data-usertype="teen"] #screen-reading {
   background:
-    linear-gradient(rgba(6, 10, 18, 0.88), rgba(6, 10, 18, 0.95)),
+    linear-gradient(rgba(6, 6, 6, 0.88), rgba(6, 6, 6, 0.95)),
     url("../assets/socatei/login-scene.svg") center top / cover no-repeat fixed,
     var(--surface);
 }
@@ -264,12 +264,12 @@ h1, h2, h3, h4 {
 .btn-primary {
   background: var(--primary);
   color: #fff;
-  box-shadow: 0 6px 16px rgba(10, 143, 196, 0.34);
+  box-shadow: 0 6px 16px rgba(0, 150, 179, 0.34);
 }
 
 .btn-primary:not(:disabled):active {
   transform: translateY(1px) scale(0.98);
-  box-shadow: 0 3px 10px rgba(10, 143, 196, 0.30);
+  box-shadow: 0 3px 10px rgba(0, 150, 179, 0.30);
 }
 
 .btn-primary:disabled {
@@ -809,13 +809,13 @@ body.mascot-theme .btn-primary {
   background: var(--primary);
   color: #fff;
   outline-color: var(--primary-soft);
-  box-shadow: 0 0 0 6px rgba(10, 143, 196, 0.18), var(--shadow-md);
+  box-shadow: 0 0 0 6px rgba(0, 150, 179, 0.18), var(--shadow-md);
   animation: node-pulse 1.8s var(--ease-out) infinite;
 }
 
 @keyframes node-pulse {
-  0%, 100% { box-shadow: 0 0 0 6px rgba(10, 143, 196, 0.18), var(--shadow-md); }
-  50%      { box-shadow: 0 0 0 13px rgba(10, 143, 196, 0.07), var(--shadow-md); }
+  0%, 100% { box-shadow: 0 0 0 6px rgba(0, 150, 179, 0.18), var(--shadow-md); }
+  50%      { box-shadow: 0 0 0 13px rgba(0, 150, 179, 0.07), var(--shadow-md); }
 }
 
 .lesson-node-label {
@@ -997,7 +997,7 @@ body[data-usertype="adult"] .app-identity { gap: var(--sp-3); }
 body[data-usertype="adult"] .identity-avatar {
   width: 54px; height: 54px; overflow: hidden;
   background: radial-gradient(circle at 50% 35%, #d5f2ee, #b9e8e1);
-  box-shadow: 0 0 0 2px rgba(10, 143, 196, 0.35), var(--shadow-sm);
+  box-shadow: 0 0 0 2px rgba(0, 150, 179, 0.35), var(--shadow-sm);
 }
 body[data-usertype="adult"] .identity-avatar img {
   width: 100%; height: 100%; object-fit: cover; object-position: top center;
@@ -1008,8 +1008,8 @@ body[data-usertype="adult"] .profile-tag { color: var(--text-muted); }
 /* usage read-out as a soft teal pill */
 body[data-usertype="adult"] .budget-indicator {
   color: var(--primary-dark);
-  background: rgba(10, 143, 196, 0.08);
-  border: 1px solid rgba(10, 143, 196, 0.25);
+  background: rgba(0, 150, 179, 0.08);
+  border: 1px solid rgba(0, 150, 179, 0.25);
   border-radius: 999px;
   padding: 6px 12px;
   font-weight: 600;
@@ -1171,8 +1171,8 @@ body[data-usertype="adult"] .budget-indicator { display: none; }
 .gamification-badge-chip {
   padding: 0.35rem 0.75rem;
   border-radius: var(--r-pill);
-  background: rgba(10, 143, 196, 0.08);
-  border: 1px solid rgba(10, 143, 196, 0.28);
+  background: rgba(0, 150, 179, 0.08);
+  border: 1px solid rgba(0, 150, 179, 0.28);
   color: var(--text);
   font-size: var(--fs-xs);
   font-weight: 700;
@@ -1533,7 +1533,7 @@ body[data-usertype="adult"] .budget-indicator { display: none; }
   display: grid; place-items: center; color: #fff;
   font-family: var(--font-display); font-weight: 800; font-size: 1.6rem;
   background: linear-gradient(135deg, var(--primary), var(--primary-bright));
-  box-shadow: 0 6px 16px rgba(10, 143, 196, 0.3);
+  box-shadow: 0 6px 16px rgba(0, 150, 179, 0.3);
   overflow: hidden;
 }
 /* when a teen sticker is chosen, it fills the tile (head-and-shoulders crop) */
@@ -2957,7 +2957,7 @@ body.mascot-theme .chat-bubble--assistant {
   cursor: pointer;
   color: #fff;
   background: var(--primary);
-  box-shadow: 0 6px 16px rgba(10, 143, 196, 0.34);
+  box-shadow: 0 6px 16px rgba(0, 150, 179, 0.34);
   transition: transform 120ms var(--ease-out);
 }
 
@@ -3387,7 +3387,7 @@ body.mascot-theme .chat-bubble--assistant {
 .lesson-row-play .icon { width: 0.95em; height: 0.95em; fill: currentColor; stroke: currentColor; }
 .lesson-row-stars { gap: 1px; color: var(--star-gold); }
 .lesson-row-stars .icon { width: 1em; height: 1em; fill: var(--star-gold); color: var(--star-gold); }
-.lesson-row--current { border-color: var(--primary-text); box-shadow: 0 0 0 2px rgba(10, 143, 196, 0.15); }
+.lesson-row--current { border-color: var(--primary-text); box-shadow: 0 0 0 2px rgba(0, 150, 179, 0.15); }
 .lesson-row--current .lesson-row-icon { border-color: var(--primary-text); }
 .lesson-row--done .lesson-row-label { color: var(--text-muted); }
 
@@ -3480,7 +3480,7 @@ body[data-usertype="teen"] #screen-reading {
   border-radius: var(--r-lg);
   box-shadow: var(--shadow-sm);
 }
-.stats-mod-card--done { border-color: rgba(10, 143, 196, 0.35); }
+.stats-mod-card--done { border-color: rgba(0, 150, 179, 0.35); }
 .stats-mod-emoji {
   flex-shrink: 0;
   width: 44px;
