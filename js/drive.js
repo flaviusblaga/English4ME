@@ -128,6 +128,7 @@ function defaultState({ profileId, userEmail, displayName, level, features }) {
       recurringCorrections: [],
       scenariosPracticed: [], // adult "Progress" panel: distinct scenario ids practiced
       activeDays: [],         // adult "Progress" panel: distinct YYYY-MM-DD active days
+      cefrLevel: null,        // adult "Progress" panel: self-assessed CEFR band (A1–C2)
     },
     usageSnapshot: {
       note: "Best-effort mirror of server-side usage tracking; not authoritative for budget enforcement.",

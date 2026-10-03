@@ -1416,6 +1416,60 @@ body[data-usertype="adult"] .phrasebank-phrase--copied {
 .progress-pro-cov--done { color: var(--text); font-weight: 600; }
 body[data-usertype="adult"] .progress-pro-cov--done svg { color: var(--primary-bright); }
 
+/* CEFR self-assessment row */
+.progress-pro-cefr {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  margin-bottom: var(--sp-3);
+  font-size: var(--fs-sm);
+}
+.progress-pro-cefr label { color: var(--text-muted); font-weight: 600; }
+.progress-pro-cefr select {
+  font: inherit;
+  font-size: var(--fs-sm);
+  font-weight: 700;
+  padding: 0.3rem 0.5rem;
+  border-radius: var(--r-sm);
+  border: 2px solid var(--line-strong);
+  background: var(--surface-raised);
+  color: var(--text);
+}
+.progress-pro-cefr-note { font-size: var(--fs-xs); color: var(--text-faint); }
+
+/* Competency snapshot — scenario coverage by professional area */
+.progress-pro-competency {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.progress-pro-comp {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 2px 8px;
+  font-size: var(--fs-sm);
+}
+.progress-pro-comp-name { color: var(--text); font-weight: 600; }
+.progress-pro-comp-count { color: var(--text-muted); font-size: var(--fs-xs); font-variant-numeric: tabular-nums; }
+.progress-pro-comp-bar {
+  grid-column: 1 / -1;
+  height: 6px;
+  border-radius: 999px;
+  background: var(--line);
+  overflow: hidden;
+}
+.progress-pro-comp-bar i {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  background: var(--primary);
+}
+body[data-usertype="adult"] .progress-pro-comp-bar i { background: var(--primary-bright); }
+
 /* The adult toolkit wrapper is a layout no-op everywhere EXCEPT the desktop
    adult layout below. display:contents means the <aside> box isn't rendered —
    its children (the panels) lay out exactly as if it weren't there — so phones,

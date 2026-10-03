@@ -141,7 +141,11 @@
 //      leadership, Negotiation, Pitch & presentation, Hiring & interviews,
 //      Difficult conversations). Client list only; the new ids need matching
 //      Worker prompts (docs/worker-scenarios-pack.md) to role-play in character.
-const CACHE_VERSION = "socatei-v55";
+// v56: adult coaching refinements — Debrief is now a scorecard (Fluency /
+//      Professionalism / Vocabulary out of 5 + 3 better phrasings + one focus),
+//      and the Progress panel gains a self-assessed CEFR level, "sessions this
+//      week", and a competency snapshot (scenario coverage by professional area).
+const CACHE_VERSION = "socatei-v56";
 
 // Critical, visible assets pre-cached on install (before `activate` deletes the
 // previous cache). Without this, a CACHE_VERSION bump left a window with no

@@ -117,7 +117,7 @@ const WRITING_EDITOR_PROMPT = (draft) =>
 // role-play. Sent the same stateless way — the transcript is embedded in one
 // message; the Worker needs no awareness of the feature.
 const DEBRIEF_PROMPT = (transcript) =>
-  `You are a supportive Business English coach. Below is a transcript of a role-play practice conversation between the learner ("You") and a practice partner ("Partner"). Review ONLY the learner's English — the "You" lines — using the Partner lines just as context.\n\nReply in exactly this plain-text format, with no markdown symbols:\n\nSTRENGTHS\n- <one or two things the learner did well>\n\nTOP FIXES\n- <an awkward or incorrect phrase> -> <a better, natural version>\n- <another> (two to four total)\n\nTRY NEXT TIME\n- <one useful phrase or structure for this kind of conversation>\n\nKeep it concise and encouraging. Transcript:\n"""\n${transcript}\n"""`;
+  `You are a supportive Business English coach. Below is a transcript of a role-play practice conversation between the learner ("You") and a practice partner ("Partner"). Assess ONLY the learner's English — the "You" lines — using the Partner lines just as context. This is a coaching scorecard, not a chat: be concise and specific.\n\nScore each 1-5 (5 = excellent) based only on this conversation. Reply in exactly this plain-text format, with no markdown symbols:\n\nSCORECARD\nFluency: X/5 — <4-6 word reason>\nProfessionalism: X/5 — <4-6 word reason>\nVocabulary: X/5 — <4-6 word reason>\n\nBETTER PHRASINGS\n- <something they said> -> <a more native, professional version>\n- <another> -> <better>\n- <another> -> <better>\n\nONE THING TO WORK ON\n- <a single, concrete focus for next time>\n\nTranscript:\n"""\n${transcript}\n"""`;
 
 function el(id) {
   return document.getElementById(id);
@@ -556,44 +556,87 @@ function renderPhrasebank() {
   }
 }
 
+// CEFR is the Common European Framework self-rating (A1–C2). The app can't
+// objectively assess a CEFR band, so it's an explicit SELF-assessment the member
+// picks — labelled as such, never presented as a measured score.
+const CEFR_LEVELS = ["A1", "A2", "B1", "B2", "C1", "C2"];
+
 // "Progress" — a professional progress panel for the adult (Business) profile.
-// Every number here is a real counter the app actually records; nothing is
-// estimated or fabricated. No streak/minutes figures because the app doesn't
-// track session time — only distinct active days, which it does.
+// Real counters only (nothing estimated), plus a self-declared CEFR level. No
+// streak/minutes figures because the app doesn't track session time.
 function renderProgressPro() {
   const panel = el("progress-pro-panel");
   const p = session.state.progress || {};
   const turns = p.totalTurns || 0;
   const practiced = new Set(p.scenariosPracticed || []);
   const scenariosTotal = SCENARIOS.length;
-  const days = (p.activeDays || []).length;
+  const activeDays = p.activeDays || [];
   const snap = session.state.usageSnapshot || {};
   const spent = snap.estimatedCostUsd || 0;
   const budget = snap.budgetUsd || 10;
+  const cefr = p.cefrLevel || "";
   const since = session.state.createdAt
     ? new Date(session.state.createdAt).toLocaleDateString(undefined, { month: "short", year: "numeric" })
     : "—";
 
+  // Sessions this week = distinct active days within the last 7 calendar days.
+  const weekAgo = new Date();
+  weekAgo.setDate(weekAgo.getDate() - 6);
+  const weekKey = weekAgo.toISOString().slice(0, 10);
+  const weekSessions = activeDays.filter((d) => d >= weekKey).length;
+
   const tile = (value, label) =>
     `<div class="progress-pro-tile"><span class="progress-pro-value">${value}</span><span class="progress-pro-label">${label}</span></div>`;
 
-  const coverage = SCENARIOS.map((s) => {
-    const done = practiced.has(s.id);
-    return `<li class="progress-pro-cov${done ? " progress-pro-cov--done" : ""}">${
-      done ? iconSvg("circle-check") : ""
-    }<span>${s.label}</span></li>`;
-  }).join("");
+  // Competency snapshot — scenario coverage grouped by professional area, so it
+  // reads as which competencies the member has actually practised.
+  const byCategory = new Map();
+  for (const s of SCENARIOS) {
+    const c = byCategory.get(s.category) || { done: 0, total: 0 };
+    c.total += 1;
+    if (practiced.has(s.id)) c.done += 1;
+    byCategory.set(s.category, c);
+  }
+  const competency = [...byCategory.entries()]
+    .map(([cat, c]) => {
+      const pct = c.total ? Math.round((c.done / c.total) * 100) : 0;
+      return (
+        `<li class="progress-pro-comp"><span class="progress-pro-comp-name">${cat}</span>` +
+        `<span class="progress-pro-comp-count">${c.done}/${c.total}</span>` +
+        `<span class="progress-pro-comp-bar"><i style="width:${pct}%"></i></span></li>`
+      );
+    })
+    .join("");
+
+  const cefrOptions = [`<option value="">—</option>`]
+    .concat(CEFR_LEVELS.map((l) => `<option value="${l}"${l === cefr ? " selected" : ""}>${l}</option>`))
+    .join("");
 
   panel.innerHTML = `
+    <div class="progress-pro-cefr">
+      <label for="progress-cefr-select">Your level</label>
+      <select id="progress-cefr-select">${cefrOptions}</select>
+      <span class="progress-pro-cefr-note">CEFR · self-assessed</span>
+    </div>
     <div class="progress-pro-grid">
       ${tile(turns, "Practice turns")}
       ${tile(`${practiced.size}/${scenariosTotal}`, "Scenarios practised")}
-      ${tile(days, days === 1 ? "Day practised" : "Days practised")}
+      ${tile(weekSessions, weekSessions === 1 ? "Session this week" : "Sessions this week")}
       ${tile(`$${spent.toFixed(2)}`, `used of $${budget.toFixed(0)} this month`)}
     </div>
-    <p class="progress-pro-since">Practising since ${since}</p>
-    <h4 class="progress-pro-head">Scenario coverage</h4>
-    <ul class="progress-pro-coverage">${coverage}</ul>`;
+    <p class="progress-pro-since">Practising since ${since} · ${activeDays.length} ${activeDays.length === 1 ? "day" : "days"} total</p>
+    <h4 class="progress-pro-head">Competency snapshot</h4>
+    <ul class="progress-pro-competency">${competency}</ul>`;
+
+  // Persist the self-assessed CEFR level when the member sets it.
+  const cefrSelect = el("progress-cefr-select");
+  if (cefrSelect) {
+    cefrSelect.addEventListener("change", () => {
+      session.state.progress = session.state.progress || {};
+      session.state.progress.cefrLevel = cefrSelect.value || null;
+      saveState(session.accessToken, session.fileId, session.state);
+    });
+  }
 }
 
 function copyPhrase(text, rowEl) {
