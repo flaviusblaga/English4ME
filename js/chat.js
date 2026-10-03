@@ -98,6 +98,20 @@ let session = null; // { accessToken, userEmail, displayName, fileId, state, pro
 let currentScenarioId = null; // null = free conversation
 let listenersInitialized = false; // guards one-time listener attachment across repeated initChat calls
 
+// Adult "Writing" mode (Business English only). A stateless, one-shot editor:
+// the learner pastes a draft email/message, we send ONE standalone request to
+// the same Worker /chat endpoint (no scenario, no conversation history) framed
+// as an editing task, and show the polished version plus a few notes. It is
+// deliberately independent of role-play history — switching modes never mixes
+// the two — so no Worker change is needed to ship it.
+let writingMode = false;
+let defaultChatPlaceholder = ""; // captured from the i18n'd input so toggling back restores it
+
+// Keep this as a single user message (the Worker takes no system override from
+// the client). Explicit output shape so the reply is consistent and copyable.
+const WRITING_EDITOR_PROMPT = (draft) =>
+  `You are a professional Business English editor. Improve the text below for a work context: fix grammar and spelling, make the tone professional and natural, and keep it concise. Do not invent facts or add content the writer did not imply.\n\nReply in exactly this plain-text format, with no markdown symbols:\n\nPOLISHED VERSION\n<the improved text, ready to paste>\n\nNOTES\n- <one short note on a key change>\n- <another>\n- <another, only if useful>\n\nText to improve:\n"""\n${draft}\n"""`;
+
 function el(id) {
   return document.getElementById(id);
 }
@@ -116,6 +130,8 @@ export function initChat({ accessToken, userEmail, displayName, fileId, state, p
   if (!listenersInitialized) {
     listenersInitialized = true;
 
+    defaultChatPlaceholder = el("chat-input").placeholder;
+
     el("chat-send").addEventListener("click", handleSend);
     el("chat-input").addEventListener("keydown", (e) => {
       if (e.key === "Enter" && !e.shiftKey) {
@@ -123,6 +139,8 @@ export function initChat({ accessToken, userEmail, displayName, fileId, state, p
         handleSend();
       }
     });
+    el("chat-mode-roleplay").addEventListener("click", () => setWritingMode(false));
+    el("chat-mode-writing").addEventListener("click", () => setWritingMode(true));
     el("debug-data-btn").addEventListener("click", () => {
       const output = el("debug-data-output");
       if (!output.hidden) {
@@ -168,11 +186,17 @@ export function initChat({ accessToken, userEmail, displayName, fileId, state, p
   el("debug-data-btn").hidden = profile.features.mascots;
 
   if (profile.features.scenarios) {
+    el("chat-mode-toggle").hidden = false;
     el("scenario-select-wrap").hidden = false;
     initScenarioSelect();
+    // Always start a (re)entered chat in role-play mode, never stuck in a
+    // leftover writing session from a previous visit.
+    setWritingMode(false);
   } else {
+    el("chat-mode-toggle").hidden = true;
     el("scenario-select-wrap").hidden = true;
     currentScenarioId = null;
+    writingMode = false;
   }
 
   if (profile.features.documents) {
@@ -474,10 +498,47 @@ export function recordTurnForParentSync(state, turn) {
   state.parentSync.todayTurns.push(turn);
 }
 
+// Toggle between role-play (the default conversation) and the stateless
+// writing editor. Switching to writing clears the visible log for a clean
+// editor surface; switching back re-renders the preserved role-play history.
+function setWritingMode(on) {
+  writingMode = on;
+  el("chat-mode-roleplay").classList.toggle("chat-mode-btn--active", !on);
+  el("chat-mode-writing").classList.toggle("chat-mode-btn--active", on);
+  el("chat-mode-roleplay").setAttribute("aria-pressed", String(!on));
+  el("chat-mode-writing").setAttribute("aria-pressed", String(on));
+
+  // The scenario picker and its documents are role-play concepts — hide them
+  // in writing mode (and only ever show them for a scenario-capable profile).
+  const scenarioCapable = !!(session && session.profile.features.scenarios);
+  el("scenario-select-wrap").hidden = on || !scenarioCapable;
+  if (session && session.profile.features.documents) {
+    el("scenario-documents").hidden = on;
+  }
+
+  el("chat-input").placeholder = on
+    ? "Paste an email, message or paragraph and I'll polish it…"
+    : defaultChatPlaceholder;
+
+  if (on) {
+    el("chat-log").innerHTML = "";
+    appendSystemNotice(
+      "Writing mode — paste any text and I'll return a polished version plus a few notes. This is separate from your role-play and isn't saved to history."
+    );
+  } else if (session) {
+    rerenderChatLog();
+  }
+}
+
 async function handleSend() {
   const input = el("chat-input");
   const text = input.value.trim();
   if (!text) return;
+
+  if (writingMode) {
+    await handleWritingSend(text);
+    return;
+  }
 
   input.value = "";
   el("chat-send").disabled = true;
@@ -561,6 +622,57 @@ async function handleSend() {
         date: session.state.parentSync.todayDate,
         turns: session.state.parentSync.todayTurns,
       }).catch((err) => console.warn("Parent-progress sync failed (non-fatal):", err));
+    }
+  } catch (err) {
+    showBanner(`Something went wrong: ${err.message}`);
+  } finally {
+    el("chat-send").disabled = false;
+  }
+}
+
+// Writing mode: one stateless round-trip through the same Worker /chat. We send
+// the draft wrapped in an editor instruction as a SINGLE message — no scenario,
+// no rolling window, nothing persisted to recentTurns — so the editor can't be
+// derailed by, or leak into, the learner's role-play history. The usage/budget
+// snapshot is still updated (the call costs the same as any chat turn).
+async function handleWritingSend(draft) {
+  const input = el("chat-input");
+  input.value = "";
+  el("chat-send").disabled = true;
+
+  appendMessageToLog("user", draft, session.profile);
+
+  try {
+    const result = await sendChatMessage({
+      userEmail: session.userEmail,
+      profileId: session.profile.id,
+      messages: [{ role: "user", content: WRITING_EDITOR_PROMPT(draft) }],
+      conversationSummary: null,
+      scenarioId: null,
+      documentContext: null,
+      lessonWordList: null,
+      mascotPreference: getMascotPreference(),
+    });
+
+    if (result.budgetStatus === "soft_block") {
+      showBanner(result.message);
+      return;
+    }
+
+    appendMessageToLog("assistant", result.reply, session.profile);
+
+    session.state.usageSnapshot = {
+      ...session.state.usageSnapshot,
+      monthKey: new Date().toISOString().slice(0, 7),
+      estimatedCostUsd: result.costUsd.monthToDateForUser,
+      lastSyncedAt: new Date().toISOString(),
+    };
+    renderBudgetIndicator();
+
+    if (result.budgetStatus === "warn") {
+      showBanner("Heads up — you're close to your $10 practice budget for this month.");
+    } else {
+      hideBanner();
     }
   } catch (err) {
     showBanner(`Something went wrong: ${err.message}`);

@@ -1018,6 +1018,32 @@ body.mascot-theme .identity-avatar {
   white-space: nowrap;
 }
 
+/* Role-play / Writing segmented control (adult chat only; hidden otherwise). */
+.chat-mode-toggle {
+  display: inline-flex;
+  padding: 3px;
+  gap: 2px;
+  border-radius: 999px;
+  border: 1px solid var(--line-strong);
+  background: var(--surface-raised);
+}
+.chat-mode-btn {
+  font: inherit;
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  padding: 0.35rem 0.8rem;
+  border: none;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+.chat-mode-btn--active {
+  background: var(--primary);
+  color: #fff;
+}
+
 /* ===================== Adult "premium dashboard" theme =====================
    Everything here is scoped to body[data-usertype="adult"], set only for the
    Business profile in loadSession — so the kids' shared chat screen is never
@@ -1074,6 +1100,16 @@ body[data-usertype="adult"] #scenario-select {
   background: var(--surface);
   border-color: var(--line);
   color: var(--text);
+}
+
+/* mode toggle on the dark adult header */
+body[data-usertype="adult"] .chat-mode-toggle {
+  background: var(--surface);
+  border-color: var(--line);
+}
+body[data-usertype="adult"] .chat-mode-btn--active {
+  background: var(--primary-bright);
+  color: #04232a;
 }
 
 /* neutral, premium body beneath the header */
