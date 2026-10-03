@@ -131,7 +131,21 @@
 //      kept their light illustrated-scene veil in dark mode, so near-white text
 //      painted on them (notably the lesson question stem) was invisible. Add the
 //      dark scrim those screens were missing, matching the login/picker screens.
-const CACHE_VERSION = "socatei-v53";
+// v54: adult menu tidy-up — the Business header is regrouped into clear sections
+//      (Practice · Documents · Progress · Settings). New "Documents" button
+//      promotes the docs manager; the redundant "View child's progress" is
+//      dropped (it's already the "Părinte" bottom tab) and the kid "Levels"
+//      exit is relabelled "Profiles". Scoped to adult; kids/teen unchanged.
+// v55: expanded Business scenario library — the Practice picker now lists the
+//      full set grouped in 6 categories (Networking & intros, Meetings &
+//      leadership, Negotiation, Pitch & presentation, Hiring & interviews,
+//      Difficult conversations). Client list only; the new ids need matching
+//      Worker prompts (docs/worker-scenarios-pack.md) to role-play in character.
+// v56: adult coaching refinements — Debrief is now a scorecard (Fluency /
+//      Professionalism / Vocabulary out of 5 + 3 better phrasings + one focus),
+//      and the Progress panel gains a self-assessed CEFR level, "sessions this
+//      week", and a competency snapshot (scenario coverage by professional area).
+const CACHE_VERSION = "socatei-v56";
 
 // Critical, visible assets pre-cached on install (before `activate` deletes the
 // previous cache). Without this, a CACHE_VERSION bump left a window with no
