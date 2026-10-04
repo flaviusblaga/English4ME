@@ -167,6 +167,11 @@ function setActivePanel(name) {
 
   const rail = el("adult-rail");
   if (rail) rail.classList.toggle("adult-rail--open", activePanel !== null);
+  // On phones a tool panel is its OWN view, not a pop-up over the chat: this
+  // flag lets the CSS hide the chat surface while a panel is open, so the
+  // screen is either "chat" or "a tool", never both stacked.
+  const screen = el("screen-chat");
+  if (screen) screen.classList.toggle("adult-panel-open", activePanel !== null);
   elHidden("rail-close", activePanel === null);
 
   // Always collapse the mobile Tools menu after a choice.
