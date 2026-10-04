@@ -164,7 +164,10 @@
 //      opens with a friendly welcome/empty-state (what you can do + quick-start
 //      scenario chips); and the documents panel no longer force-shows itself
 //      alongside another tool (setActivePanel owns one-panel-at-a-time).
-const CACHE_VERSION = "socatei-v61";
+// v62: review fixes on the value pass — the chat welcome sets the member's name
+//      as text (never HTML); Debrief guards against a double-run from the header
+//      button and the mobile Tools menu at once.
+const CACHE_VERSION = "socatei-v62";
 
 // Critical, visible assets pre-cached on install (before `activate` deletes the
 // previous cache). Without this, a CACHE_VERSION bump left a window with no

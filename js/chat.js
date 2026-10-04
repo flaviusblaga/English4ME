@@ -107,6 +107,7 @@ let listenersInitialized = false; // guards one-time listener attachment across 
 // the two — so no Worker change is needed to ship it.
 let writingMode = false;
 let defaultChatPlaceholder = ""; // captured from the i18n'd input so toggling back restores it
+let debriefInFlight = false; // guards against a second Debrief while one is running
 
 // Adult toolkit: exactly ONE panel is open at a time (phrases / progress /
 // documents), never several stacked over the chat. On desktop it shows in the
@@ -559,8 +560,7 @@ function renderChatWelcome() {
   const way = (icon, title, rest) =>
     `<li>${iconSvg(icon)}<span><b>${title}</b> — ${rest}</span></li>`;
   card.innerHTML =
-    `<div class="chat-welcome-head">${iconSvg("graduation-cap")}` +
-    `<h3>${name ? `Welcome back, ${name}.` : "Welcome back."} Let's practise Business English.</h3></div>` +
+    `<div class="chat-welcome-head">${iconSvg("graduation-cap")}<h3 class="chat-welcome-title"></h3></div>` +
     `<p class="chat-welcome-sub">Rehearse real work situations, sharpen your writing, and get coached — all in English.</p>` +
     `<ul class="chat-welcome-ways">` +
     way("message-circle", "Role-play", "a real scenario — pick one below and dive in") +
@@ -570,6 +570,10 @@ function renderChatWelcome() {
     `</ul>` +
     `<p class="chat-welcome-hint">Jump into a scenario:</p>` +
     `<div class="chat-welcome-chips"></div>`;
+  // Set the member's name as TEXT, never HTML, so a name with special
+  // characters can't inject markup (graphify finding).
+  card.querySelector(".chat-welcome-title").textContent =
+    (name ? `Welcome back, ${name}. ` : "Welcome back. ") + "Let's practise Business English.";
   const chipsWrap = card.querySelector(".chat-welcome-chips");
   for (const id of ["status-meeting", "salary-negotiation", "give-feedback", "networking-smalltalk", "pitch-leadership"]) {
     const sc = SCENARIOS.find((s) => s.id === id);
@@ -1114,6 +1118,11 @@ async function handleDebrief() {
     return;
   }
 
+  // Guard re-entry: Debrief can be launched from the header button OR the mobile
+  // Tools menu, so a disabled header button alone doesn't stop a double-tap.
+  if (debriefInFlight) return;
+  debriefInFlight = true;
+
   const transcript = turns
     .map((turn) => `${turn.role === "user" ? "You" : "Partner"}: ${turn.text}`)
     .join("\n");
@@ -1144,6 +1153,7 @@ async function handleDebrief() {
   } catch (err) {
     showBanner(`Something went wrong: ${err.message}`);
   } finally {
+    debriefInFlight = false;
     el("debrief-btn").disabled = false;
     el("chat-send").disabled = false;
   }
