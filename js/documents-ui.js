@@ -39,18 +39,19 @@ export function initDocumentsUi({ userEmail: email, getScenarioId: getId, getSce
 // Call whenever the active scenario changes or on initial load, passing the
 // current Drive entry for that scenario (or null/undefined if none saved yet).
 export function refreshDocumentsSummary(entry) {
+  // The container's visibility is owned by the chat's setActivePanel (one tool
+  // panel open at a time) — this only refreshes the summary text, never shows or
+  // hides the panel.
   const scenarioId = getScenarioId();
-  const container = el("scenario-documents");
+  const label = el("scenario-documents-label");
+  if (!label) return;
 
-  if (!scenarioId) {
-    container.hidden = true;
-    return;
-  }
-
-  container.hidden = false;
   closePanel();
 
-  const label = el("scenario-documents-label");
+  if (!scenarioId) {
+    label.textContent = "Pick a scenario first, then attach documents for it.";
+    return;
+  }
   if (entry && entry.files && entry.files.length > 0) {
     const names = entry.files.map((f) => f.filename).join(", ");
     const date = new Date(entry.extractedAt).toLocaleDateString();

@@ -107,6 +107,7 @@ let listenersInitialized = false; // guards one-time listener attachment across 
 // the two — so no Worker change is needed to ship it.
 let writingMode = false;
 let defaultChatPlaceholder = ""; // captured from the i18n'd input so toggling back restores it
+let debriefInFlight = false; // guards against a second Debrief while one is running
 
 // Adult toolkit: exactly ONE panel is open at a time (phrases / progress /
 // documents), never several stacked over the chat. On desktop it shows in the
@@ -342,6 +343,9 @@ export function initChat({ accessToken, userEmail, displayName, fileId, state, p
     el("gamification-badges-btn").hidden = true;
     el("gamification-badges-panel").hidden = true;
   }
+
+  // A warm welcome instead of a blank chat (adult only, empty conversation).
+  maybeShowChatWelcome();
 }
 
 function initScenarioSelect() {
@@ -543,6 +547,66 @@ function appendSystemNotice(text) {
   log.scrollTop = log.scrollHeight;
 }
 
+// Friendly empty-state for the adult (Business) chat, so a fresh session isn't a
+// cold blank box. Explains what the member can do and offers quick-start
+// scenario chips. Shown only when the conversation is empty; removed on the
+// first message (see removeChatWelcome).
+function renderChatWelcome() {
+  const log = el("chat-log");
+  if (!log) return;
+  const name = (session.displayName || "").split(" ")[0];
+  const card = document.createElement("div");
+  card.className = "chat-welcome";
+  const way = (icon, title, rest) =>
+    `<li>${iconSvg(icon)}<span><b>${title}</b> — ${rest}</span></li>`;
+  card.innerHTML =
+    `<div class="chat-welcome-head">${iconSvg("graduation-cap")}<h3 class="chat-welcome-title"></h3></div>` +
+    `<p class="chat-welcome-sub">Rehearse real work situations, sharpen your writing, and get coached — all in English.</p>` +
+    `<ul class="chat-welcome-ways">` +
+    way("message-circle", "Role-play", "a real scenario — pick one below and dive in") +
+    way("pencil", "Writing", "switch to Writing mode to polish an email or message") +
+    way("clipboard-list", "Debrief", "get a coaching scorecard after a role-play") +
+    way("folder", "Phrases &amp; Documents", "ready-to-use lines and your own notes, in Tools") +
+    `</ul>` +
+    `<p class="chat-welcome-hint">Jump into a scenario:</p>` +
+    `<div class="chat-welcome-chips"></div>`;
+  // Set the member's name as TEXT, never HTML, so a name with special
+  // characters can't inject markup (graphify finding).
+  card.querySelector(".chat-welcome-title").textContent =
+    (name ? `Welcome back, ${name}. ` : "Welcome back. ") + "Let's practise Business English.";
+  const chipsWrap = card.querySelector(".chat-welcome-chips");
+  for (const id of ["status-meeting", "salary-negotiation", "give-feedback", "networking-smalltalk", "pitch-leadership"]) {
+    const sc = SCENARIOS.find((s) => s.id === id);
+    if (!sc) continue;
+    const chip = document.createElement("button");
+    chip.type = "button";
+    chip.className = "chat-welcome-chip";
+    chip.textContent = sc.label;
+    chip.addEventListener("click", () => {
+      const sel = el("scenario-select");
+      if (sel) sel.value = id;
+      handleScenarioChange(id);
+    });
+    chipsWrap.appendChild(chip);
+  }
+  log.appendChild(card);
+}
+
+function removeChatWelcome() {
+  const w = el("chat-log") && el("chat-log").querySelector(".chat-welcome");
+  if (w) w.remove();
+}
+
+// Show the welcome only for the adult chat, with an empty conversation and not
+// in writing mode.
+function maybeShowChatWelcome() {
+  if (!session || !session.profile.features.scenarios || writingMode) return;
+  const log = el("chat-log");
+  if (!log || log.querySelector(".chat-welcome")) return; // already shown
+  const turns = (session.state.conversation && session.state.conversation.recentTurns) || [];
+  if (turns.length === 0) renderChatWelcome();
+}
+
 function renderBudgetIndicator() {
   const { estimatedCostUsd, budgetUsd } = session.state.usageSnapshot;
   el("budget-indicator").textContent = `Usage this month: $${estimatedCostUsd.toFixed(2)} / $${budgetUsd.toFixed(2)}`;
@@ -579,24 +643,33 @@ function renderBadgesPanel() {
   }
 }
 
-// Phrasebank — static, curated Business English phrases grouped by situation.
-// Built once (content never changes at runtime); each group is a collapsible
-// header and each phrase a copy-to-clipboard row.
+// Phrasebank — a coaching resource. Built once: a short intro, then each
+// situation group is a collapsible section of rich cards (context + register +
+// Hear / Copy / Use-in-chat). Content is static; only the actions are live.
 function renderPhrasebank() {
   const panel = el("phrasebank-panel");
   panel.innerHTML = "";
-  for (const group of PHRASEBANK) {
+
+  const intro = document.createElement("p");
+  intro.className = "phrasebank-intro";
+  intro.innerHTML =
+    `${iconSvg("message-circle")} Ready-to-use lines for real work moments. ` +
+    `Tap <b>Use</b> to drop one into the chat and practise it, <b>Hear</b> for pronunciation.`;
+  panel.appendChild(intro);
+
+  PHRASEBANK.forEach((group, gi) => {
     const section = document.createElement("div");
-    section.className = "phrasebank-group";
+    section.className = "phrasebank-group" + (gi === 0 ? " phrasebank-group--open" : "");
 
     const head = document.createElement("button");
     head.type = "button";
     head.className = "phrasebank-group-head";
-    head.innerHTML = `<span>${group.category}</span> ${iconSvg("chevron-down")}`;
+    head.innerHTML =
+      `<span class="phrasebank-group-name">${group.icon ? `<span class="phrasebank-group-emoji">${group.icon}</span>` : ""}${group.category}</span> ${iconSvg("chevron-down")}`;
 
     const list = document.createElement("div");
     list.className = "phrasebank-list";
-    list.hidden = true;
+    list.hidden = gi !== 0;
 
     head.addEventListener("click", () => {
       list.hidden = !list.hidden;
@@ -604,17 +677,74 @@ function renderPhrasebank() {
     });
 
     for (const phrase of group.phrases) {
-      const row = document.createElement("button");
-      row.type = "button";
-      row.className = "phrasebank-phrase";
-      row.textContent = phrase;
-      row.addEventListener("click", () => copyPhrase(phrase, row));
-      list.appendChild(row);
+      list.appendChild(renderPhraseCard(phrase));
     }
 
     section.appendChild(head);
     section.appendChild(list);
     panel.appendChild(section);
+  });
+}
+
+// One phrase card: the "when to use" context, the phrase, a register pill, and
+// the three actions. Hear speaks it (TTS); Copy copies it; Use drops it into
+// the chat input (closing the panel on mobile) so the member can practise it.
+function renderPhraseCard(phrase) {
+  const card = document.createElement("div");
+  card.className = "phrase-card";
+
+  const ctx = document.createElement("p");
+  ctx.className = "phrase-ctx";
+  ctx.textContent = phrase.context;
+
+  const text = document.createElement("p");
+  text.className = "phrase-text";
+  text.textContent = phrase.text;
+
+  const foot = document.createElement("div");
+  foot.className = "phrase-foot";
+
+  const reg = document.createElement("span");
+  reg.className = `phrase-reg phrase-reg--${phrase.register || "neutral"}`;
+  reg.textContent = phrase.register || "neutral";
+
+  const actions = document.createElement("div");
+  actions.className = "phrase-actions";
+
+  const hear = document.createElement("button");
+  hear.type = "button";
+  hear.className = "phrase-act";
+  hear.innerHTML = `${iconSvg("volume-2")} Hear`;
+  hear.addEventListener("click", () => speak(phrase.text));
+
+  const copy = document.createElement("button");
+  copy.type = "button";
+  copy.className = "phrase-act";
+  copy.innerHTML = `${iconSvg("clipboard-list")} Copy`;
+  copy.addEventListener("click", () => copyPhrase(phrase.text, copy));
+
+  const use = document.createElement("button");
+  use.type = "button";
+  use.className = "phrase-act phrase-act--primary";
+  use.innerHTML = `${iconSvg("send")} Use`;
+  use.addEventListener("click", () => usePhraseInChat(phrase.text));
+
+  actions.append(hear, copy, use);
+  foot.append(reg, actions);
+  card.append(ctx, text, foot);
+  return card;
+}
+
+// Drop a phrase into the chat input so the member can tweak/send it. Closes the
+// tool panel (important on mobile, where it's a full bottom-sheet) and focuses
+// the input.
+function usePhraseInChat(text) {
+  if (activePanel) setActivePanel(activePanel); // close the open panel
+  const input = el("chat-input");
+  if (input) {
+    input.value = text;
+    input.focus();
+    input.setSelectionRange(text.length, text.length);
   }
 }
 
@@ -703,12 +833,12 @@ function renderProgressPro() {
 
 function copyPhrase(text, rowEl) {
   const flash = () => {
-    const prev = rowEl.textContent;
-    rowEl.classList.add("phrasebank-phrase--copied");
+    const prev = rowEl.innerHTML;
+    rowEl.classList.add("phrase-act--copied");
     rowEl.textContent = "Copied ✓";
     setTimeout(() => {
-      rowEl.textContent = prev;
-      rowEl.classList.remove("phrasebank-phrase--copied");
+      rowEl.innerHTML = prev;
+      rowEl.classList.remove("phrase-act--copied");
     }, 900);
   };
   if (navigator.clipboard && navigator.clipboard.writeText) {
@@ -796,6 +926,7 @@ function setWritingMode(on) {
     );
   } else if (session) {
     rerenderChatLog();
+    maybeShowChatWelcome();
   }
 }
 
@@ -803,6 +934,8 @@ async function handleSend() {
   const input = el("chat-input");
   const text = input.value.trim();
   if (!text) return;
+
+  removeChatWelcome();
 
   if (writingMode) {
     await handleWritingSend(text);
@@ -985,6 +1118,11 @@ async function handleDebrief() {
     return;
   }
 
+  // Guard re-entry: Debrief can be launched from the header button OR the mobile
+  // Tools menu, so a disabled header button alone doesn't stop a double-tap.
+  if (debriefInFlight) return;
+  debriefInFlight = true;
+
   const transcript = turns
     .map((turn) => `${turn.role === "user" ? "You" : "Partner"}: ${turn.text}`)
     .join("\n");
@@ -1015,6 +1153,7 @@ async function handleDebrief() {
   } catch (err) {
     showBanner(`Something went wrong: ${err.message}`);
   } finally {
+    debriefInFlight = false;
     el("debrief-btn").disabled = false;
     el("chat-send").disabled = false;
   }

@@ -159,7 +159,15 @@
 //      so a stale cached HTML can no longer crash the app.
 // v60: mobile adult tool panels open as a clean bottom-sheet overlay (dimmed
 //      backdrop + ✕) instead of an inline block that fought the chat for space.
-const CACHE_VERSION = "socatei-v60";
+// v61: adult Business value pass — Phrasebank is now a coaching resource (each
+//      phrase shows its situation + register + Hear/Copy/Use-in-chat); the chat
+//      opens with a friendly welcome/empty-state (what you can do + quick-start
+//      scenario chips); and the documents panel no longer force-shows itself
+//      alongside another tool (setActivePanel owns one-panel-at-a-time).
+// v62: review fixes on the value pass — the chat welcome sets the member's name
+//      as text (never HTML); Debrief guards against a double-run from the header
+//      button and the mobile Tools menu at once.
+const CACHE_VERSION = "socatei-v62";
 
 // Critical, visible assets pre-cached on install (before `activate` deletes the
 // previous cache). Without this, a CACHE_VERSION bump left a window with no
