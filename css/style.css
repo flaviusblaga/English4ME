@@ -1148,6 +1148,44 @@ body[data-usertype="adult"] #home-btn { margin-left: auto; }
   body[data-usertype="adult"] #progress-pro-btn,
   body[data-usertype="adult"] #documents-btn,
   body[data-usertype="adult"] #debrief-btn { display: none; }
+
+  /* The active tool panel opens as a clean bottom-sheet OVER the chat (not an
+     inline block fighting the chat for space). The huge spread shadow dims the
+     rest of the screen so it reads as an intentional overlay; the ✕ closes it.
+     When closed, #adult-rail is back to display:contents and everything hidden. */
+  body[data-usertype="adult"] #adult-rail.adult-rail--open {
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    top: auto;
+    max-height: 82vh;
+    z-index: 70;
+    background: var(--surface);
+    border-top: 1px solid var(--line-strong);
+    border-radius: 18px 18px 0 0;
+    box-shadow: 0 0 0 100vmax rgba(0, 0, 0, 0.55), 0 -12px 40px rgba(0, 0, 0, 0.45);
+    padding: var(--sp-3) var(--sp-4) calc(16px + env(safe-area-inset-bottom, 0px));
+    overflow-y: auto;
+  }
+  body[data-usertype="adult"] #adult-rail.adult-rail--open > #rail-close {
+    position: sticky;
+    top: 0;
+    align-self: flex-end;
+    margin: 0 0 6px auto;
+    z-index: 1;
+  }
+  /* Inside the sheet the panels fill it — drop their own card chrome/height cap. */
+  body[data-usertype="adult"] #adult-rail.adult-rail--open > .phrasebank-panel,
+  body[data-usertype="adult"] #adult-rail.adult-rail--open > .progress-pro-panel,
+  body[data-usertype="adult"] #adult-rail.adult-rail--open > .scenario-documents {
+    max-height: none;
+    border: none;
+    background: transparent;
+    border-radius: 0;
+  }
 }
 
 /* neutral, premium body beneath the header */
