@@ -1,6 +1,7 @@
 import { sendChatMessage, syncProgress } from "./worker-client.js";
 import { saveState } from "./drive.js";
 import { SCENARIOS } from "./scenarios-client.js";
+import { getScenarioLesson } from "./scenario-lessons.data.js";
 import { PHRASEBANK } from "./phrasebank.data.js";
 import { initDocumentsUi, refreshDocumentsSummary } from "./documents-ui.js";
 import { BADGES, updateGamificationAfterTurn, badgeLabel } from "./gamification.js";
@@ -132,6 +133,18 @@ function el(id) {
   return document.getElementById(id);
 }
 
+// Escape text before it goes into an innerHTML template, so content (phrase
+// text, a register value) can never inject markup. Used where building a node
+// per item via textContent would be too noisy.
+function escapeHtml(s) {
+  return String(s == null ? "" : s)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
 // Null-safe visibility toggle. A stale cached index.html (old HTML + newer JS)
 // must never crash the whole app by setting `.hidden` on a missing element —
 // that was the "Cannot set properties of null" failure. Everything that shows/
@@ -167,6 +180,11 @@ function setActivePanel(name) {
 
   const rail = el("adult-rail");
   if (rail) rail.classList.toggle("adult-rail--open", activePanel !== null);
+  // On phones a tool panel is its OWN view, not a pop-up over the chat: this
+  // flag lets the CSS hide the chat surface while a panel is open, so the
+  // screen is either "chat" or "a tool", never both stacked.
+  const screen = el("screen-chat");
+  if (screen) screen.classList.toggle("adult-panel-open", activePanel !== null);
   elHidden("rail-close", activePanel === null);
 
   // Always collapse the mobile Tools menu after a choice.
@@ -395,9 +413,67 @@ function handleScenarioChange(scenarioId) {
   const label = scenarioId
     ? SCENARIOS.find((s) => s.id === scenarioId).label
     : "Free conversation";
-  appendSystemNotice(`Starting: ${label}`);
+
+  // A scenario with a mini-lesson gets a short structured brief (goal, key
+  // phrases, a tip, a warm-up) BEFORE the role-play starts — a cold "Starting…"
+  // notice taught nothing. Scenarios without a lesson, and free conversation,
+  // keep the plain notice.
+  const lesson = scenarioId ? getScenarioLesson(scenarioId) : null;
+  if (lesson) {
+    renderScenarioLesson(label, lesson);
+  } else {
+    appendSystemNotice(`Starting: ${label}`);
+  }
 
   refreshDocumentsSummary((session.state.documentContext || {})[scenarioId]);
+}
+
+// The pre-role-play brief for a scenario. Rendered into the chat log so it reads
+// as the opening of the scene; replaced by the normal conversation on the first
+// message (see removeScenarioLesson, called from handleSend).
+function renderScenarioLesson(label, lesson) {
+  const log = el("chat-log");
+  if (!log) return;
+  const card = document.createElement("div");
+  card.className = "scenario-lesson";
+
+  const phrases = (lesson.phrases || [])
+    .map(
+      (p) =>
+        `<li><span class="scenario-lesson-phrase">${escapeHtml(p.text)}</span>` +
+        `<span class="phrase-reg phrase-reg--${escapeHtml(p.register || "neutral")}">${escapeHtml(p.register || "neutral")}</span></li>`
+    )
+    .join("");
+
+  card.innerHTML =
+    `<div class="scenario-lesson-head">${iconSvg("graduation-cap")}<h3 class="scenario-lesson-title"></h3></div>` +
+    `<p class="scenario-lesson-goal"></p>` +
+    `<div class="scenario-lesson-block"><h4>${iconSvg("message-circle")} Key phrases</h4><ul class="scenario-lesson-phrases">${phrases}</ul></div>` +
+    `<div class="scenario-lesson-block scenario-lesson-tip"><h4>${iconSvg("target")} Tip</h4><p class="scenario-lesson-tip-text"></p></div>` +
+    `<div class="scenario-lesson-block scenario-lesson-warmup"><h4>${iconSvg("pencil")} Warm-up</h4><p class="scenario-lesson-warmup-text"></p></div>` +
+    `<button type="button" class="btn scenario-lesson-start">${iconSvg("message-circle")} Start role-play</button>`;
+
+  // Set all free-text fields as textContent, never HTML, so content can't inject
+  // markup (consistent with the chat-welcome fix).
+  card.querySelector(".scenario-lesson-title").textContent = label;
+  card.querySelector(".scenario-lesson-goal").textContent = lesson.goal || "";
+  card.querySelector(".scenario-lesson-tip-text").textContent = lesson.tip || "";
+  card.querySelector(".scenario-lesson-warmup-text").textContent = lesson.warmup || "";
+
+  card.querySelector(".scenario-lesson-start").addEventListener("click", () => {
+    removeScenarioLesson();
+    appendSystemNotice(`Starting: ${label}`);
+    const input = el("chat-input");
+    if (input) input.focus();
+  });
+
+  log.appendChild(card);
+  log.scrollTop = 0;
+}
+
+function removeScenarioLesson() {
+  const c = el("chat-log") && el("chat-log").querySelector(".scenario-lesson");
+  if (c) c.remove();
 }
 
 function initVoiceUi() {
@@ -804,6 +880,12 @@ function renderProgressPro() {
     .concat(CEFR_LEVELS.map((l) => `<option value="${l}"${l === cefr ? " selected" : ""}>${l}</option>`))
     .join("");
 
+  // A gentle "what's worth doing next" plan — deliberately NOT a scored weekly
+  // challenge. No streaks, no "you missed X", no reminders (matches the whole
+  // app's no-pressure philosophy). Just a few concrete, actionable ideas that
+  // broaden the member's range, rotating each week.
+  const plan = buildWeeklyPlan(practiced);
+
   panel.innerHTML = `
     <div class="progress-pro-cefr">
       <label for="progress-cefr-select">Your level</label>
@@ -817,6 +899,11 @@ function renderProgressPro() {
       ${tile(`$${spent.toFixed(2)}`, `used of $${budget.toFixed(0)} this month`)}
     </div>
     <p class="progress-pro-since">Practising since ${since} · ${activeDays.length} ${activeDays.length === 1 ? "day" : "days"} total</p>
+    <div class="weekly-plan">
+      <h4 class="progress-pro-head">This week</h4>
+      <p class="weekly-plan-sub">A few ideas to keep momentum — no pressure, no streaks.</p>
+      <ul class="weekly-plan-list">${plan.map(weeklyPlanItemHtml).join("")}</ul>
+    </div>
     <h4 class="progress-pro-head">Competency snapshot</h4>
     <ul class="progress-pro-competency">${competency}</ul>`;
 
@@ -829,6 +916,112 @@ function renderProgressPro() {
       saveState(session.accessToken, session.fileId, session.state);
     });
   }
+
+  // Wire the plan's action buttons: each jumps straight to the thing it
+  // suggests and closes the panel so the member lands on it.
+  panel.querySelectorAll(".weekly-plan-action").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const kind = btn.dataset.kind;
+      if (kind === "scenario") {
+        const id = btn.dataset.scenario;
+        closeActivePanel();
+        const sel = el("scenario-select");
+        if (sel) sel.value = id;
+        handleScenarioChange(id);
+      } else if (kind === "writing") {
+        closeActivePanel();
+        setWritingMode(true);
+      } else if (kind === "phrases") {
+        setActivePanel("phrases"); // switches the open panel from progress to phrases
+      }
+    });
+  });
+}
+
+// Close whatever adult tool panel is open (used by the weekly-plan buttons so
+// the member lands on the chat / the thing they picked, not back in the panel).
+function closeActivePanel() {
+  if (activePanel) setActivePanel(activePanel);
+}
+
+// A stable-per-week index, so the plan's suggestions don't reshuffle every time
+// the panel is opened, but do refresh each week.
+function currentWeekSeed() {
+  return Math.floor(Date.now() / (7 * 24 * 60 * 60 * 1000));
+}
+
+// Build 3 non-punitive suggestions from REAL state (no invented numbers):
+//   1. a scenario to try — one not yet practised, from the least-covered area,
+//      so the plan broadens the member's range; if all are done, a revisit.
+//   2. a Writing-mode task.
+//   3. a phrase group to review, rotating weekly.
+function buildWeeklyPlan(practicedSet) {
+  const seed = currentWeekSeed();
+  const plan = [];
+
+  const unpracticed = SCENARIOS.filter((s) => !practicedSet.has(s.id));
+  if (unpracticed.length) {
+    // Coverage ratio per category, to steer toward the least-covered area.
+    const cov = new Map();
+    for (const s of SCENARIOS) {
+      const c = cov.get(s.category) || { done: 0, total: 0 };
+      c.total += 1;
+      if (practicedSet.has(s.id)) c.done += 1;
+      cov.set(s.category, c);
+    }
+    const ratio = (cat) => {
+      const c = cov.get(cat);
+      return c && c.total ? c.done / c.total : 1;
+    };
+    const cats = [...new Set(unpracticed.map((s) => s.category))].sort((a, b) => ratio(a) - ratio(b));
+    const pool = unpracticed.filter((s) => s.category === cats[0]);
+    const s = pool[seed % pool.length];
+    plan.push({ kind: "scenario", id: s.id, label: s.label, category: s.category, revisit: false });
+  } else {
+    const s = SCENARIOS[seed % SCENARIOS.length];
+    plan.push({ kind: "scenario", id: s.id, label: s.label, category: s.category, revisit: true });
+  }
+
+  plan.push({ kind: "writing" });
+
+  const group = PHRASEBANK.length ? PHRASEBANK[seed % PHRASEBANK.length] : null;
+  plan.push({ kind: "phrases", group: group ? group.category : null });
+
+  return plan;
+}
+
+function weeklyPlanItemHtml(item) {
+  let icon = "message-circle";
+  let text = "";
+  let action = "Start";
+  if (item.kind === "scenario") {
+    icon = "message-circle";
+    text = item.revisit
+      ? `Revisit <b>${escapeHtml(item.label)}</b> and sharpen it.`
+      : `Try a <b>${escapeHtml(item.category)}</b> scenario: <b>${escapeHtml(item.label)}</b>.`;
+    action = item.revisit ? "Start again" : "Start";
+    return (
+      `<li class="weekly-plan-item">${iconSvg(icon)}<span class="weekly-plan-text">${text}</span>` +
+      `<button type="button" class="btn btn-small weekly-plan-action" data-kind="scenario" data-scenario="${escapeHtml(item.id)}">${action}</button></li>`
+    );
+  }
+  if (item.kind === "writing") {
+    icon = "pencil";
+    text = `Polish a real email or message in <b>Writing mode</b>.`;
+    return (
+      `<li class="weekly-plan-item">${iconSvg(icon)}<span class="weekly-plan-text">${text}</span>` +
+      `<button type="button" class="btn btn-small weekly-plan-action" data-kind="writing">Open</button></li>`
+    );
+  }
+  // phrases
+  icon = "folder";
+  text = item.group
+    ? `Review the <b>${escapeHtml(item.group)}</b> phrases.`
+    : `Browse the phrasebank for lines you can reuse.`;
+  return (
+    `<li class="weekly-plan-item">${iconSvg(icon)}<span class="weekly-plan-text">${text}</span>` +
+    `<button type="button" class="btn btn-small weekly-plan-action" data-kind="phrases">Open</button></li>`
+  );
 }
 
 function copyPhrase(text, rowEl) {
@@ -936,6 +1129,7 @@ async function handleSend() {
   if (!text) return;
 
   removeChatWelcome();
+  removeScenarioLesson();
 
   if (writingMode) {
     await handleWritingSend(text);
