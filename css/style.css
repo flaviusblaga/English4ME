@@ -4613,3 +4613,16 @@ body.mascot-theme .mascot-avatar.antic-flip,
   flex: none;
 }
 .update-toast-dismiss:hover { opacity: 1; }
+
+/* ===================== Reduced motion (a11y) ===================== */
+/* Honour the OS "reduce motion" setting across the whole app. Near-instant
+   (not fully "none") so JS that waits on animationend/transitionend still
+   fires, but the visible motion — pulses, confetti, slides, spins — is gone. */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
