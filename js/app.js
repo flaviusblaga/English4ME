@@ -871,11 +871,14 @@ function showSessionError(err) {
         `sign in with a <b>regular</b> Google account (the same one as on the tablet). That way progress syncs across both.</p>` +
         `<p>Otherwise: sign out and back in, and on the Google screen <b>check the Google Drive permission</b>.</p>`
       : `<p>A network error occurred. Check your internet and try again.</p>`) +
-    `<p class="session-error-detail">${detail}</p>` +
+    `<p class="session-error-detail"></p>` +
     `<div class="session-error-actions">` +
     `<button type="button" id="session-error-signout" class="btn btn-primary">Sign out and back in</button>` +
     `<button type="button" id="session-error-close" class="btn btn-small">Close</button>` +
     `</div></div>`;
+  // The error detail comes from an Error/Worker message — set it as text, never
+  // HTML, so a message that happens to contain markup can't be injected.
+  box.querySelector(".session-error-detail").textContent = detail;
   box.hidden = false;
   el("session-error-signout").onclick = handleLogout;
   el("session-error-close").onclick = () => { box.hidden = true; };

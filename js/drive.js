@@ -155,9 +155,19 @@ async function findFile(accessToken, filename) {
   return data.files && data.files.length > 0 ? data.files[0].id : null;
 }
 
+// A unique-per-request multipart boundary, so interpolated content can never
+// collide with (or inject) the delimiter — defence-in-depth over the old fixed
+// string, even though today only app-controlled values are uploaded.
+function multipartBoundary() {
+  const rnd = (globalThis.crypto && crypto.randomUUID)
+    ? crypto.randomUUID()
+    : `${Math.random().toString(36).slice(2)}${Date.now().toString(36)}`;
+  return `e4m-${rnd}`;
+}
+
 async function createFile(accessToken, filename, content) {
   const metadata = { name: filename, parents: ["appDataFolder"] };
-  const boundary = "engleza-familie-boundary";
+  const boundary = multipartBoundary();
   const body =
     `--${boundary}\r\n` +
     `Content-Type: application/json; charset=UTF-8\r\n\r\n` +
@@ -264,7 +274,7 @@ export async function saveState(accessToken, fileId, data) {
 // before that scope was added get a 403 here until they sign in again.
 export async function saveRecapToDrive(accessToken, title, textContent) {
   const metadata = { name: title, mimeType: "application/vnd.google-apps.document" };
-  const boundary = "engleza-familie-recap-boundary";
+  const boundary = multipartBoundary();
   const body =
     `--${boundary}\r\n` +
     `Content-Type: application/json; charset=UTF-8\r\n\r\n` +

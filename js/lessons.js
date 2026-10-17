@@ -794,8 +794,9 @@ function showMenu() {
   if (session.profile.features.mascots) {
     menuIntroRow.hidden = false;
     // Not tied to a question index here (there isn't one yet) — pick randomly
-    // for "both" so repeat visits to the menu show some variety too.
-    const asker = activeMascotForAsking(Math.random() < 0.5 ? 0 : 1);
+    // across ALL THREE mascots for "both" so repeat visits show real variety
+    // (0/1 alone never produced Sushi, since activeMascotForAsking does index % 3).
+    const asker = activeMascotForAsking(Math.floor(Math.random() * 3));
     setMascotAvatar(el("lesson-menu-avatar"), asker);
     el("lesson-menu-intro-line").textContent = `${asker}: ${getRandomLine(LESSON_MENU_INTRO_LINES)}`;
   } else {
@@ -1730,7 +1731,11 @@ function finishLesson() {
   renderGamificationBar();
 
   const rewards = computeRewards(session.state, session.profile.contentTier);
-  const isFirstCompletion = !existing;
+  // Daily practice marks no lesson complete and never increases lessonsCompleted,
+  // so it must NOT count as a first completion — otherwise it logs a phantom
+  // "[Reward] First completion …" line (real screen-time the family pays) and
+  // shows the per-lesson "earned" text every single day.
+  const isFirstCompletion = !isDailyPractice && !existing;
   const bonusJustEarned = !!(rewards && rewards.bonusEarned && rewardsBefore && !rewardsBefore.bonusEarned);
 
   recordTurnForParentSync(session.state, {
