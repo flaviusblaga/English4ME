@@ -684,7 +684,10 @@ function maybeShowChatWelcome() {
 }
 
 function renderBudgetIndicator() {
-  const { estimatedCostUsd, budgetUsd } = session.state.usageSnapshot;
+  // Null-safe like every other usageSnapshot reader: a state file created before
+  // this field existed has no usageSnapshot, and there is no migration that adds
+  // it — without the guard this throws during initChat and breaks the whole chat.
+  const { estimatedCostUsd = 0, budgetUsd = 10 } = session.state.usageSnapshot || {};
   el("budget-indicator").textContent = `Usage this month: $${estimatedCostUsd.toFixed(2)} / $${budgetUsd.toFixed(2)}`;
 
   // The adult dashboard's usage card (same numbers, richer presentation). The
@@ -848,9 +851,12 @@ function renderProgressPro() {
     : "—";
 
   // Sessions this week = distinct active days within the last 7 calendar days.
+  // activeDays entries are LOCAL YYYY-MM-DD keys (todayLocalDateString), so the
+  // cutoff must be built from local date parts too — toISOString() is UTC and
+  // was off by one day in UTC+2/+3 overnight, counting an extra "this week" day.
   const weekAgo = new Date();
   weekAgo.setDate(weekAgo.getDate() - 6);
-  const weekKey = weekAgo.toISOString().slice(0, 10);
+  const weekKey = `${weekAgo.getFullYear()}-${String(weekAgo.getMonth() + 1).padStart(2, "0")}-${String(weekAgo.getDate()).padStart(2, "0")}`;
   const weekSessions = activeDays.filter((d) => d >= weekKey).length;
 
   const tile = (value, label) =>
@@ -1200,10 +1206,19 @@ async function handleSend() {
         }
       }
 
+      // Guard the cost read: if the Worker omits costUsd, keep the previous
+      // estimate instead of throwing — a throw here is caught by the outer catch,
+      // shows a scary banner, and (because saveState runs after) silently drops
+      // the reply + turn increments that are already on screen.
+      const prevCost = (session.state.usageSnapshot && session.state.usageSnapshot.estimatedCostUsd) || 0;
+      const freshCost =
+        result.costUsd && typeof result.costUsd.monthToDateForUser === "number"
+          ? result.costUsd.monthToDateForUser
+          : prevCost;
       session.state.usageSnapshot = {
         ...session.state.usageSnapshot,
         monthKey: new Date().toISOString().slice(0, 7),
-        estimatedCostUsd: result.costUsd.monthToDateForUser,
+        estimatedCostUsd: freshCost,
         lastSyncedAt: new Date().toISOString(),
       };
       renderBudgetIndicator();
