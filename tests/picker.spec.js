@@ -35,6 +35,16 @@ test("restores to the profile picker from a cached session", async ({ page }) =>
   expect(errors, `uncaught page errors:\n${errors.join("\n")}`).toEqual([]);
 });
 
+test("does not eagerly load the Did-you-know fact bank at boot", async ({ page }) => {
+  const requested = [];
+  page.on("request", (req) => requested.push(req.url()));
+  await page.goto("/index.html");
+  await expect(page.locator("#screen-profile-picker")).toBeVisible();
+  // The ~840-line fact bank is lazy-loaded only when "Did you know?" is opened,
+  // so it must not be fetched during a normal boot.
+  expect(requested.some((u) => u.includes("didyouknow.data.js"))).toBe(false);
+});
+
 test("avatar-picker dialog opens, then closes on Escape", async ({ page }) => {
   await page.goto("/index.html");
   await expect(page.locator("#screen-profile-picker")).toBeVisible();

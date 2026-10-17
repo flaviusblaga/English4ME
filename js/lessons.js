@@ -70,10 +70,8 @@ import {
   buildGrammarExerciseQueue,
   GRAMMAR_STEM_LINES,
 } from "./grammar-client.js";
-import {
-  DOMAINS as DYK_DOMAINS,
-  randomFact,
-} from "./didyouknow.data.js";
+// "Did you know?" fact bank (~840 lines) is lazy-loaded on first open — see
+// ensureDykData() below — so it stays out of the initial bundle.
 
 const MASCOT_AVATARS = {
   Bobo: { emoji: "🦫", img: "assets/socatei/bobo-face.png" },
@@ -1002,7 +1000,19 @@ function showStats() {
 let dykDomain = "all";       // active domain filter ("all" = every fact)
 let dykFeaturedId = null;    // id of the fact on the featured card (avoid repeats)
 
-function showDidYouKnow() {
+// The fact bank, loaded once on first open and cached. Keeping it out of the
+// static import graph shaves ~840 lines off what every kid/teen session parses
+// at boot, for a feature many sessions never open.
+let DYK_DOMAINS = [];
+let randomFact = null;
+async function ensureDykData() {
+  if (randomFact) return;
+  const mod = await import("./didyouknow.data.js");
+  DYK_DOMAINS = mod.DOMAINS;
+  randomFact = mod.randomFact;
+}
+
+async function showDidYouKnow() {
   el("lesson-menu-view").hidden = true;
   el("lesson-stats-view").hidden = true;
   el("lesson-didyouknow-view").hidden = false;
@@ -1013,6 +1023,9 @@ function showDidYouKnow() {
 
   el("lesson-dyk-intro").textContent = t("didYouKnow.intro");
   el("lesson-dyk-list-heading").textContent = t("didYouKnow.listHeading");
+
+  // Pull in the fact bank on demand; the view's static headings are already up.
+  await ensureDykData();
 
   // Start fresh each visit: a new random featured fact and the "all" filter.
   dykDomain = "all";
