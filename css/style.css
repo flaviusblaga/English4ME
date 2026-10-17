@@ -4554,3 +4554,62 @@ body.mascot-theme .mascot-avatar.antic-flip,
 .dyk-chip:active { transform: translateY(1px); }
 
 .dyk-list { padding-top: var(--sp-1); }
+
+/* ===================== App version + update toast ===================== */
+/* A faint build tag on the login card, so you can confirm which version is
+   running after a deploy (filled by js/pwa.js from the active cache name). */
+.app-version {
+  margin-top: var(--sp-4);
+  text-align: center;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  color: var(--text-faint);
+}
+.app-version:empty { display: none; }
+
+/* "A new version is available — Refresh" banner, shown when a newer service
+   worker has installed. Bottom-centred, above everything, tap to reload. */
+.update-toast {
+  position: fixed;
+  left: 50%;
+  bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+  transform: translateX(-50%);
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  max-width: calc(100vw - 32px);
+  padding: 10px 10px 10px 16px;
+  border-radius: 999px;
+  background: var(--text);
+  color: var(--surface-raised);
+  box-shadow: var(--shadow-lg);
+  font-size: var(--fs-sm);
+}
+.update-toast-msg { font-weight: 600; }
+.update-toast-btn {
+  font: inherit;
+  font-weight: 700;
+  font-family: var(--font-display);
+  padding: 7px 16px;
+  border: none;
+  border-radius: 999px;
+  background: var(--primary);
+  color: #111;
+  cursor: pointer;
+  flex: none;
+}
+.update-toast-dismiss {
+  font: inherit;
+  width: 28px;
+  height: 28px;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--surface-raised);
+  opacity: 0.7;
+  cursor: pointer;
+  flex: none;
+}
+.update-toast-dismiss:hover { opacity: 1; }
