@@ -451,6 +451,8 @@ function openAvatarPicker(member) {
   }
 
   overlay.hidden = false;
+  // Move focus into the dialog so keyboard/screen-reader users land inside it.
+  el("avatar-picker-close").focus();
 }
 
 // ---- Super-admin family manager ----------------------------------------
@@ -468,6 +470,7 @@ function closeAdminMenu() {
 
 async function openAdminMenu() {
   el("admin-panel").hidden = false;
+  el("admin-panel-close").focus(); // move focus into the dialog
   await renderFamilyList();
 }
 
@@ -1049,6 +1052,16 @@ window.addEventListener("DOMContentLoaded", async () => {
   });
   initParentView();
   initPwa();
+
+  // Escape closes whichever overlay dialog is open (most-nested first), so
+  // keyboard users aren't trapped. Mirrors the existing tap-the-backdrop close.
+  document.addEventListener("keydown", (event) => {
+    if (event.key !== "Escape") return;
+    const avatar = el("avatar-picker");
+    const admin = el("admin-panel");
+    if (avatar && !avatar.hidden) { avatar.hidden = true; return; }
+    if (admin && !admin.hidden) { closeAdminMenu(); return; }
+  });
 
   // Restore instantly from the cached token — no Google needed, so a refresh
   // never bounces you to the login screen while the token is still valid.

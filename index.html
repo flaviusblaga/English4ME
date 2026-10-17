@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ro">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
@@ -97,7 +97,7 @@
 
     <!-- Avatar chooser. Lives inside the picker screen so it disappears with
          it; contents are built in js/app.js from the member's options. -->
-    <div id="avatar-picker" class="avatar-picker" hidden>
+    <div id="avatar-picker" class="avatar-picker" hidden role="dialog" aria-modal="true" aria-labelledby="avatar-picker-title">
       <div class="avatar-picker-panel">
         <h2 id="avatar-picker-title">Choose your picture</h2>
         <div id="avatar-picker-grid" class="avatar-picker-grid"></div>
@@ -272,7 +272,7 @@
 
     <footer class="chat-input-row">
       <button id="mic-btn" class="btn btn-small btn-icon" hidden aria-label="Speak"><span class="icon-slot" data-icon="mic"></span></button>
-      <textarea id="chat-input" rows="2" data-i18n-ph="chat.inputPlaceholder" placeholder="Type your message in English..."></textarea>
+      <textarea id="chat-input" rows="2" aria-label="Your message" data-i18n-ph="chat.inputPlaceholder" placeholder="Type your message in English..."></textarea>
       <button id="chat-send" class="btn btn-primary btn-send" aria-label="Send"><span class="icon-slot" data-icon="send"></span></button>
     </footer>
 
@@ -584,7 +584,7 @@
           Points and the streak stay.
         </p>
         <div class="reward-settings-row">
-          <label for="reset-child-select">Copilul:</label>
+          <label for="reset-child-select">Child:</label>
           <select id="reset-child-select"></select>
         </div>
         <div class="reward-settings-row">
@@ -602,7 +602,7 @@
       </details>
 
       <div class="parent-view-lookup">
-        <label for="parent-view-child-select">Copilul:</label>
+        <label for="parent-view-child-select">Child:</label>
         <select id="parent-view-child-select"></select>
         <label for="parent-view-profile-select">Modulul:</label>
         <select id="parent-view-profile-select">
@@ -655,7 +655,7 @@
         <p class="cp-section-title"><span class="icon-slot" data-icon="chart-column"></span> Billing & usage</p>
         <div id="usage-card" class="usage-card">
           <div class="usage-main">
-            <span class="usage-label">Consum luna aceasta</span>
+            <span class="usage-label">Usage this month</span>
             <span class="usage-val"><b id="usage-spent">$0.00</b> <small id="usage-limit">/ $10.00</small></span>
             <div class="usage-bar"><i id="usage-fill"></i></div>
           </div>
@@ -680,10 +680,10 @@
 
   <!-- Super-admin family manager (a modal overlay). Top-level so it can open over
        the Control Panel; contents built in js/app.js. -->
-  <div id="admin-panel" class="admin-panel" hidden>
+  <div id="admin-panel" class="admin-panel" hidden role="dialog" aria-modal="true" aria-labelledby="admin-panel-title">
     <div class="admin-panel-box">
       <div class="admin-panel-head">
-        <h2 id="admin-panel-title">Familii</h2>
+        <h2 id="admin-panel-title">Families</h2>
         <button id="admin-panel-close" type="button" class="btn btn-small">Close</button>
       </div>
       <div id="admin-panel-body"></div>
