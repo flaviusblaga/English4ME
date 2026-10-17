@@ -131,7 +131,7 @@ function renderResetPicker() {
   const allBtn = document.createElement("button");
   allBtn.type = "button";
   allBtn.className = "btn btn-small reset-all-btn";
-  allBtn.innerHTML = `${iconSvg("rotate-cw")} Resetează tot modulul`;
+  allBtn.innerHTML = `${iconSvg("rotate-cw")} Reset the whole module`;
   allBtn.addEventListener("click", () => doReset({ all: true, label: "tot modulul" }));
   body.appendChild(allBtn);
 
@@ -146,7 +146,7 @@ function renderResetPicker() {
     const catBtn = document.createElement("button");
     catBtn.type = "button";
     catBtn.className = "btn btn-small";
-    catBtn.textContent = "Resetează categoria";
+    catBtn.textContent = "Reset the category";
     catBtn.addEventListener("click", () =>
       doReset({ lessonIds: cat.lessons.map((l) => l.id), label: cat.label })
     );
@@ -162,8 +162,8 @@ function renderResetPicker() {
       lBtn.type = "button";
       lBtn.className = "btn btn-small btn-icon";
       lBtn.innerHTML = iconSvg("rotate-cw");
-      lBtn.title = `Resetează „${lesson.label}"`;
-      lBtn.setAttribute("aria-label", `Resetează ${lesson.label}`);
+      lBtn.title = `Reset "${lesson.label}"`;
+      lBtn.setAttribute("aria-label", `Reset ${lesson.label}`);
       lBtn.addEventListener("click", () => doReset({ lessonIds: [lesson.id], label: lesson.label }));
       row.append(name, lBtn);
       wrap.appendChild(row);
@@ -178,23 +178,23 @@ async function doReset({ all, lessonIds, label }) {
   const childEmail = childSelect ? childSelect.value : "";
   const childName = childSelect && childSelect.selectedOptions[0] ? childSelect.selectedOptions[0].textContent : "";
   if (!childEmail) {
-    status.textContent = "Selectează un copil.";
+    status.textContent = "Select a child.";
     status.hidden = false;
     return;
   }
   const profileId = el("reset-module-select").value;
-  if (!window.confirm(`Resetezi „${label}" pentru ${childName}? Lecțiile redevin nefăcute (punctele rămân).`)) return;
+  if (!window.confirm(`Reset "${label}" for ${childName}? The lessons become undone (points stay).`)) return;
 
   status.hidden = false;
   status.textContent = "Se trimite…";
   try {
     await adminResetLessons({ childEmail, profileId, all: !!all, lessonIds: lessonIds || [] });
     status.innerHTML = iconSvg("circle-check");
-    status.append(` Reset trimis pentru „${label}". Se aplică pe dispozitivul copilului când deschide modulul.`);
+    status.append(` Reset sent for "${label}". It applies on the child's device when they open the module.`);
   } catch (err) {
     status.textContent =
       err.code === "forbidden"
-        ? "Doar un părinte din familie poate reseta."
+        ? "Only a parent in the family can reset."
         : `Nu s-a putut reseta: ${err.message}`;
   }
 }
@@ -367,7 +367,7 @@ function renderRewards(rewards) {
     bonusLine.append(t("parent.rwBonusEarned", { amount: rewards.bonusAmount, unit: rewards.bonusUnit }));
   } else {
     bonusLine.innerHTML = iconSvg("gift");
-    bonusLine.append(` Bonus la modul complet: ${rewards.bonusAmount} ${rewards.bonusUnit} (mai are ${rewards.totalLessons - rewards.lessonsCompleted} lecții)`);
+    bonusLine.append(` Full-module bonus: ${rewards.bonusAmount} ${rewards.bonusUnit} (${rewards.totalLessons - rewards.lessonsCompleted} lessons to go)`);
   }
   card.appendChild(bonusLine);
 

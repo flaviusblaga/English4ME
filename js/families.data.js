@@ -34,7 +34,7 @@
 // own family's numbers from inside the app (Worker-stored, see progress.js);
 // this is only the starting point.
 export const DEFAULT_REWARDS = {
-  perLesson: { amount: 20, unit: "minute de tehnologie" },
+  perLesson: { amount: 20, unit: "tech minutes" },
   moduleBonus: { beginner: 50, intermediate: 100, advanced: 150, expert: 200, unit: "lei" },
 };
 
@@ -169,10 +169,10 @@ function looksLikeEmail(s) {
 //
 // input: { id?, name, progressMirror?, driveReport?, members: [{ kind, name?, emails: [] }] }
 export function normalizeFamily(input, existingFamilies) {
-  if (!input || typeof input !== "object") return { ok: false, error: "Date lipsă." };
+  if (!input || typeof input !== "object") return { ok: false, error: "Missing data." };
 
   const name = String(input.name || "").trim().slice(0, 60);
-  if (!name) return { ok: false, error: "Familia are nevoie de un nume." };
+  if (!name) return { ok: false, error: "The family needs a name." };
 
   // A stable id: keep the given one (edit), else derive a unique slug.
   const usedIds = new Set((existingFamilies || []).map((f) => f.id));
@@ -196,7 +196,7 @@ export function normalizeFamily(input, existingFamilies) {
   const members = [];
   const seenInThisFamily = new Set();
   const counters = { adult: 0, teen: 0, kid: 0 };
-  const defaultName = { adult: "Părinte", teen: "Adolescent", kid: "Copil" };
+  const defaultName = { adult: "Parent", teen: "Teen", kid: "Child" };
 
   for (const rm of rawMembers) {
     const kind = KID_KINDS.includes(rm && rm.kind) ? rm.kind : null;
@@ -206,8 +206,8 @@ export function normalizeFamily(input, existingFamilies) {
     for (const e of Array.isArray(rm.emails) ? rm.emails : []) {
       const ne = normEmail(e);
       if (!ne) continue;
-      if (!looksLikeEmail(ne)) return { ok: false, error: `Adresă invalidă: ${e}` };
-      if (taken.has(ne)) return { ok: false, error: `Adresa ${ne} e deja în familia „${taken.get(ne)}".` };
+      if (!looksLikeEmail(ne)) return { ok: false, error: `Invalid address: ${e}` };
+      if (taken.has(ne)) return { ok: false, error: `The address ${ne} is already in the family "${taken.get(ne)}".` };
       if (seenInThisFamily.has(ne)) continue; // dedupe within the family
       seenInThisFamily.add(ne);
       emails.push(ne);
@@ -227,7 +227,7 @@ export function normalizeFamily(input, existingFamilies) {
     members.push(member);
   }
 
-  if (!members.length) return { ok: false, error: "Adaugă cel puțin un membru cu o adresă de email." };
+  if (!members.length) return { ok: false, error: "Add at least one member with an email address." };
 
   return {
     ok: true,

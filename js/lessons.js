@@ -1961,21 +1961,21 @@ function summarizeRun() {
 function buildRecapText(score, total) {
   const { knew, practice } = summarizeRun();
   const lines = [];
-  lines.push(`Lesson recap · Rezumatul lecției`);
+  lines.push(`Lesson recap`);
   lines.push(`Student: ${session.displayName}`);
-  lines.push(`Lesson · Lecția: ${currentLesson.label} (${session.profile.displayName})`);
-  lines.push(`Date · Data: ${todayLocalDateString()}`);
-  lines.push(`Score · Scor: ${score} / ${total} (${"⭐".repeat(starsForScore(score, total)) || "—"})`);
+  lines.push(`Lesson: ${currentLesson.label} (${session.profile.displayName})`);
+  lines.push(`Date: ${todayLocalDateString()}`);
+  lines.push(`Score: ${score} / ${total} (${"⭐".repeat(starsForScore(score, total)) || "—"})`);
   lines.push("");
   if (knew.length) {
-    lines.push(`✅ Knew these · Le-a știut:`);
+    lines.push(`✅ Knew these:`);
     for (const e of knew) {
       lines.push(e.translation ? `  • ${e.label} — ${e.translation}` : `  • ${e.answer}`);
     }
     lines.push("");
   }
   if (practice.length) {
-    lines.push(`🔁 Practice again · De mai exersat:`);
+    lines.push(`🔁 Practice again:`);
     for (const e of practice) {
       if (e.translation) lines.push(`  • ${e.label} — ${e.translation}`);
       else if (e.explain) lines.push(`  • ${e.answer} — ${e.explain}`);
@@ -1985,8 +1985,8 @@ function buildRecapText(score, total) {
   }
   lines.push(
     practice.length === 0
-      ? "🎉 Perfect run — every single one! · Totul corect!"
-      : `💪 Finished the whole lesson — ${practice.length} item(s) to catch next time. · A terminat toată lecția!`
+      ? "🎉 Perfect run — every single one!"
+      : `💪 Finished the whole lesson — ${practice.length} item(s) to catch next time.`
   );
   return lines.join("\n");
 }

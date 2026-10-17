@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <title>English4ME — Invata engleza cu Bobo, Fizz si Sushi</title>
+  <title>english4Me — Business English for managers in Romania</title>
 
   <!-- Set the theme before the stylesheet paints, so there is no flash: use the
        saved choice if any, otherwise follow the system (prefers-color-scheme). -->
@@ -23,19 +23,19 @@
 
   <!-- Installable-app (PWA) wiring -->
   <link rel="manifest" href="manifest.webmanifest" />
-  <meta name="theme-color" content="#0a8fc4" />
-  <link rel="icon" href="assets/socatei/favicon.ico?v=3" sizes="16x16 32x32 48x48" />
-  <link rel="icon" href="assets/socatei/favicon-32.png?v=3" type="image/png" sizes="32x32" />
-  <link rel="icon" href="assets/socatei/icon-192.png?v=3" type="image/png" sizes="192x192" />
-  <link rel="apple-touch-icon" href="assets/socatei/apple-touch-icon.png?v=3" />
+  <meta name="theme-color" content="#FF6B1A" />
+  <link rel="icon" href="assets/brand/favicon.ico?v=4" sizes="16x16 32x32 48x48" />
+  <link rel="icon" href="assets/brand/favicon-32.png?v=4" type="image/png" sizes="32x32" />
+  <link rel="icon" href="assets/brand/icon-192.png?v=4" type="image/png" sizes="192x192" />
+  <link rel="apple-touch-icon" href="assets/brand/apple-touch-icon.png?v=4" />
   <meta name="mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-  <meta name="apple-mobile-web-app-title" content="English4ME" />
+  <meta name="apple-mobile-web-app-title" content="english4Me" />
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Baloo+2:wght@500;600;700;800&family=Nunito:wght@400;600;700;800&display=swap" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;700;800&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap" />
   <link rel="stylesheet" href="css/style.css" />
   <script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
@@ -46,14 +46,14 @@
       <!-- Order follows the redesign mockup: brand → headline → subtitle →
            mascot illustration → Google button → install → invitation card. -->
       <div class="login-brand">
-        <!-- The E4ME app logo (the colourful book mark), above the wordmark. -->
-        <img class="login-logo" src="assets/socatei/logo-e4me.png" alt="English4ME" width="88" height="88"
+        <!-- The english4Me app logo (speech-bubble mark), above the wordmark. -->
+        <img class="login-logo" src="assets/brand/mark.svg" alt="english4Me" width="88" height="88"
              onerror="this.remove()" />
-        <h1 class="wordmark"><span class="wm-en">English</span><span class="wm-4">4</span><span class="wm-me">ME</span></h1>
+        <h1 class="wordmark"><span class="wm-en">english</span><span class="wm-4">4</span><span class="wm-me">Me</span></h1>
       </div>
 
-      <h2 class="login-headline">Învață engleza.<br /><span class="hl-accent">Deschide-ți lumea.</span></h2>
-      <p class="subtitle">Învață împreună cu<br /><span class="subtitle-names"><b class="nm nm-bobo">Bobo</b>, <b class="nm nm-fizz">Fizz</b>, <b class="nm nm-sushi">Sushi</b> <span class="nm-friends">&amp; friends</span></span></p>
+      <h2 class="login-headline">Learn English.<br /><span class="hl-accent">Open up your world.</span></h2>
+      <p class="subtitle">Learn together with<br /><span class="subtitle-names"><b class="nm nm-bobo">Bobo</b>, <b class="nm nm-fizz">Fizz</b>, <b class="nm nm-sushi">Sushi</b> <span class="nm-friends">&amp; friends</span></span></p>
 
       <!-- The current die-cut stickers, standing on the CSS cyan scene. -->
       <div class="login-mascots">
@@ -69,23 +69,23 @@
 
       <button id="login-btn" class="btn btn-google">
         <svg class="google-g" viewBox="0 0 24 24" aria-hidden="true"><path fill="#4285F4" d="M22 12c0-.7-.1-1.4-.2-2H12v4h5.6a4.8 4.8 0 0 1-2 3.1v2.6h3.3C20.8 18 22 15.3 22 12z"/><path fill="#34A853" d="M12 22c2.7 0 5-.9 6.6-2.4l-3.3-2.6c-.9.6-2 1-3.3 1-2.5 0-4.7-1.7-5.5-4H3.1v2.6A10 10 0 0 0 12 22z"/><path fill="#FBBC05" d="M6.5 14a6 6 0 0 1 0-3.9V7.5H3.1a10 10 0 0 0 0 9z"/><path fill="#EA4335" d="M12 6.1c1.5 0 2.8.5 3.8 1.5l2.9-2.9A10 10 0 0 0 3.1 7.5l3.4 2.6c.8-2.3 3-4 5.5-4z"/></svg>
-        Continuă cu Google
+        Continue with Google
       </button>
       <p id="login-error" class="error" hidden></p>
-      <button id="install-app-btn" class="btn btn-small" hidden><span class="icon-slot" data-icon="smartphone"></span> Instalează pe telefon</button>
-      <p id="ios-install-hint" class="hint" hidden>Pe iPhone: apasă Share ⬆️ (în Safari), apoi „Add to Home Screen".</p>
+      <button id="install-app-btn" class="btn btn-small" hidden><span class="icon-slot" data-icon="smartphone"></span> Install on your phone</button>
+      <p id="ios-install-hint" class="hint" hidden>On iPhone: tap Share ⬆️ (in Safari), then "Add to Home Screen".</p>
 
       <div class="login-invite">
         <span class="icon-slot login-invite-icon" data-icon="lock"></span>
-        <p><strong>Acces doar cu invitație.</strong> Contul tău Google trebuie adăugat de administrator.</p>
+        <p><strong>Invite-only access.</strong> Your Google account must be added by an admin.</p>
       </div>
     </div>
   </main>
 
   <main id="screen-profile-picker" class="screen" hidden>
     <div class="card card-wide">
-      <h1>Cine învață azi? 👋</h1>
-      <p class="profile-picker-sub">Alege profilul tău</p>
+      <h1>Who's learning today? 👋</h1>
+      <p class="profile-picker-sub">Choose your profile</p>
       <div id="profile-picker-list" class="profile-picker-list"></div>
       <!-- Only the super-admin (checked server-side too) sees this. -->
       <button id="admin-entry-btn" type="button" class="admin-entry-btn" hidden><span class="cp-entry-ico"><span class="icon-slot" data-icon="settings"></span></span><span class="cp-entry-text"><strong>Panou de control</strong><small>Facturare, familii, progres copii</small></span><span class="cp-entry-go"><span class="icon-slot" data-icon="arrow-right"></span></span></button>
@@ -95,9 +95,9 @@
          it; contents are built in js/app.js from the member's options. -->
     <div id="avatar-picker" class="avatar-picker" hidden>
       <div class="avatar-picker-panel">
-        <h2 id="avatar-picker-title">Alege poza</h2>
+        <h2 id="avatar-picker-title">Choose your picture</h2>
         <div id="avatar-picker-grid" class="avatar-picker-grid"></div>
-        <button id="avatar-picker-close" type="button" class="btn btn-small">Închide</button>
+        <button id="avatar-picker-close" type="button" class="btn btn-small">Close</button>
       </div>
     </div>
 
@@ -106,8 +106,8 @@
   <main id="screen-level-picker" class="screen" hidden>
     <div class="card card-wide">
       <button id="level-picker-back-btn" class="btn btn-small"><span class="icon-slot" data-icon="arrow-left"></span> Alt membru</button>
-      <h1 id="level-picker-title">Alege nivelul <span class="icon-slot" data-icon="target"></span></h1>
-      <p class="profile-picker-sub">Poți face orice nivel — testul doar îți recomandă unul.</p>
+      <h1 id="level-picker-title">Choose your level <span class="icon-slot" data-icon="target"></span></h1>
+      <p class="profile-picker-sub">You can take any level — the test just recommends one.</p>
       <div id="level-picker-list" class="profile-picker-list"></div>
       <button id="level-picker-retake-btn" class="btn btn-small level-picker-retake"><span class="icon-slot" data-icon="rotate-cw"></span> Reia testul de nivel</button>
     </div>
@@ -131,7 +131,7 @@
         <div id="placement-result-emoji" class="placement-result-emoji">🎉</div>
         <h1 id="placement-result-title"></h1>
         <p id="placement-result-sub" class="hint"></p>
-        <button id="placement-start-btn" class="btn btn-primary">Începe primele lecții <span class="icon-slot" data-icon="arrow-right"></span></button>
+        <button id="placement-start-btn" class="btn btn-primary">Start your first lessons <span class="icon-slot" data-icon="arrow-right"></span></button>
         <button id="placement-retake-btn" class="btn btn-small"><span class="icon-slot" data-icon="rotate-cw"></span> Reia testul</button>
       </div>
     </div>
@@ -448,7 +448,7 @@
       <div id="lesson-summary" class="lesson-summary" hidden></div>
       <div class="lesson-complete-actions">
         <button id="lesson-chat-about-it-btn" class="btn btn-primary"><span class="icon-slot" data-icon="message-circle"></span> Chat about it with the Socatei</button>
-        <button id="lesson-save-recap-btn" class="btn btn-small"><span class="icon-slot" data-icon="save"></span> Save recap to Drive · Salvează pe Drive</button>
+        <button id="lesson-save-recap-btn" class="btn btn-small"><span class="icon-slot" data-icon="save"></span> Save recap to Drive</button>
         <button id="lesson-back-to-menu-btn" class="btn btn-small"><span class="icon-slot" data-icon="arrow-left"></span> <span data-i18n="lesson.backToLessons">Back to lessons</span></button>
       </div>
     </div>
@@ -473,7 +473,7 @@
       </div>
       <div class="reading-passage-head">
         <h2 id="reading-passage-title" class="reading-passage-title"></h2>
-        <button id="reading-listen-btn" type="button" class="btn btn-small"><span class="icon-slot" data-icon="volume-2"></span> Ascultă</button>
+        <button id="reading-listen-btn" type="button" class="btn btn-small"><span class="icon-slot" data-icon="volume-2"></span> Listen</button>
       </div>
       <p id="reading-passage-text" class="reading-passage-text"></p>
       <p id="reading-question-text" class="reading-question-text"></p>
@@ -500,38 +500,38 @@
       <!-- Each household decides what practice is worth. Saved per FAMILY on
            the Worker, so it reaches the children's devices too. -->
       <details id="reward-settings" class="reward-settings">
-        <summary><span class="icon-slot" data-icon="settings"></span> Recompensele familiei — ce câștigă copiii</summary>
+        <summary><span class="icon-slot" data-icon="settings"></span> Family rewards — what the kids earn</summary>
         <p class="hint">
-          Tu decizi ce primesc copiii. Poate fi orice — minute pe tabletă, puncte
-          spre o bicicletă, lei. Se aplică imediat pe telefoanele lor.
+          You decide what the kids get. It can be anything — tablet minutes, points
+          toward a bike, cash. It applies to their phones right away.
         </p>
 
         <div class="reward-settings-row">
-          <label for="reward-per-lesson-amount">La fiecare lecție terminată</label>
+          <label for="reward-per-lesson-amount">For each lesson completed</label>
           <div class="reward-settings-pair">
             <input id="reward-per-lesson-amount" type="number" min="0" step="1" inputmode="numeric" />
-            <input id="reward-per-lesson-unit" type="text" maxlength="40" list="reward-per-lesson-units" placeholder="alege sau scrie…" />
+            <input id="reward-per-lesson-unit" type="text" maxlength="40" list="reward-per-lesson-units" placeholder="choose or type…" />
           </div>
-          <p class="reward-settings-hint">Apasă în căsuță pentru idei — sau scrie ce vrei tu.</p>
+          <p class="reward-settings-hint">Tap the box for ideas — or type your own.</p>
         </div>
         <!-- Ready-made choices so a parent doesn't have to invent one. The input
              still accepts free text, so any family can define its own reward. -->
         <datalist id="reward-per-lesson-units">
-          <option value="minute de tehnologie"></option>
-          <option value="minute la telefon / tabletă"></option>
-          <option value="minute de joc video"></option>
-          <option value="minute de joacă afară"></option>
-          <option value="minute în plus până la culcare"></option>
-          <option value="puncte"></option>
-          <option value="steluțe"></option>
-          <option value="XP (experiență)"></option>
-          <option value="ștampile de colecție"></option>
-          <option value="bănuți de buzunar"></option>
-          <option value="o gustare preferată"></option>
-          <option value="alegerea desenului de seară"></option>
+          <option value="tech minutes"></option>
+          <option value="minutes on the phone / tablet"></option>
+          <option value="video-game minutes"></option>
+          <option value="minutes playing outside"></option>
+          <option value="extra minutes before bedtime"></option>
+          <option value="points"></option>
+          <option value="stars"></option>
+          <option value="XP (experience)"></option>
+          <option value="collectible stamps"></option>
+          <option value="pocket money"></option>
+          <option value="a favourite snack"></option>
+          <option value="choosing the evening cartoon"></option>
         </datalist>
 
-        <p class="reward-settings-subhead">Bonus la terminarea unui modul întreg</p>
+        <p class="reward-settings-subhead">Bonus for completing a whole module</p>
         <div class="reward-settings-grid">
           <label for="reward-bonus-beginner"><span class="icon-slot" data-icon="palette"></span> Playroom</label>
           <input id="reward-bonus-beginner" type="number" min="0" step="1" inputmode="numeric" />
@@ -544,38 +544,38 @@
         </div>
 
         <div class="reward-settings-row">
-          <label for="reward-bonus-unit">Bonusul se măsoară în</label>
-          <input id="reward-bonus-unit" type="text" maxlength="40" list="reward-bonus-units" placeholder="alege sau scrie…" />
-          <p class="reward-settings-hint">Nu doar bani — o ieșire, o jucărie, un privilegiu. Apasă pentru idei.</p>
+          <label for="reward-bonus-unit">The bonus is measured in</label>
+          <input id="reward-bonus-unit" type="text" maxlength="40" list="reward-bonus-units" placeholder="choose or type…" />
+          <p class="reward-settings-hint">Not just money — an outing, a toy, a privilege. Tap for ideas.</p>
         </div>
         <!-- Bigger, rarer rewards for finishing a whole module. -->
         <datalist id="reward-bonus-units">
           <option value="lei"></option>
-          <option value="o ieșire aleasă de copil"></option>
-          <option value="o jucărie sau o carte"></option>
-          <option value="o zi fără corvezi"></option>
-          <option value="o activitate specială cu părintele"></option>
-          <option value="weekend de gaming prelungit"></option>
-          <option value="copilul alege meniul de weekend"></option>
-          <option value="o excursie mică"></option>
-          <option value="bani pentru pușculiță"></option>
-          <option value="un privilegiu special"></option>
-          <option value="o experiență (cinema, patinoar…)"></option>
-          <option value="puncte spre un obiectiv mare (bicicletă…)"></option>
+          <option value="an outing chosen by the child"></option>
+          <option value="a toy or a book"></option>
+          <option value="a chore-free day"></option>
+          <option value="a special activity with a parent"></option>
+          <option value="an extended gaming weekend"></option>
+          <option value="the child picks the weekend menu"></option>
+          <option value="a small trip"></option>
+          <option value="money for the piggy bank"></option>
+          <option value="a special privilege"></option>
+          <option value="an experience (cinema, ice rink…)"></option>
+          <option value="points toward a big goal (a bike…)"></option>
         </datalist>
 
-        <button id="reward-settings-save" type="button" class="btn btn-primary">Salvează</button>
+        <button id="reward-settings-save" type="button" class="btn btn-primary">Save</button>
         <p id="reward-settings-status" class="hint" hidden></p>
       </details>
 
       <!-- Admin: reset a child's lesson progress. Whole module, a category, or a
            single lesson. Applies on the child's device next time they open it. -->
       <details id="reset-lessons" class="reward-settings">
-        <summary><span class="icon-slot" data-icon="rotate-cw"></span> Reset lecții — pentru un copil</summary>
+        <summary><span class="icon-slot" data-icon="rotate-cw"></span> Reset lessons — for a child</summary>
         <p class="hint">
-          Alegi copilul și modulul, apoi resetezi tot modulul, o categorie sau o
-          lecție. Resetul se aplică pe dispozitivul copilului când deschide modulul.
-          Punctele și streak-ul rămân.
+          Choose the child and module, then reset the whole module, a category, or a
+          single lesson. The reset applies on the child's device when they open the module.
+          Points and the streak stay.
         </p>
         <div class="reward-settings-row">
           <label for="reset-child-select">Copilul:</label>
@@ -641,7 +641,7 @@
   <main id="screen-control-panel" class="screen" hidden>
     <header class="chat-header">
       <strong><span class="icon-slot" data-icon="settings"></span> Panou de control</strong>
-      <button id="control-panel-back-btn" class="btn btn-small"><span class="icon-slot" data-icon="arrow-left"></span> Înapoi</button>
+      <button id="control-panel-back-btn" class="btn btn-small"><span class="icon-slot" data-icon="arrow-left"></span> Back</button>
     </header>
 
     <div class="control-panel-body">
@@ -660,13 +660,13 @@
 
       <button id="cp-families-btn" type="button" class="cp-tile">
         <span class="cp-tile-ico"><span class="icon-slot" data-icon="users"></span></span>
-        <span class="cp-tile-text"><strong>Administrare familii</strong><small>Adaugă, editează sau șterge familii</small></span>
+        <span class="cp-tile-text"><strong>Manage families</strong><small>Add, edit, or delete families</small></span>
         <span class="cp-tile-go"><span class="icon-slot" data-icon="arrow-right"></span></span>
       </button>
 
       <button id="cp-progress-btn" type="button" class="cp-tile">
         <span class="cp-tile-ico"><span class="icon-slot" data-icon="chart-column"></span></span>
-        <span class="cp-tile-text"><strong>Progres copii</strong><small>Vezi cum stau copiii cu lecțiile și recompensele</small></span>
+        <span class="cp-tile-text"><strong>Kids' progress</strong><small>See how the kids are doing with lessons and rewards</small></span>
         <span class="cp-tile-go"><span class="icon-slot" data-icon="arrow-right"></span></span>
       </button>
     </div>
@@ -678,7 +678,7 @@
     <div class="admin-panel-box">
       <div class="admin-panel-head">
         <h2 id="admin-panel-title">Familii</h2>
-        <button id="admin-panel-close" type="button" class="btn btn-small">Închide</button>
+        <button id="admin-panel-close" type="button" class="btn btn-small">Close</button>
       </div>
       <div id="admin-panel-body"></div>
     </div>
@@ -687,16 +687,16 @@
   <!-- Persistent bottom navigation — moved into the active app screen by app.js. -->
   <nav id="app-nav" class="app-nav" hidden>
     <button id="nav-home" type="button" class="app-nav-btn">
-      <span class="app-nav-icon"><span class="icon-slot" data-icon="home"></span></span><span class="app-nav-label">Acasă</span>
+      <span class="app-nav-icon"><span class="icon-slot" data-icon="home"></span></span><span class="app-nav-label">Home</span>
     </button>
     <button id="nav-chat" type="button" class="app-nav-btn">
       <span class="app-nav-icon"><span class="icon-slot" data-icon="message-circle"></span></span><span class="app-nav-label">Chat</span>
     </button>
     <button id="nav-reading" type="button" class="app-nav-btn">
-      <span class="app-nav-icon"><span class="icon-slot" data-icon="book-open"></span></span><span class="app-nav-label">Lectură</span>
+      <span class="app-nav-icon"><span class="icon-slot" data-icon="book-open"></span></span><span class="app-nav-label">Reading</span>
     </button>
     <button id="nav-parent" type="button" class="app-nav-btn">
-      <span class="app-nav-icon"><span class="icon-slot" data-icon="eye"></span></span><span class="app-nav-label">Părinte</span>
+      <span class="app-nav-icon"><span class="icon-slot" data-icon="eye"></span></span><span class="app-nav-label">Parent</span>
     </button>
   </nav>
 

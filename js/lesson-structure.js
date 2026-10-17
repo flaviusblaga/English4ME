@@ -81,78 +81,78 @@ const CYCLE_TYPES = {
 export const TIER_CATEGORIES = {
   beginner: [
     {
-      id: "beg-me", label: "Eu și familia mea", emoji: "🏡",
+      id: "beg-me", label: "Me and my family", emoji: "🏡",
       lessons: [
-        { id: "beg-me-1", label: "Familia și corpul", emoji: "👨‍👩‍👧", themes: ["family", "body", "more-body"] },
-        { id: "beg-me-2", label: "Cum mă simt", emoji: "😊", themes: ["feelings", "more-feelings", "actions"] },
-        { id: "beg-me-3", label: "Acasă", emoji: "🛋️", themes: ["house", "bathroom", "kitchen-items"] },
-        { id: "beg-me-4", label: "Haine și sănătate", emoji: "👕", themes: ["clothes", "accessories", "medical"] },
+        { id: "beg-me-1", label: "Family and the body", emoji: "👨‍👩‍👧", themes: ["family", "body", "more-body"] },
+        { id: "beg-me-2", label: "How I feel", emoji: "😊", themes: ["feelings", "more-feelings", "actions"] },
+        { id: "beg-me-3", label: "At home", emoji: "🛋️", themes: ["house", "bathroom", "kitchen-items"] },
+        { id: "beg-me-4", label: "Clothes and health", emoji: "👕", themes: ["clothes", "accessories", "medical"] },
       ],
     },
     {
-      id: "beg-nature", label: "Animale și natură", emoji: "🐾",
+      id: "beg-nature", label: "Animals and nature", emoji: "🐾",
       lessons: [
-        { id: "beg-nat-1", label: "Animale de acasă și de la fermă", emoji: "🐶", themes: ["animals", "farm-animals", "birds"] },
-        { id: "beg-nat-2", label: "Animale sălbatice și marine", emoji: "🦁", themes: ["wild-animals", "sea-animals", "insects"] },
+        { id: "beg-nat-1", label: "Pets and farm animals", emoji: "🐶", themes: ["animals", "farm-animals", "birds"] },
+        { id: "beg-nat-2", label: "Wild and sea animals", emoji: "🦁", themes: ["wild-animals", "sea-animals", "insects"] },
         { id: "beg-nat-3", label: "Natura din jur", emoji: "🌳", themes: ["nature", "garden", "weather"] },
-        { id: "beg-nat-4", label: "Anotimpuri și spațiu", emoji: "🌍", themes: ["seasons", "space"] },
+        { id: "beg-nat-4", label: "Seasons and space", emoji: "🌍", themes: ["seasons", "space"] },
       ],
     },
     {
-      id: "beg-food", label: "Mâncare", emoji: "🍎",
+      id: "beg-food", label: "Food", emoji: "🍎",
       lessons: [
-        { id: "beg-food-1", label: "Mâncarea de zi cu zi", emoji: "🥗", themes: ["food", "fruits", "vegetables", "breakfast"] },
-        { id: "beg-food-2", label: "Dulciuri și restaurant", emoji: "🍰", themes: ["desserts", "fast-food", "world-food"] },
+        { id: "beg-food-1", label: "Everyday food", emoji: "🥗", themes: ["food", "fruits", "vegetables", "breakfast"] },
+        { id: "beg-food-2", label: "Sweets and restaurants", emoji: "🍰", themes: ["desserts", "fast-food", "world-food"] },
       ],
     },
     {
-      id: "beg-play", label: "Școală și joacă", emoji: "🎒",
+      id: "beg-play", label: "School and play", emoji: "🎒",
       lessons: [
-        { id: "beg-play-1", label: "La școală", emoji: "✏️", themes: ["school", "stationery", "toys"] },
-        { id: "beg-play-2", label: "Sport și muzică", emoji: "⚽", themes: ["sports", "active-sports", "music"] },
-        { id: "beg-play-3", label: "Petreceri și povești", emoji: "🎉", themes: ["party", "fantasy"] },
+        { id: "beg-play-1", label: "At school", emoji: "✏️", themes: ["school", "stationery", "toys"] },
+        { id: "beg-play-2", label: "Sports and music", emoji: "⚽", themes: ["sports", "active-sports", "music"] },
+        { id: "beg-play-3", label: "Parties and stories", emoji: "🎉", themes: ["party", "fantasy"] },
       ],
     },
     {
-      id: "beg-world", label: "Orașul și lucrurile", emoji: "🏙️",
+      id: "beg-world", label: "The city and things", emoji: "🏙️",
       lessons: [
-        { id: "beg-world-1", label: "Culori, cifre și forme", emoji: "🎨", themes: ["colors", "numbers", "shapes"] },
+        { id: "beg-world-1", label: "Colours, numbers, and shapes", emoji: "🎨", themes: ["colors", "numbers", "shapes"] },
         { id: "beg-world-2", label: "Transport", emoji: "🚗", themes: ["transport", "more-vehicles", "time"] },
-        { id: "beg-world-3", label: "Locuri și meserii", emoji: "🏢", themes: ["places", "jobs", "money"] },
-        { id: "beg-world-4", label: "Unelte și aventuri", emoji: "🔧", themes: ["tools", "electronics", "camping"] },
+        { id: "beg-world-3", label: "Places and jobs", emoji: "🏢", themes: ["places", "jobs", "money"] },
+        { id: "beg-world-4", label: "Tools and adventures", emoji: "🔧", themes: ["tools", "electronics", "camping"] },
       ],
     },
   ],
 
   intermediate: [
     {
-      id: "int-daily", label: "Viața de zi cu zi", emoji: "💬",
+      id: "int-daily", label: "Everyday life", emoji: "💬",
       lessons: [
-        { id: "int-daily-1", label: "Rutina și familia", emoji: "🕗", themes: ["daily-routines", "family"] },
-        { id: "int-daily-2", label: "Școală și mâncare", emoji: "🍽️", themes: ["school", "food"] },
-        { id: "int-daily-3", label: "Weekend și viață zilnică", emoji: "🌤️", themes: ["weekend", "daily-life-long"] },
+        { id: "int-daily-1", label: "Routine and family", emoji: "🕗", themes: ["daily-routines", "family"] },
+        { id: "int-daily-2", label: "School and food", emoji: "🍽️", themes: ["school", "food"] },
+        { id: "int-daily-3", label: "Weekend and daily life", emoji: "🌤️", themes: ["weekend", "daily-life-long"] },
       ],
     },
     {
       id: "int-form", label: "Cum formulezi", emoji: "🗣️",
       lessons: [
-        { id: "int-form-1", label: "Întrebări și prepoziții", emoji: "❓", themes: ["questions", "prepositions"] },
-        { id: "int-form-2", label: "Descrieri și legături", emoji: "🔗", themes: ["describing", "connectors"] },
+        { id: "int-form-1", label: "Questions and prepositions", emoji: "❓", themes: ["questions", "prepositions"] },
+        { id: "int-form-2", label: "Descriptions and connectors", emoji: "🔗", themes: ["describing", "connectors"] },
       ],
     },
     {
       id: "int-world", label: "Lumea mea", emoji: "🌍",
       lessons: [
-        { id: "int-world-1", label: "Animale și vreme", emoji: "🐾", themes: ["animals", "weather"] },
-        { id: "int-world-2", label: "Pasiuni și orașul meu", emoji: "🎸", themes: ["hobbies", "my-town"] },
-        { id: "int-world-3", label: "Sănătate și cumpărături", emoji: "🛒", themes: ["health", "shopping"] },
+        { id: "int-world-1", label: "Animals and weather", emoji: "🐾", themes: ["animals", "weather"] },
+        { id: "int-world-2", label: "Hobbies and my town", emoji: "🎸", themes: ["hobbies", "my-town"] },
+        { id: "int-world-3", label: "Health and shopping", emoji: "🛒", themes: ["health", "shopping"] },
       ],
     },
     {
-      id: "int-story", label: "Povestiri și planuri", emoji: "📖",
+      id: "int-story", label: "Stories and plans", emoji: "📖",
       lessons: [
-        { id: "int-story-1", label: "Fraze lungi și întâmplări", emoji: "📚", themes: ["longer-sentences", "past-stories"] },
-        { id: "int-story-2", label: "Planuri și păreri", emoji: "💭", themes: ["future-plans", "opinions"] },
+        { id: "int-story-1", label: "Longer sentences and events", emoji: "📚", themes: ["longer-sentences", "past-stories"] },
+        { id: "int-story-2", label: "Plans and opinions", emoji: "💭", themes: ["future-plans", "opinions"] },
       ],
     },
   ],
@@ -274,11 +274,11 @@ function buildTeenCategories() {
 
   // Group the lessons into five progression stages.
   const STAGES = [
-    { id: "teen-tenses",  label: "Timpuri și structuri",  emoji: "⏳", take: 4 },
-    { id: "teen-precision", label: "Precizie și nuanță",  emoji: "🎯", take: 4 },
+    { id: "teen-tenses",  label: "Tenses and structures",  emoji: "⏳", take: 4 },
+    { id: "teen-precision", label: "Precision and nuance",  emoji: "🎯", take: 4 },
     { id: "teen-vocab",   label: "Vocabular avansat",     emoji: "📚", take: 3 },
-    { id: "teen-idioms",  label: "Expresii și idiomuri",  emoji: "💬", take: 3 },
-    { id: "teen-style",   label: "Stil și capcane",       emoji: "✍️", take: 99 }, // the rest
+    { id: "teen-idioms",  label: "Expressions and idioms",  emoji: "💬", take: 3 },
+    { id: "teen-style",   label: "Style and pitfalls",       emoji: "✍️", take: 99 }, // the rest
   ];
 
   const categories = [];

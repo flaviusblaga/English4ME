@@ -12,7 +12,7 @@ export const PROFILES = [
   },
   {
     id: "kids-primar",
-    displayName: "English4ME — Beginner (Bobo, Fizz & Sushi)",
+    displayName: "english4Me — Beginner (Bobo, Fizz & Sushi)",
     level: "beginner",
     contentTier: "beginner",
     emoji: "🌱",
@@ -21,7 +21,7 @@ export const PROFILES = [
   },
   {
     id: "kids-intermediate",
-    displayName: "English4ME — Intermediate (Bobo, Fizz & Sushi)",
+    displayName: "english4Me — Intermediate (Bobo, Fizz & Sushi)",
     level: "intermediate",
     contentTier: "intermediate",
     emoji: "🌿",
@@ -30,7 +30,7 @@ export const PROFILES = [
   },
   {
     id: "kids-advanced",
-    displayName: "English4ME — Advanced",
+    displayName: "english4Me — Advanced",
     level: "advanced",
     contentTier: "advanced",
     emoji: "🌳",
@@ -42,11 +42,11 @@ export const PROFILES = [
   },
   {
     id: "teen",
-    displayName: "English4ME — Teen (14-18)",
+    displayName: "english4Me — Teen (14-18)",
     level: "teen",
     contentTier: "teen",
     emoji: "🎓",
-    description: "Engleză pentru 14-18 ani: gramatică avansată, idiomuri și conversație reală despre școală, viitor și lumea din jur.",
+    description: "English for ages 14-18: advanced grammar, idioms, and real conversation about school, the future, and the world around you.",
     // Combines the Advanced+Expert lessons with a mature conversation partner —
     // no mascots. chatFirst is OFF so the lesson map is the landing view; chat
     // is one tab away.
@@ -54,7 +54,7 @@ export const PROFILES = [
   },
   {
     id: "kids-expert",
-    displayName: "English4ME — Expert",
+    displayName: "english4Me — Expert",
     level: "expert",
     contentTier: "expert",
     emoji: "🏆",
@@ -171,8 +171,8 @@ export const AVATARS = {
     ...MASCOTS_FULL,
   ],
   teen: [
-    { id: "teen-boy", name: "Băiat", img: "assets/socatei/teen-boy-sticker.png" },
-    { id: "teen-girl", name: "Fată", img: "assets/socatei/teen-girl-sticker.png" },
+    { id: "teen-boy", name: "Boy", img: "assets/socatei/teen-boy-sticker.png" },
+    { id: "teen-girl", name: "Girl", img: "assets/socatei/teen-girl-sticker.png" },
     ...MASCOTS_FULL,
   ],
 };
