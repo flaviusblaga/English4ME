@@ -1,0 +1,39 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  syntax:
+    name: Syntax check (node --check)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      # Catches syntax errors in every shipped module before merge — the app
+      # has no build step, so this is the cheapest real gate.
+      - name: node --check every JS file
+        run: |
+          for f in js/*.js sw.js; do
+            echo "checking $f"
+            node --check "$f"
+          done
+
+  smoke:
+    name: Smoke (Playwright)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      # Boots the static app and asserts the login screen renders with no
+      # uncaught JS errors (external Google origins are stubbed in the test).
+      - run: npx playwright test

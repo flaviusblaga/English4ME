@@ -1,0 +1,13 @@
+{
+  "name": "english4me",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Dev tooling only (tests / CI). The app itself is static — no build step, no runtime dependencies.",
+  "scripts": {
+    "check": "for f in js/*.js sw.js; do node --check \"$f\" || exit 1; done",
+    "test": "playwright test"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.48.0"
+  }
+}
