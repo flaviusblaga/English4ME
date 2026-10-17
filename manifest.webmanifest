@@ -1,29 +1,29 @@
 {
-  "name": "English4ME — Invata engleza cu Bobo, Fizz si Sushi",
-  "short_name": "English4ME",
-  "description": "Invata engleza cu Bobo, Fizz si Sushi — lectii, exercitii si recompense pentru toata familia.",
+  "name": "english4Me — Business English for managers in Romania",
+  "short_name": "english4Me",
+  "description": "Engleza de business, pe înțelesul tău — exersează ședințe, emailuri, negocieri și prezentări în engleză, cu antrenament.",
   "lang": "ro",
   "start_url": ".",
   "scope": ".",
   "display": "standalone",
   "orientation": "portrait",
-  "background_color": "#000000",
-  "theme_color": "#0a8fc4",
+  "background_color": "#FFFFFF",
+  "theme_color": "#FF6B1A",
   "icons": [
     {
-      "src": "assets/socatei/icon-192.png",
+      "src": "assets/brand/icon-192.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "assets/socatei/icon-512.png",
+      "src": "assets/brand/icon-512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "assets/socatei/icon-maskable-512.png",
+      "src": "assets/brand/icon-maskable-512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable"

@@ -167,7 +167,7 @@
 // v62: review fixes on the value pass — the chat welcome sets the member's name
 //      as text (never HTML); Debrief guards against a double-run from the header
 //      button and the mobile Tools menu at once.
-const CACHE_VERSION = "socatei-v64";
+const CACHE_VERSION = "english4me-v65";
 
 // Critical, visible assets pre-cached on install (before `activate` deletes the
 // previous cache). Without this, a CACHE_VERSION bump left a window with no
@@ -180,7 +180,10 @@ const PRECACHE = [
   "css/style.css",
   "js/app.js",
   "manifest.webmanifest",
-  "assets/socatei/logo-e4me.png",
+  "assets/brand/mark.svg",
+  "assets/brand/logo.svg",
+  "assets/brand/logo-white.svg",
+  "assets/brand/icon-192.png",
   "assets/socatei/bobo-sticker.png",
   "assets/socatei/sushi-sticker.png",
   "assets/socatei/fizz-sticker.png",

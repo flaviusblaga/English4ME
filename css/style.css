@@ -8,10 +8,11 @@
 /* Single purple "Bobo & Fizz" system, applied to everyone (matches the
    redesign mockup: kids + parent share one playful purple look). */
 :root {
-  /* fonts — Poppins is the mockup's typeface (geometric, modern, clean); Baloo 2
-     and Nunito stay as diacritic-safe fallbacks while Poppins loads. */
-  --font-display: "Poppins", "Baloo 2", "Nunito", system-ui, sans-serif;
-  --font-body: "Poppins", "Nunito", system-ui, sans-serif;
+  /* fonts — english4Me brand: Plus Jakarta Sans for display / wordmark / buttons,
+     Inter for body & UI, JetBrains Mono for small uppercase mono labels. */
+  --font-display: "Plus Jakarta Sans", "Inter", system-ui, sans-serif;
+  --font-body: "Inter", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
 
   /* spacing — 8px system (mockup): 8 16 24 32 40 48 64 */
   --sp-1: 4px; --sp-2: 8px; --sp-3: 12px; --sp-4: 16px; --sp-5: 24px; --sp-6: 32px;
@@ -28,27 +29,34 @@
   /* motion */
   --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
 
-  /* colour system — English4ME brand: cyan primary + orange accent on slate
-     neutrals (matches the E4ME logo: cyan "Me", orange "4", on black/white).
-     Variable NAMES are unchanged so no selector or JS reference breaks. */
-  --backdrop: #eef2f7;        /* behind the phone column (neutral slate) */
-  --surface: #f8fafc;         /* screen canvas */
-  --surface-raised: #ffffff;  /* cards */
-  --surface-tint: #ffffff;    /* panels */
-  --line: #e2e8f0;
-  --line-strong: #cbd5e1;
-  --text: #0f172a;
-  --text-muted: #64748b;
-  --text-faint: #94a3b8;      /* inactive nav / chevrons */
+  /* colour system — english4Me brand (brand book v1): Signal Orange is the
+     action/primary, Clear Cyan is progress/accent, on Ink + Paper neutrals.
+     Variable NAMES are unchanged (--primary now carries orange) so no selector
+     or JS reference breaks. The raw brand tokens are mirrored as --e4m-* below. */
+  --backdrop: #ECEAE6;        /* Canvas — behind the phone column */
+  --surface: #FAF8F5;         /* Warm Paper — screen canvas */
+  --surface-raised: #FFFFFF;  /* Paper — cards */
+  --surface-tint: #FFFFFF;    /* panels */
+  --line: #E3E0DB;            /* Line — borders, separators */
+  --line-strong: #D5D0C9;
+  --text: #111111;            /* Ink */
+  --text-muted: #55514C;      /* readable secondary text */
+  --text-faint: #8A8580;      /* Muted — inactive nav / labels */
 
-  --primary: #0a8fc4;         /* brand cyan (button-safe, white text) */
-  --primary-dark: #0773a0;
-  --primary-bright: #1ac3f5;  /* logo cyan — the far end of cyan gradients + accents */
-  --primary-soft: #cceffb;    /* light cyan chip bg */
-  --primary-tint: #eefaff;
-  --secondary: #f97316;       /* brand orange (accent) */
-  --highlight: #fb923c;       /* orange-400 — featured borders, warm highlights */
+  --primary: #FF6B1A;         /* Signal Orange — action: primary buttons, logo */
+  --primary-dark: #C24A08;    /* Orange Deep — hover/pressed, orange text on light */
+  --primary-bright: #FF8A4D;  /* lighter orange — gradient ends, warm accents */
+  --primary-soft: #FFF0E6;    /* Orange Tint — chip / card bg */
+  --primary-tint: #FFF6F0;    /* subtle orange panel wash */
+  --secondary: #14B8D4;       /* Clear Cyan — progress, active states, "Me" */
+  --highlight: #FF8A4D;       /* light orange — featured borders, warm highlights */
   --star-gold: #f4b400;       /* filled reward stars */
+
+  /* raw brand tokens, verbatim from the brand book (mirror of the semantic set) */
+  --e4m-orange: #FF6B1A; --e4m-orange-deep: #C24A08; --e4m-orange-tint: #FFF0E6;
+  --e4m-cyan: #14B8D4;   --e4m-cyan-deep: #0B7E92;   --e4m-cyan-tint: #E3F7FB;
+  --e4m-ink: #111111;    --e4m-paper: #FFFFFF;       --e4m-warm: #FAF8F5;
+  --e4m-line: #E3E0DB;   --e4m-muted: #8A8580;
 
   --success: #10b981;
   --success-soft: #d1fae5;
@@ -64,17 +72,18 @@
   --chip-hot-text: #c2410c;
 
   /* accents — profile-card tints, confetti, lesson nodes. --kid-purple keeps its
-     NAME but carries the brand cyan primary, so every "current/primary" accent
-     that referenced it turns cyan; coral already carries the brand orange. */
-  --kid-purple: #0a8fc4; --kid-purple-dark: #0773a0;
-  --kid-coral: #f97316;  --kid-coral-dark: #ea580c;
-  --kid-teal: #1ac3f5;   --kid-teal-dark: #0ea5e9;
+     NAME but now carries the brand Signal Orange primary, so every
+     "current/primary" accent that referenced it turns orange; --kid-teal carries
+     Clear Cyan. The yellow/pink/blue stay as playful accents for the kid screens. */
+  --kid-purple: #FF6B1A; --kid-purple-dark: #C24A08;
+  --kid-coral: #FF6B1A;  --kid-coral-dark: #C24A08;
+  --kid-teal: #14B8D4;   --kid-teal-dark: #0B7E92;
   --kid-yellow: #fbbf24; --kid-yellow-dark: #f59e0b;
   --kid-pink: #f472b6;   --kid-pink-dark: #ec4899;
   --kid-blue: #38bdf8;   --kid-blue-dark: #0ea5e9;
 
   /* tint backgrounds for the round icon tiles */
-  --tile-coral: #ffedd5; --tile-blue: #e0f2fe; --tile-green: #d1fae5; --tile-yellow: #fef3c7;
+  --tile-coral: #FFF0E6; --tile-blue: #E3F7FB; --tile-green: #d1fae5; --tile-yellow: #fef3c7;
 }
 
 /* ---------- Dark mode ----------
@@ -87,28 +96,30 @@
    gives a brighter teal used by the small pills.
    NOTE: authored without a live render — verify on a real device and iterate. */
 :root {
-  --primary-text: var(--primary); /* light mode: accent text = the teal itself */
+  /* orange ACCENT TEXT on a light surface uses Orange Deep so it passes AA
+     (Signal Orange on white is only 2.9:1). Buttons keep Signal Orange. */
+  --primary-text: #C24A08;
 }
 /* Dark palette. Keyed off <html data-theme="dark">, which an inline <head>
    script sets before first paint from the saved preference or, when there is
    none, the system setting (prefers-color-scheme) — so the app follows the
    phone by default but a manual toggle can override it. */
 :root[data-theme="dark"] {
-  --backdrop: #060a12;         /* behind the phone column */
-  --surface: #0f172a;          /* screen canvas (slate-900) */
-  --surface-raised: #1b2536;   /* cards (slate-800-ish) */
-  --surface-tint: #1b2536;     /* panels */
-  --line: #2c3a4f;
-  --line-strong: #3d4d63;
-  --text: #f1f5f9;             /* slate-100 */
-  --text-muted: #a3b2c7;       /* brighter than light's muted, for dark bg */
-  --text-faint: #7183a0;       /* inactive nav / chevrons */
+  --backdrop: #000000;         /* behind the phone column */
+  --surface: #141311;          /* screen canvas — warm near-black (Ink family) */
+  --surface-raised: #1F1D1A;   /* cards */
+  --surface-tint: #1F1D1A;     /* panels */
+  --line: #332F2A;
+  --line-strong: #47423B;
+  --text: #F5F3F0;             /* near-Paper on Ink */
+  --text-muted: #B4AEA6;       /* brighter than light's muted, for dark bg */
+  --text-faint: #837D74;       /* inactive nav / labels */
 
-  /* Cyan accents: buttons keep the mid cyan (white text stays legible on them),
-     but cyan TEXT on a dark surface needs to be brighter → --primary-text. */
-  --primary-text: #5fd3f5;     /* bright cyan, for accent text on dark */
-  --primary-soft: #0b3a4d;     /* dark cyan chip bg */
-  --primary-tint: #0c2f3e;     /* subtler dark cyan panel */
+  /* Orange accents on dark: buttons keep Signal Orange; orange TEXT on a dark
+     surface uses a lighter orange for contrast → --primary-text. */
+  --primary-text: #FF9A5C;     /* light orange, for accent text on dark */
+  --primary-soft: #3A2415;     /* dark orange chip bg */
+  --primary-tint: #2A1B10;     /* subtler dark orange panel */
 
   --success-soft: #0b3b30;
   --success-text: #6ee7b7;     /* green-300 */
@@ -145,53 +156,25 @@
 :root[data-theme="dark"] #screen-level-picker,
 :root[data-theme="dark"] #screen-placement {
   background:
-    linear-gradient(rgba(6, 10, 18, 0.88), rgba(6, 10, 18, 0.95)),
+    linear-gradient(rgba(10, 9, 8, 0.88), rgba(10, 9, 8, 0.95)),
     url("../assets/socatei/login-scene.svg") center bottom / cover no-repeat,
     var(--surface);
 }
 :root[data-theme="dark"] body[data-usertype="teen"] #screen-parent-view,
 :root[data-theme="dark"] body[data-usertype="teen"] #screen-reading {
   background:
-    linear-gradient(rgba(6, 10, 18, 0.88), rgba(6, 10, 18, 0.95)),
+    linear-gradient(rgba(10, 9, 8, 0.88), rgba(10, 9, 8, 0.95)),
     url("../assets/socatei/login-scene.svg") center top / cover no-repeat fixed,
     var(--surface);
 }
 
-/* ---------- Adult (Business English) — Peers/NetWorth brand ----------
-   Only the adult profile aligns to the Peers palette (cyan #00BCD4, orange
-   #E86C2C, neutral near-black #0A0A0A in dark), so english4me.networth.ro's
-   business surface matches peers.networth.ro. Kids/teen and the shared
-   login/picker keep the base English4ME palette. Tokens are redefined on
-   body[data-usertype="adult"], so they override the inherited :root tokens for
-   the whole adult subtree. */
-body[data-usertype="adult"] {
-  --primary: #0096b3;         /* Peers cyan, button-safe (white text) */
-  --primary-dark: #00768f;
-  --primary-bright: #00bcd4;  /* exact Peers cyan — accents/gradients */
-  --primary-soft: #cceef3;
-  --primary-tint: #effbfd;
-  --secondary: #e86c2c;       /* Peers orange */
-  --highlight: #f0864a;
-}
-:root[data-theme="dark"] body[data-usertype="adult"] {
-  --backdrop: #000000;
-  --surface: #0a0a0a;         /* Peers near-black */
-  --surface-raised: #161616;
-  --surface-tint: #161616;
-  --line: #262626;
-  --line-strong: #3a3a3a;
-  --text: #f4f4f5;
-  --text-muted: #a1a1aa;
-  --text-faint: #71717a;
-  --primary: #0096b3;
-  --primary-dark: #00768f;
-  --primary-bright: #00bcd4;
-  --primary-text: #2ad6ea;    /* bright cyan accent text on dark */
-  --primary-soft: #06343b;
-  --primary-tint: #082a30;
-  --secondary: #e86c2c;
-  --highlight: #f0864a;
-}
+/* ---------- Adult (Business English) ----------
+   The adult/Business surface now uses the SAME unified english4Me brand as the
+   rest of the app (Signal Orange primary, Clear Cyan accent, Ink + Paper
+   neutrals), so there is no profile-specific palette override here anymore.
+   (It previously aligned to the Peers palette; the brand book supersedes that.)
+   Adult-specific LAYOUT rules live further down; only the colour tokens were
+   removed here so the adult subtree inherits the base brand. */
 
 /* Kept as a hook so JS that toggles body.mascot-theme still works; the visual
    system is now shared, so this only bumps the base type size for the little
@@ -1108,8 +1091,8 @@ body[data-usertype="adult"] .chat-mode-toggle {
   border-color: var(--line);
 }
 body[data-usertype="adult"] .chat-mode-btn--active {
-  background: var(--primary-bright);
-  color: #04232a;
+  background: var(--primary);
+  color: #fff;
 }
 
 /* ---- Adult header tidy-up: from a "morman" to clear sections ----
@@ -1460,9 +1443,9 @@ body[data-usertype="adult"] .budget-indicator { display: none; }
   color: #fff;
 }
 body[data-usertype="adult"] .phrase-act--primary {
-  background: var(--primary-bright);
-  border-color: var(--primary-bright);
-  color: #04232a;
+  background: var(--primary);
+  border-color: var(--primary);
+  color: #fff;
 }
 .phrase-act--copied { background: var(--primary); border-color: var(--primary); color: #fff; }
 
@@ -1539,9 +1522,9 @@ body[data-usertype="adult"] .chat-welcome-chip:hover { background: var(--primary
   justify-content: center;
 }
 body[data-usertype="adult"] .scenario-lesson-start {
-  background: var(--primary-bright);
-  border-color: var(--primary-bright);
-  color: #04232a;
+  background: var(--primary);
+  border-color: var(--primary);
+  color: #fff;
 }
 
 /* ===================== Progress panel (adult) ===================== */
@@ -1649,9 +1632,9 @@ body[data-usertype="adult"] .progress-pro-cov--done svg { color: var(--primary-b
 .weekly-plan-text b { font-weight: 700; }
 .weekly-plan-action { margin-left: auto; flex-shrink: 0; white-space: nowrap; }
 body[data-usertype="adult"] .weekly-plan-action {
-  background: var(--primary-bright);
-  border-color: var(--primary-bright);
-  color: #04232a;
+  background: var(--primary);
+  border-color: var(--primary);
+  color: #fff;
 }
 
 /* Competency snapshot — scenario coverage by professional area */
@@ -1714,9 +1697,9 @@ body[data-usertype="adult"] .progress-pro-comp-bar i { background: var(--primary
 /* Active tab (desktop header Phrases/Progress/Documents) — shows which panel
    the rail is currently displaying. */
 body[data-usertype="adult"] .tool-tab--active {
-  background: var(--primary-bright);
-  color: #04232a;
-  border-color: var(--primary-bright);
+  background: var(--primary);
+  color: #fff;
+  border-color: var(--primary);
 }
 
 /* =============================================================
@@ -1850,21 +1833,21 @@ body[data-usertype="adult"] .tool-tab--active {
 .login-logo {
   width: 88px;
   height: 88px;
-  border-radius: 22px;
-  box-shadow: var(--shadow-md);
+  /* the mark is a transparent speech-bubble SVG with a tail — no box/shadow. */
 }
 
-/* Wordmark: English (text) · 4 (orange) · ME (cyan) — echoes the app icon. */
+/* Wordmark: english (Ink, medium) · 4 (Signal Orange, extrabold) · Me (Ink,
+   extrabold) — brand book §2.3. Always "english4Me". */
 .login-card h1.wordmark {
   font-family: var(--font-display);
-  font-weight: 700;
-  font-size: 1.6rem;
-  letter-spacing: -0.01em;
+  font-weight: 800;
+  font-size: 1.7rem;
+  letter-spacing: -0.035em;
   margin: 0;
 }
-.wordmark .wm-en { color: var(--text); }
-.wordmark .wm-4 { color: var(--secondary); }
-.wordmark .wm-me { color: var(--primary-text); }
+.wordmark .wm-en { color: var(--text); font-weight: 500; }
+.wordmark .wm-4 { color: var(--primary); font-weight: 800; }
+.wordmark .wm-me { color: var(--text); font-weight: 800; }
 
 .login-headline {
   font-family: var(--font-display);
@@ -4021,7 +4004,7 @@ body[data-usertype="teen"] #screen-reading {
 :root[data-theme="dark"] body[data-usertype="teen"] #screen-lesson,
 :root[data-theme="dark"] body[data-usertype="teen"] #screen-chat {
   background:
-    linear-gradient(rgba(6, 10, 18, 0.90), rgba(6, 10, 18, 0.96)),
+    linear-gradient(rgba(10, 9, 8, 0.90), rgba(10, 9, 8, 0.96)),
     url("../assets/socatei/login-scene.svg") center top / cover no-repeat fixed,
     var(--surface);
 }
