@@ -153,6 +153,7 @@
    near-opaque dark scrim on every screen that paints it, so a faint hint of the
    scene remains but text keeps full contrast. */
 :root[data-theme="dark"] #screen-login,
+:root[data-theme="dark"] #screen-profile-picker,
 :root[data-theme="dark"] #screen-level-picker,
 :root[data-theme="dark"] #screen-placement {
   background:
