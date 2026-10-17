@@ -282,13 +282,13 @@ h1, h2, h3, h4 {
 
 .btn-primary {
   background: var(--primary);
-  color: #fff;
-  box-shadow: 0 6px 16px rgba(10, 143, 196, 0.34);
+  color: #111; /* Ink on Signal Orange — WCAG AA (6.6:1) */
+  box-shadow: 0 6px 16px rgba(255, 107, 26, 0.34);
 }
 
 .btn-primary:not(:disabled):active {
   transform: translateY(1px) scale(0.98);
-  box-shadow: 0 3px 10px rgba(10, 143, 196, 0.30);
+  box-shadow: 0 3px 10px rgba(255, 107, 26, 0.30);
 }
 
 .btn-primary:disabled {
@@ -828,13 +828,13 @@ body.mascot-theme .btn-primary {
   background: var(--primary);
   color: #fff;
   outline-color: var(--primary-soft);
-  box-shadow: 0 0 0 6px rgba(10, 143, 196, 0.18), var(--shadow-md);
+  box-shadow: 0 0 0 6px rgba(255, 107, 26, 0.18), var(--shadow-md);
   animation: node-pulse 1.8s var(--ease-out) infinite;
 }
 
 @keyframes node-pulse {
-  0%, 100% { box-shadow: 0 0 0 6px rgba(10, 143, 196, 0.18), var(--shadow-md); }
-  50%      { box-shadow: 0 0 0 13px rgba(10, 143, 196, 0.07), var(--shadow-md); }
+  0%, 100% { box-shadow: 0 0 0 6px rgba(255, 107, 26, 0.18), var(--shadow-md); }
+  50%      { box-shadow: 0 0 0 13px rgba(255, 107, 26, 0.07), var(--shadow-md); }
 }
 
 .lesson-node-label {
@@ -887,6 +887,15 @@ body.mascot-theme .app-header {
   justify-content: space-between;
   gap: var(--sp-3);
   padding: var(--sp-3) var(--sp-4) var(--sp-2);
+}
+
+/* The english4Me mark, as a small brand anchor at the left of the learning
+   header (a transparent speech-bubble SVG with a tail — no box/shadow). */
+.app-header-mark {
+  width: 26px;
+  height: 26px;
+  flex: none;
+  display: block;
 }
 
 .app-identity {
@@ -1024,7 +1033,7 @@ body.mascot-theme .identity-avatar {
 }
 .chat-mode-btn--active {
   background: var(--primary);
-  color: #fff;
+  color: #111;
 }
 
 /* ===================== Adult "premium dashboard" theme =====================
@@ -1042,7 +1051,7 @@ body[data-usertype="adult"] .app-identity { gap: var(--sp-3); }
 body[data-usertype="adult"] .identity-avatar {
   width: 54px; height: 54px; overflow: hidden;
   background: radial-gradient(circle at 50% 35%, #d5f2ee, #b9e8e1);
-  box-shadow: 0 0 0 2px rgba(10, 143, 196, 0.35), var(--shadow-sm);
+  box-shadow: 0 0 0 2px rgba(255, 107, 26, 0.35), var(--shadow-sm);
 }
 body[data-usertype="adult"] .identity-avatar img {
   width: 100%; height: 100%; object-fit: cover; object-position: top center;
@@ -1053,8 +1062,8 @@ body[data-usertype="adult"] .profile-tag { color: var(--text-muted); }
 /* usage read-out as a soft teal pill */
 body[data-usertype="adult"] .budget-indicator {
   color: var(--primary-dark);
-  background: rgba(10, 143, 196, 0.08);
-  border: 1px solid rgba(10, 143, 196, 0.25);
+  background: rgba(255, 107, 26, 0.08);
+  border: 1px solid rgba(255, 107, 26, 0.25);
   border-radius: 999px;
   padding: 6px 12px;
   font-weight: 600;
@@ -1092,7 +1101,7 @@ body[data-usertype="adult"] .chat-mode-toggle {
 }
 body[data-usertype="adult"] .chat-mode-btn--active {
   background: var(--primary);
-  color: #fff;
+  color: #111;
 }
 
 /* ---- Adult header tidy-up: from a "morman" to clear sections ----
@@ -1300,8 +1309,8 @@ body[data-usertype="adult"] .budget-indicator { display: none; }
 .gamification-badge-chip {
   padding: 0.35rem 0.75rem;
   border-radius: var(--r-pill);
-  background: rgba(10, 143, 196, 0.08);
-  border: 1px solid rgba(10, 143, 196, 0.28);
+  background: rgba(255, 107, 26, 0.08);
+  border: 1px solid rgba(255, 107, 26, 0.28);
   color: var(--text);
   font-size: var(--fs-xs);
   font-weight: 700;
@@ -1440,14 +1449,14 @@ body[data-usertype="adult"] .budget-indicator { display: none; }
 .phrase-act--primary {
   background: var(--primary);
   border-color: var(--primary);
-  color: #fff;
+  color: #111;
 }
 body[data-usertype="adult"] .phrase-act--primary {
   background: var(--primary);
   border-color: var(--primary);
-  color: #fff;
+  color: #111;
 }
-.phrase-act--copied { background: var(--primary); border-color: var(--primary); color: #fff; }
+.phrase-act--copied { background: var(--primary); border-color: var(--primary); color: #111; }
 
 /* ===================== Adult chat welcome / empty-state ===================== */
 .chat-welcome {
@@ -1524,7 +1533,7 @@ body[data-usertype="adult"] .chat-welcome-chip:hover { background: var(--primary
 body[data-usertype="adult"] .scenario-lesson-start {
   background: var(--primary);
   border-color: var(--primary);
-  color: #fff;
+  color: #111;
 }
 
 /* ===================== Progress panel (adult) ===================== */
@@ -1634,7 +1643,7 @@ body[data-usertype="adult"] .progress-pro-cov--done svg { color: var(--primary-b
 body[data-usertype="adult"] .weekly-plan-action {
   background: var(--primary);
   border-color: var(--primary);
-  color: #fff;
+  color: #111;
 }
 
 /* Competency snapshot — scenario coverage by professional area */
@@ -1698,7 +1707,7 @@ body[data-usertype="adult"] .progress-pro-comp-bar i { background: var(--primary
    the rail is currently displaying. */
 body[data-usertype="adult"] .tool-tab--active {
   background: var(--primary);
-  color: #fff;
+  color: #111;
   border-color: var(--primary);
 }
 
@@ -2111,7 +2120,7 @@ body[data-usertype="adult"] .tool-tab--active {
   display: grid; place-items: center; color: #fff;
   font-family: var(--font-display); font-weight: 800; font-size: 1.6rem;
   background: linear-gradient(135deg, var(--primary), var(--primary-bright));
-  box-shadow: 0 6px 16px rgba(10, 143, 196, 0.3);
+  box-shadow: 0 6px 16px rgba(255, 107, 26, 0.3);
   overflow: hidden;
 }
 /* when a teen sticker is chosen, it fills the tile (head-and-shoulders crop) */
@@ -3535,7 +3544,7 @@ body.mascot-theme .chat-bubble--assistant {
   cursor: pointer;
   color: #fff;
   background: var(--primary);
-  box-shadow: 0 6px 16px rgba(10, 143, 196, 0.34);
+  box-shadow: 0 6px 16px rgba(255, 107, 26, 0.34);
   transition: transform 120ms var(--ease-out);
 }
 
@@ -3960,12 +3969,12 @@ body.mascot-theme .chat-bubble--assistant {
   justify-content: center;
   border-radius: 50%;
   background: var(--primary);
-  color: #fff;
+  color: #111;
 }
 .lesson-row-play .icon { width: 0.95em; height: 0.95em; fill: currentColor; stroke: currentColor; }
 .lesson-row-stars { gap: 1px; color: var(--star-gold); }
 .lesson-row-stars .icon { width: 1em; height: 1em; fill: var(--star-gold); color: var(--star-gold); }
-.lesson-row--current { border-color: var(--primary-text); box-shadow: 0 0 0 2px rgba(10, 143, 196, 0.15); }
+.lesson-row--current { border-color: var(--primary-text); box-shadow: 0 0 0 2px rgba(255, 107, 26, 0.15); }
 .lesson-row--current .lesson-row-icon { border-color: var(--primary-text); }
 .lesson-row--done .lesson-row-label { color: var(--text-muted); }
 
@@ -4075,7 +4084,7 @@ body[data-usertype="teen"] #screen-reading {
   border-radius: var(--r-lg);
   box-shadow: var(--shadow-sm);
 }
-.stats-mod-card--done { border-color: rgba(10, 143, 196, 0.35); }
+.stats-mod-card--done { border-color: rgba(255, 107, 26, 0.35); }
 .stats-mod-emoji {
   flex-shrink: 0;
   width: 44px;
