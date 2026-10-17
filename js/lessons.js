@@ -4,13 +4,14 @@ import { parentEmailsForEmail } from "./profile.js";
 import {
   getCategories,
   getStructuredLesson,
-  getStructuredLessons,
   buildFiftyWordQueue,
   buildFiftySentenceQueue,
   buildFiftyGrammarQueue,
   migrateCompletions,
   needsMigration,
   EXERCISES_PER_LESSON,
+  ensureGrammarExtras,
+  GRAMMAR_TIERS,
 } from "./lesson-structure.js";
 import { syncProgress, fetchPendingResets } from "./worker-client.js";
 import { updateGamificationAfterLesson, BADGES, badgeLabel } from "./gamification.js";
@@ -83,7 +84,6 @@ const MASCOT_AVATARS = {
 // tier's lesson content ships.
 const TIER_CONFIG = {
   beginner: {
-    lessonSet: getStructuredLessons("beginner"),
     getLessonFn: (id) => getStructuredLesson("beginner", id),
     buildQueue: (lesson) => buildFiftyWordQueue(lesson, ALL_BEGINNER_WORDS),
     stemLines: QUESTION_STEM_LINES,
@@ -98,7 +98,6 @@ const TIER_CONFIG = {
     buildQuestion: (item, pool, type) => buildWordQuestion(item, pool, type),
   },
   intermediate: {
-    lessonSet: getStructuredLessons("intermediate"),
     getLessonFn: (id) => getStructuredLesson("intermediate", id),
     buildQueue: buildFiftySentenceQueue,
     stemLines: SENTENCE_QUESTION_STEM_LINES,
@@ -111,7 +110,6 @@ const TIER_CONFIG = {
     buildQuestion: (item, pool, type) => buildSentenceQuestion(item, type),
   },
   advanced: {
-    lessonSet: getStructuredLessons("advanced"),
     getLessonFn: (id) => getStructuredLesson("advanced", id),
     buildQueue: buildFiftyGrammarQueue,
     stemLines: GRAMMAR_STEM_LINES,
@@ -120,7 +118,6 @@ const TIER_CONFIG = {
     maxScore: () => EXERCISES_PER_LESSON,
   },
   expert: {
-    lessonSet: getStructuredLessons("expert"),
     getLessonFn: (id) => getStructuredLesson("expert", id),
     buildQueue: buildFiftyGrammarQueue,
     stemLines: GRAMMAR_STEM_LINES,
@@ -130,7 +127,6 @@ const TIER_CONFIG = {
   },
   // Teen (14-18): Advanced + Expert combined into one 17-lesson grammar tier.
   teen: {
-    lessonSet: getStructuredLessons("teen"),
     getLessonFn: (id) => getStructuredLesson("teen", id),
     buildQueue: buildFiftyGrammarQueue,
     stemLines: GRAMMAR_STEM_LINES,
@@ -439,8 +435,13 @@ function updateLessonMascotSelectUi() {
   }
 }
 
-export function initLessons({ accessToken, userEmail, displayName, fileId, state, profile, avatar, onJustChat, onChatAboutIt }) {
+export async function initLessons({ accessToken, userEmail, displayName, fileId, state, profile, avatar, onJustChat, onChatAboutIt }) {
   session = { accessToken, userEmail, displayName, fileId, state, profile, avatar };
+  // Advanced/Expert/Teen lessons live in the lazy-loaded grammar banks; pull
+  // them in before anything reads the grammar structure (migration below, the
+  // menu render, resolving a lesson's items). Beginner/Intermediate skip this
+  // and never download the ~91 KB of grammar content.
+  if (GRAMMAR_TIERS.has(profile.contentTier)) await ensureGrammarExtras();
   applyStructureMigration();
   onJustChatCallback = onJustChat;
   onChatAboutItCallback = onChatAboutIt;
