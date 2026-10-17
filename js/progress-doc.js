@@ -61,9 +61,9 @@ function srsSummary(state) {
 }
 
 const LEVEL_LABEL = {
-  "kids-primar": "Începător",
-  "kids-intermediate": "Intermediar",
-  "kids-advanced": "Avansat",
+  "kids-primar": "Beginner",
+  "kids-intermediate": "Intermediate",
+  "kids-advanced": "Advanced",
   "kids-expert": "Expert",
 };
 
@@ -77,38 +77,38 @@ export function buildReportHtml({ state, memberName, profileId }) {
     : [];
 
   const rows = [
-    ["Nivel", LEVEL_LABEL[profileId] || profileId || "—"],
-    ["Zile de practică", `${game.totalActiveDays || 0}`],
-    ["Puncte", `${game.points || 0}`],
-    ["Lecții terminate", `${progress.sessionsCompleted || 0}`],
-    ["Cuvinte întâlnite", `${srs.seen}`],
-    ["Cuvinte știute bine", `${srs.mastered}`],
-    ["Ultima practică", formatRoDate(game.lastPracticeDate)],
+    ["Level", LEVEL_LABEL[profileId] || profileId || "—"],
+    ["Practice days", `${game.totalActiveDays || 0}`],
+    ["Points", `${game.points || 0}`],
+    ["Lessons completed", `${progress.sessionsCompleted || 0}`],
+    ["Words encountered", `${srs.seen}`],
+    ["Words known well", `${srs.mastered}`],
+    ["Last practice", formatRoDate(game.lastPracticeDate)],
   ];
 
   return `<html><body>
-<h1>Progres — ${escapeHtml(memberName)}</h1>
-<p><i>Raport generat automat de aplicația english4Me pe ${formatRoDate(todayLocalDate())}.
-Se actualizează singur după fiecare zi de practică.</i></p>
+<h1>Progress — ${escapeHtml(memberName)}</h1>
+<p><i>Report generated automatically by english4Me on ${formatRoDate(todayLocalDate())}.
+It updates itself after each practice day.</i></p>
 
-<h2>Pe scurt</h2>
+<h2>At a glance</h2>
 <table border="1" cellpadding="6" cellspacing="0">
 ${rows.map(([label, value]) => `<tr><td><b>${escapeHtml(label)}</b></td><td>${escapeHtml(value)}</td></tr>`).join("\n")}
 </table>
 
-<h2>Zilele în care a exersat</h2>
+<h2>Days practised</h2>
 ${practiceDays.length
   ? `<p>${practiceDays.map((d) => escapeHtml(formatRoDate(d))).join(" · ")}</p>`
-  : "<p>Încă nicio zi înregistrată.</p>"}
+  : "<p>No days recorded yet.</p>"}
 
-<h2>De exersat în continuare</h2>
+<h2>To keep practising</h2>
 ${corrections.length
   ? `<ul>${corrections.map((c) => `<li>${escapeHtml(typeof c === "string" ? c : c.note || c.text || "")}</li>`).join("")}</ul>`
-  : "<p>Nimic de semnalat deocamdată.</p>"}
+  : "<p>Nothing to flag yet.</p>"}
 
 <hr>
-<p><small>Acest raport se află în Google Drive-ul copilului și e partajat cu tine.
-Nu este stocat pe niciun alt server.</small></p>
+<p><small>This report lives in the child's Google Drive and is shared with you.
+It is not stored on any other server.</small></p>
 </body></html>`;
 }
 
@@ -198,7 +198,7 @@ export async function publishProgressDoc({ accessToken, state, memberName, profi
     if (!doc.fileId) {
       // Only NEW reports get this name — Drive keeps a file's title when it is
       // updated, so a report created before the rename stays "Socatei — …".
-      const created = await createReportDoc(accessToken, `english4Me — Progres ${memberName}`, html);
+      const created = await createReportDoc(accessToken, `english4Me — Progress ${memberName}`, html);
       doc.fileId = created.id;
       doc.webViewLink = created.webViewLink || null;
     } else {

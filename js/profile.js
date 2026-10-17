@@ -46,7 +46,7 @@ export const PROFILES = [
     level: "teen",
     contentTier: "teen",
     emoji: "🎓",
-    description: "Engleză pentru 14-18 ani: gramatică avansată, idiomuri și conversație reală despre școală, viitor și lumea din jur.",
+    description: "English for ages 14-18: advanced grammar, idioms, and real conversation about school, the future, and the world around you.",
     // Combines the Advanced+Expert lessons with a mature conversation partner —
     // no mascots. chatFirst is OFF so the lesson map is the landing view; chat
     // is one tab away.
@@ -171,8 +171,8 @@ export const AVATARS = {
     ...MASCOTS_FULL,
   ],
   teen: [
-    { id: "teen-boy", name: "Băiat", img: "assets/socatei/teen-boy-sticker.png" },
-    { id: "teen-girl", name: "Fată", img: "assets/socatei/teen-girl-sticker.png" },
+    { id: "teen-boy", name: "Boy", img: "assets/socatei/teen-boy-sticker.png" },
+    { id: "teen-girl", name: "Girl", img: "assets/socatei/teen-girl-sticker.png" },
     ...MASCOTS_FULL,
   ],
 };

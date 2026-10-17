@@ -12,7 +12,7 @@
 export const ADVANCED_EXTRA2 = [
   {
     id: "mixed-conditionals",
-    label: "Condiționale mixte",
+    label: "Mixed conditionals",
     emoji: "🔀",
     questions: [
       { q: "If I ____ harder last year, I would have a better job now.", options: ["studied", "had studied", "would study", "study"], correct: 1,
@@ -35,7 +35,7 @@ export const ADVANCED_EXTRA2 = [
   },
   {
     id: "countable-uncountable",
-    label: "Numărabile și nenumărabile",
+    label: "Countable and uncountable",
     emoji: "🧮",
     questions: [
       { q: "Could you give me some ____ about the course?", options: ["informations", "information", "an information", "informative"], correct: 1,
@@ -81,7 +81,7 @@ export const ADVANCED_EXTRA2 = [
   },
   {
     id: "time-clauses",
-    label: "Propoziții de timp",
+    label: "Time clauses",
     emoji: "⏰",
     questions: [
       { q: "I'll call you when I ____ home.", options: ["will get", "get", "am getting", "would get"], correct: 1,
@@ -127,7 +127,7 @@ export const ADVANCED_EXTRA2 = [
   },
   {
     id: "future-perfect",
-    label: "Viitor perfect și continuu",
+    label: "Future perfect and continuous",
     emoji: "🔮",
     questions: [
       { q: "By next June I ____ here for ten years.", options: ["will work", "will have worked", "am working", "will be working"], correct: 1,
@@ -150,7 +150,7 @@ export const ADVANCED_EXTRA2 = [
   },
   {
     id: "participle-clauses",
-    label: "Propoziții participiale",
+    label: "Participle clauses",
     emoji: "✂️",
     questions: [
       { q: "____ the door, she noticed the light was on.", options: ["Open", "Opening", "Opened", "To open"], correct: 1,
@@ -196,7 +196,7 @@ export const ADVANCED_EXTRA2 = [
   },
   {
     id: "indirect-questions",
-    label: "Întrebări indirecte",
+    label: "Indirect questions",
     emoji: "🙋",
     questions: [
       { q: "Could you tell me where ____?", options: ["is the station", "the station is", "is station", "does the station"], correct: 1,
@@ -219,7 +219,7 @@ export const ADVANCED_EXTRA2 = [
   },
   {
     id: "obligation-permission",
-    label: "Obligație și permisiune",
+    label: "Obligation and permission",
     emoji: "🚦",
     questions: [
       { q: "You ____ wear a helmet — it is the law.", options: ["should", "must", "could", "might"], correct: 1,
@@ -265,7 +265,7 @@ export const ADVANCED_EXTRA2 = [
   },
   {
     id: "prepositional-verbs",
-    label: "Verbe cu prepoziție",
+    label: "Prepositional verbs",
     emoji: "🔌",
     questions: [
       { q: "I am looking forward ____ your reply.", options: ["for", "to", "at", "on"], correct: 1,
@@ -288,7 +288,7 @@ export const ADVANCED_EXTRA2 = [
   },
   {
     id: "purpose-result",
-    label: "Scop și rezultat",
+    label: "Purpose and result",
     emoji: "🎯",
     questions: [
       { q: "He left early ____ avoid the traffic.", options: ["for", "to", "for to", "so"], correct: 1,
@@ -311,7 +311,7 @@ export const ADVANCED_EXTRA2 = [
   },
   {
     id: "determiners",
-    label: "Determinanți",
+    label: "Determiners",
     emoji: "🔢",
     questions: [
       { q: "____ of my parents came.", options: ["Both", "Every", "Each one", "All the two"], correct: 0,
@@ -360,7 +360,7 @@ export const ADVANCED_EXTRA2 = [
 export const EXPERT_EXTRA2 = [
   {
     id: "cleft-sentences",
-    label: "Propoziții scindate",
+    label: "Cleft sentences",
     emoji: "🔦",
     questions: [
       { q: "____ I need is a holiday.", options: ["That", "What", "Which", "It"], correct: 1,
@@ -383,7 +383,7 @@ export const EXPERT_EXTRA2 = [
   },
   {
     id: "hedging",
-    label: "Nuanțare și prudență",
+    label: "Hedging and caution",
     emoji: "🌫️",
     questions: [
       { q: "The results ____ that costs are rising.", options: ["prove", "suggest", "show definitely", "confirm totally"], correct: 1,
@@ -475,7 +475,7 @@ export const EXPERT_EXTRA2 = [
   },
   {
     id: "ellipsis",
-    label: "Elipsă și substituție",
+    label: "Ellipsis and substitution",
     emoji: "➖",
     questions: [
       { q: '"Are you coming?" "I hope ____."', options: ["it", "so", "that", "this"], correct: 1,
@@ -498,7 +498,7 @@ export const EXPERT_EXTRA2 = [
   },
   {
     id: "idioms-nature",
-    label: "Idiomuri din natură",
+    label: "Nature idioms",
     emoji: "🌦️",
     questions: [
       { q: "It's raining cats and ____.", options: ["dogs", "mice", "birds", "frogs"], correct: 0,
@@ -521,7 +521,7 @@ export const EXPERT_EXTRA2 = [
   },
   {
     id: "idioms-body",
-    label: "Idiomuri cu părți ale corpului",
+    label: "Body-part idioms",
     emoji: "🖐️",
     questions: [
       { q: "It cost an arm and a ____.", options: ["hand", "leg", "foot", "head"], correct: 1,
@@ -567,7 +567,7 @@ export const EXPERT_EXTRA2 = [
   },
   {
     id: "connotation",
-    label: "Conotație",
+    label: "Connotation",
     emoji: "🎨",
     questions: [
       { q: "Which is the POSITIVE word for someone careful with money?", options: ["stingy", "thrifty", "mean", "tight"], correct: 1,
@@ -590,7 +590,7 @@ export const EXPERT_EXTRA2 = [
   },
   {
     id: "sound-alikes",
-    label: "Cuvinte care sună la fel",
+    label: "Words that sound alike",
     emoji: "🔊",
     questions: [
       { q: "The team had a positive ____ on the result.", options: ["affect", "effect", "afect", "efect"], correct: 1,
@@ -728,7 +728,7 @@ export const EXPERT_EXTRA2 = [
   },
   {
     id: "phrasal-separable",
-    label: "Verbe cu particulă: poziția",
+    label: "Phrasal verbs: position",
     emoji: "🔀",
     questions: [
       { q: "The TV is on. Which is correct?", options: ["Turn off it", "Turn it off", "Off turn it", "Turn off of it"], correct: 1,
@@ -751,7 +751,7 @@ export const EXPERT_EXTRA2 = [
   },
   {
     id: "formal-writing",
-    label: "Scriere formală",
+    label: "Formal writing",
     emoji: "✉️",
     questions: [
       { q: "Formal opening to an unknown reader:", options: ["Hi there", "Dear Sir or Madam", "Hello you", "To whoever reads"], correct: 1,
@@ -774,7 +774,7 @@ export const EXPERT_EXTRA2 = [
   },
   {
     id: "tense-nuance",
-    label: "Nuanțe de timp verbal",
+    label: "Verb-tense nuances",
     emoji: "🎚️",
     questions: [
       { q: "I ____ in Cluj for ten years — and I still live there.", options: ["lived", "have lived", "live", "was living"], correct: 1,
@@ -797,7 +797,7 @@ export const EXPERT_EXTRA2 = [
   },
   {
     id: "quantifier-nuance",
-    label: "Nuanțe de cantitate",
+    label: "Quantity nuances",
     emoji: "🥄",
     questions: [
       { q: "He has ____ friends — he is quite lonely.", options: ["a few", "few", "several", "some"], correct: 1,
@@ -820,7 +820,7 @@ export const EXPERT_EXTRA2 = [
   },
   {
     id: "commonly-misused",
-    label: "Greșeli frecvente",
+    label: "Common mistakes",
     emoji: "⚠️",
     questions: [
       { q: "I look forward to ____ from you.", options: ["hear", "hearing", "heard", "be hearing"], correct: 1,

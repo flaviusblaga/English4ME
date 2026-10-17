@@ -8,7 +8,7 @@ import { getAccessToken } from "./auth.js";
 function authHeaders(extra) {
   const token = getAccessToken();
   if (!token) {
-    const err = new Error("Sesiunea a expirat. Conectează-te din nou.");
+    const err = new Error("Your session has expired. Sign in again.");
     err.code = "no_session";
     throw err;
   }

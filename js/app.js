@@ -132,10 +132,10 @@ async function openControlPanel() {
       if (hint) hint.hidden = true;
     } else if (hint) {
       hint.hidden = false;
-      hint.textContent = "Consumul apare după prima conversație din zona ta de învățare.";
+      hint.textContent = "Usage shows up after your first conversation in your learning area.";
     }
   } catch {
-    if (hint) { hint.hidden = false; hint.textContent = "Nu am putut încărca consumul acum."; }
+    if (hint) { hint.hidden = false; hint.textContent = "Couldn't load usage right now."; }
   }
 }
 
@@ -238,7 +238,7 @@ async function renderProfilePicker() {
   if (adults.length) {
     const sec = document.createElement("div");
     sec.className = "picker-section";
-    sec.appendChild(sectionLabel("adults", iconSvg("users"), "Adulți"));
+    sec.appendChild(sectionLabel("adults", iconSvg("users"), "Adults"));
     const wrap = document.createElement("div");
     wrap.className = "adult-wrap";
     for (const member of adults) wrap.appendChild(renderAdultCard(member, remembered));
@@ -249,7 +249,7 @@ async function renderProfilePicker() {
   if (teens.length) {
     const sec = document.createElement("div");
     sec.className = "picker-section";
-    sec.appendChild(sectionLabel("teens", iconSvg("graduation-cap"), "Adolescenți"));
+    sec.appendChild(sectionLabel("teens", iconSvg("graduation-cap"), "Teens"));
     const wrap = document.createElement("div");
     wrap.className = "teen-wrap";
     for (const member of teens) wrap.appendChild(renderTeenCard(member, remembered));
@@ -304,8 +304,8 @@ function pickerWrap(card, member) {
     edit.type = "button";
     edit.className = "profile-avatar-edit";
     edit.innerHTML = iconSvg("pencil");
-    edit.title = `Schimbă poza lui ${member.name}`;
-    edit.setAttribute("aria-label", `Schimbă poza lui ${member.name}`);
+    edit.title = `Change ${member.name}'s picture`;
+    edit.setAttribute("aria-label", `Change ${member.name}'s picture`);
     edit.addEventListener("click", (event) => {
       event.stopPropagation();
       openAvatarPicker(member);
@@ -425,7 +425,7 @@ function openAvatarPicker(member) {
   const overlay = el("avatar-picker");
   const grid = el("avatar-picker-grid");
   el("avatar-picker-title").textContent =
-    member.kind === "kid" ? `Cine te reprezintă, ${member.name}?` : `Alege poza pentru ${member.name}`;
+    member.kind === "kid" ? `Who represents you, ${member.name}?` : `Choose a picture for ${member.name}`;
   grid.innerHTML = "";
 
   const current = getMemberAvatar(member);
@@ -539,7 +539,7 @@ function membersToLines(members, kind) {
     .filter((m) => m.kind === kind)
     .map((m) => {
       const email = (m.emails || []).join(", ");
-      const auto = new RegExp("^(Părinte|Adolescent|Copil) \\d+$").test(m.name || "");
+      const auto = new RegExp("^(Parent|Teen|Child) \\d+$").test(m.name || "");
       return m.name && !auto ? `${m.name}, ${email}` : email;
     })
     .join("\n");
@@ -648,12 +648,12 @@ async function saveFamilyForm(fam, button) {
 }
 
 async function confirmDeleteFamily(fam) {
-  if (!confirm(`Ștergi familia „${fam.name}"? Membrii ei nu vor mai putea intra în aplicație.`)) return;
+  if (!confirm(`Delete the family "${fam.name}"? Its members will no longer be able to access the app.`)) return;
   try {
     await adminDeleteFamily(fam.id);
     await renderFamilyList();
   } catch (err) {
-    alert(`Nu s-a putut șterge: ${err.message}`);
+    alert(`Couldn't delete: ${err.message}`);
   }
 }
 
@@ -706,10 +706,10 @@ const LEVEL_LABEL = { "kids-primar": "Playroom", "kids-intermediate": "Adventure
 // profile id — same content underneath, playful framing on top. `mascot` is a
 // sticker filename, or "cup" for the trophy (Expert has no mascot).
 const MODULES = {
-  "kids-primar":       { m: "playroom", label: "Playroom with Bobo",   sub: "Joacă-te, învață și vorbește cu Bobo!",        mascot: "bobo" },
-  "kids-intermediate": { m: "adventure", label: "Adventure with Fizz",  sub: "Explorează, descoperă și devino curios!",       mascot: "fizz" },
-  "kids-advanced":     { m: "storytime", label: "Storytime with Sushi", sub: "Citește, ascultă și imaginează-ți poveștile!",  mascot: "sushi" },
-  "kids-expert":       { m: "mastery",   label: "Mastery Cup",          sub: "Provocări avansate pentru a deveni campion!",   mascot: "cup" },
+  "kids-primar":       { m: "playroom", label: "Playroom with Bobo",   sub: "Play, learn, and talk with Bobo!",        mascot: "bobo" },
+  "kids-intermediate": { m: "adventure", label: "Adventure with Fizz",  sub: "Explore, discover, and get curious!",       mascot: "fizz" },
+  "kids-advanced":     { m: "storytime", label: "Storytime with Sushi", sub: "Read, listen, and imagine the stories!",  mascot: "sushi" },
+  "kids-expert":       { m: "mastery",   label: "Mastery Cup",          sub: "Advanced challenges to become a champion!",   mascot: "cup" },
 };
 
 function showLevelPicker(member, recommendedProfileId) {
@@ -861,20 +861,20 @@ function showSessionError(err) {
     box.className = "session-error";
     document.body.appendChild(box);
   }
-  const detail = (err && (err.message || err.toString())) || "necunoscut";
+  const detail = (err && (err.message || err.toString())) || "unknown";
   box.innerHTML =
     `<div class="session-error-box">` +
-    `<strong>Nu am putut deschide lecțiile 😕</strong>` +
+    `<strong>Couldn't open the lessons 😕</strong>` +
     (looksLikePermission
-      ? `<p>Aplicația nu a primit acces la Google Drive (acolo se salvează progresul).</p>` +
-        `<p><b>Dacă e un cont de copil cu control parental</b> (Family Link), Google nu îi permite acest acces — ` +
-        `intră în aplicație cu un cont Google <b>obișnuit</b> (același ca pe tabletă). Așa progresul se și sincronizează pe ambele.</p>` +
-        `<p>Altfel: ieși și intră din nou, iar la ecranul Google <b>bifează permisiunea pentru Google Drive</b>.</p>`
-      : `<p>A apărut o eroare de rețea. Verifică internetul și încearcă din nou.</p>`) +
+      ? `<p>The app didn't get access to Google Drive (that's where progress is saved).</p>` +
+        `<p><b>If this is a child account with parental controls</b> (Family Link), Google won't allow this access — ` +
+        `sign in with a <b>regular</b> Google account (the same one as on the tablet). That way progress syncs across both.</p>` +
+        `<p>Otherwise: sign out and back in, and on the Google screen <b>check the Google Drive permission</b>.</p>`
+      : `<p>A network error occurred. Check your internet and try again.</p>`) +
     `<p class="session-error-detail">${detail}</p>` +
     `<div class="session-error-actions">` +
-    `<button type="button" id="session-error-signout" class="btn btn-primary">Ieși și reconectează-te</button>` +
-    `<button type="button" id="session-error-close" class="btn btn-small">Închide</button>` +
+    `<button type="button" id="session-error-signout" class="btn btn-primary">Sign out and back in</button>` +
+    `<button type="button" id="session-error-close" class="btn btn-small">Close</button>` +
     `</div></div>`;
   box.hidden = false;
   el("session-error-signout").onclick = handleLogout;
