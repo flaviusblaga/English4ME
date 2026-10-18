@@ -962,14 +962,12 @@ function storedThemePref() {
   }
 }
 
-function systemPrefersDark() {
-  return !!(window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches);
-}
-
 function effectiveTheme() {
+  // Default is DARK (the premium brand look); the system preference is no longer
+  // followed — only an explicit saved choice overrides the dark default.
   return document.documentElement.getAttribute("data-theme")
     || storedThemePref()
-    || (systemPrefersDark() ? "dark" : "light");
+    || "dark";
 }
 
 // Each toggle button offers the OPPOSITE of the current theme (what a tap does).
@@ -987,7 +985,8 @@ function updateThemeToggleLabels(theme) {
 function applyTheme(theme) {
   document.documentElement.setAttribute("data-theme", theme);
   const meta = document.querySelector('meta[name="theme-color"]');
-  if (meta) meta.setAttribute("content", theme === "dark" ? "#0f172a" : "#0a8fc4");
+  // Brand chrome colour: Ink in dark, Signal Orange in light.
+  if (meta) meta.setAttribute("content", theme === "dark" ? "#141311" : "#FF6B1A");
   updateThemeToggleLabels(theme);
 }
 
@@ -1000,12 +999,8 @@ function toggleTheme() {
 function initTheme() {
   applyTheme(effectiveTheme());
   document.querySelectorAll(".theme-toggle").forEach((btn) => btn.addEventListener("click", toggleTheme));
-  // Follow the system live, but only while the user hasn't made an explicit choice.
-  if (window.matchMedia) {
-    window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", (e) => {
-      if (!storedThemePref()) applyTheme(e.matches ? "dark" : "light");
-    });
-  }
+  // The app defaults to dark and no longer follows the system setting live; only
+  // the explicit toggle (saved to localStorage) changes the theme from here.
 }
 
 window.addEventListener("DOMContentLoaded", async () => {

@@ -6,17 +6,15 @@
   <title>english4Me — Business English for managers in Romania</title>
 
   <!-- Set the theme before the stylesheet paints, so there is no flash: use the
-       saved choice if any, otherwise follow the system (prefers-color-scheme). -->
+       saved choice if any, otherwise DEFAULT TO DARK (the premium brand look). -->
   <script>
     (function () {
       try {
         var saved = localStorage.getItem("e4me-theme");
-        var theme = (saved === "light" || saved === "dark")
-          ? saved
-          : (window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+        var theme = (saved === "light" || saved === "dark") ? saved : "dark";
         document.documentElement.setAttribute("data-theme", theme);
       } catch (e) {
-        document.documentElement.setAttribute("data-theme", "light");
+        document.documentElement.setAttribute("data-theme", "dark");
       }
     })();
   </script>
