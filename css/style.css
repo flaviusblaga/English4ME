@@ -4129,6 +4129,58 @@ body[data-usertype="teen"] #screen-reading {
 }
 .stats-mod-card--done .stats-mod-bar > i { background: var(--primary); }
 
+/* ---------- Practice-activity chart (js/activity-chart.js) ---------- */
+.activity-sub {
+  margin: 2px 0 10px;
+  font-size: 0.82rem;
+  color: var(--text-muted);
+}
+.activity-chart { position: relative; }
+.activity-svg { display: block; width: 100%; height: auto; overflow: visible; }
+/* Recessive scaffolding. */
+.activity-axis { stroke: var(--line-strong); stroke-width: 1.5; }
+.activity-grid { stroke: var(--line); stroke-width: 1; }
+.activity-ytick,
+.activity-xtick,
+.activity-nowlabel { font-size: 15px; fill: var(--text-faint); }
+.activity-nowlabel,
+.activity-xtick { text-anchor: middle; }
+.activity-ytick { text-anchor: start; }
+.activity-xtick:first-of-type { text-anchor: start; }
+.activity-nowlabel { fill: var(--primary-text); font-weight: 700; }
+/* The single data series — one hue, on the brand orange. */
+.activity-track { fill: var(--line); opacity: 0.5; }
+.activity-bar { fill: var(--primary); transition: fill 0.12s ease; }
+.activity-col { cursor: default; }
+.activity-col:hover .activity-bar { fill: var(--primary-bright); }
+.activity-col:focus { outline: none; }
+.activity-col:focus-visible .activity-track { stroke: var(--primary-text); stroke-width: 2; }
+/* Hover/focus tooltip. */
+.activity-tip {
+  position: absolute;
+  top: 0;
+  transform: translateX(-50%);
+  pointer-events: none;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  padding: 6px 9px;
+  border-radius: var(--r-md, 10px);
+  background: var(--surface-raised);
+  border: 1px solid var(--line);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.14);
+  font-size: 0.78rem;
+  white-space: nowrap;
+  z-index: 2;
+}
+.activity-tip-range { color: var(--text-muted); }
+.activity-tip-count { color: var(--text); font-weight: 700; }
+.activity-empty {
+  margin: 8px 0 2px;
+  font-size: 0.9rem;
+  color: var(--text-muted);
+}
+
 /* ---------- Days-practised (streak) zone ---------- */
 .streak-card {
   margin: 0 var(--sp-4) var(--sp-3);

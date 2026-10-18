@@ -34,6 +34,7 @@ import {
 } from "./chat.js";
 import { speak, recognizeOnce, isSpeechInputAvailable } from "./voice.js";
 import { renderDidYouKnow } from "./lessons-didyouknow.js";
+import { renderActivityChart } from "./activity-chart.js";
 import { iconSvg } from "./icons.js";
 import { t, profileTagLabel } from "./i18n.js";
 import {
@@ -988,6 +989,7 @@ function showStats() {
   setNavVisible(true);
   renderWordsCard();
   renderModulesProgress();
+  renderActivityChart(el("stats-activity"), session.state.gamification && session.state.gamification.practiceDays);
   renderStreakCard();
   renderRewardsCard();
   renderStatsBadges();
