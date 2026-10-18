@@ -45,6 +45,19 @@ test("does not eagerly load the Did-you-know fact bank at boot", async ({ page }
   expect(requested.some((u) => u.includes("didyouknow.data.js"))).toBe(false);
 });
 
+test("does not eagerly load the Advanced/Expert grammar banks at boot", async ({ page }) => {
+  const requested = [];
+  page.on("request", (req) => requested.push(req.url()));
+  await page.goto("/index.html");
+  await expect(page.locator("#screen-profile-picker")).toBeVisible();
+  // grammar-extra.js + grammar-extra2.js are ~91 KB of Advanced/Expert/Teen
+  // question banks, lazy-loaded (lesson-structure.js ensureGrammarExtras) only
+  // when one of those tiers is entered. A Beginner/Intermediate boot — and the
+  // picker itself — must never fetch them.
+  expect(requested.some((u) => u.includes("grammar-extra.js"))).toBe(false);
+  expect(requested.some((u) => u.includes("grammar-extra2.js"))).toBe(false);
+});
+
 test("avatar-picker dialog opens, then closes on Escape", async ({ page }) => {
   await page.goto("/index.html");
   await expect(page.locator("#screen-profile-picker")).toBeVisible();

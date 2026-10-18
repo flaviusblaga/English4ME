@@ -3,7 +3,7 @@ import { BADGES, badgeLabel } from "./gamification.js";
 import { setActiveRewards } from "./rewards.js";
 import { iconSvg } from "./icons.js";
 import { t, moduleName } from "./i18n.js";
-import { getCategories } from "./lesson-structure.js";
+import { getCategories, ensureGrammarExtras, GRAMMAR_TIERS } from "./lesson-structure.js";
 import { getProfile } from "./profile.js";
 
 const LAST_CHILD_EMAIL_KEY = "engleza-familie:lastChildEmail";
@@ -115,7 +115,7 @@ export function setAllFamiliesChildren(families) {
 // Builds the tier → category → lesson picker (static structure) with a reset
 // button at each level. The reset is queued on the Worker and applied on the
 // child's device when they next open that module (see applyPendingResets).
-function renderResetPicker() {
+async function renderResetPicker() {
   const body = el("reset-lessons-body");
   if (!body) return;
   const profileId = el("reset-module-select").value;
@@ -127,6 +127,9 @@ function renderResetPicker() {
   }
   body.innerHTML = "";
   if (!contentTier) return;
+  // The Advanced/Expert/Teen structure lives in the lazy-loaded grammar banks,
+  // so load them before reading the picker's categories for those tiers.
+  if (GRAMMAR_TIERS.has(contentTier)) await ensureGrammarExtras();
 
   const allBtn = document.createElement("button");
   allBtn.type = "button";

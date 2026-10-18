@@ -32,16 +32,21 @@ import {
   buildSentenceQuestion,
 } from "./lessons-client.js";
 import { ADVANCED_LESSONS, EXPERT_LESSONS, buildGrammarQuestion } from "./grammar-client.js";
-import { ADVANCED_EXTRA, EXPERT_EXTRA } from "./grammar-extra.js";
-import { ADVANCED_EXTRA2, EXPERT_EXTRA2 } from "./grammar-extra2.js";
 
 export const EXERCISES_PER_LESSON = 50;
 
-const ADVANCED_ALL = [...ADVANCED_LESSONS, ...ADVANCED_EXTRA, ...ADVANCED_EXTRA2];
-const EXPERT_ALL = [...EXPERT_LESSONS, ...EXPERT_EXTRA, ...EXPERT_EXTRA2];
+// grammar-extra.js + grammar-extra2.js hold ~91 KB of Advanced/Expert question
+// banks. Only the Advanced/Expert/Teen tiers ever touch them, so they are
+// LAZY-LOADED (see ensureGrammarExtras) rather than imported at boot — a
+// Beginner/Intermediate child (the common case) never downloads them. Until
+// they load, the grammar banks hold only the base themes from grammar-client.
+// `let` so ensureGrammarExtras can swap in the full banks once.
+let ADVANCED_ALL = [...ADVANCED_LESSONS];
+let EXPERT_ALL = [...EXPERT_LESSONS];
 
 // Full banks per tier: the original themes plus the Advanced/Expert additions.
 // The TEEN tier (14-18) is Advanced + Expert combined — the full grammar bank.
+// advanced/expert/teen start base-only and are filled in by ensureGrammarExtras.
 const BANKS = {
   beginner: LESSONS,
   intermediate: SENTENCE_LESSONS,
@@ -49,6 +54,11 @@ const BANKS = {
   expert: EXPERT_ALL,
   teen: [...ADVANCED_ALL, ...EXPERT_ALL],
 };
+
+// Which tiers depend on the lazy-loaded extras. A flow that enters one of these
+// tiers must `await ensureGrammarExtras()` before reading the grammar
+// structure or resolving a grammar lesson's items.
+export const GRAMMAR_TIERS = new Set(["advanced", "expert", "teen"]);
 
 // Which field holds a theme's items, per tier.
 const ITEMS_FIELD = {
@@ -292,6 +302,35 @@ function buildTeenCategories() {
 }
 
 TIER_CATEGORIES.teen = buildTeenCategories();
+
+// ---------------------------------------------------------------------------
+// Lazy load of the Advanced/Expert extra question banks
+// ---------------------------------------------------------------------------
+// The base banks above cover only a handful of grammar themes; the full
+// Advanced/Expert/Teen content lives in grammar-extra.js + grammar-extra2.js.
+// This imports them once (idempotent, concurrency-safe via a cached promise),
+// merges them into the grammar banks, and rebuilds the generated Teen
+// structure so it reflects the full 68-theme bank. A grammar-tier flow awaits
+// this before touching getCategories / getStructuredLesson / totalLessons.
+let extrasPromise = null;
+export function ensureGrammarExtras() {
+  if (!extrasPromise) {
+    extrasPromise = Promise.all([
+      import("./grammar-extra.js"),
+      import("./grammar-extra2.js"),
+    ]).then(([extra, extra2]) => {
+      ADVANCED_ALL = [...ADVANCED_LESSONS, ...extra.ADVANCED_EXTRA, ...extra2.ADVANCED_EXTRA2];
+      EXPERT_ALL = [...EXPERT_LESSONS, ...extra.EXPERT_EXTRA, ...extra2.EXPERT_EXTRA2];
+      BANKS.advanced = ADVANCED_ALL;
+      BANKS.expert = EXPERT_ALL;
+      BANKS.teen = [...ADVANCED_ALL, ...EXPERT_ALL];
+      // The Teen structure is generated from the bank, so rebuild it now that
+      // the bank is complete (replaces the base-only structure built at load).
+      TIER_CATEGORIES.teen = buildTeenCategories();
+    });
+  }
+  return extrasPromise;
+}
 
 // ---------------------------------------------------------------------------
 // Lookups

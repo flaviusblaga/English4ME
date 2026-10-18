@@ -166,8 +166,8 @@ function fillUsageCard(estimatedCostUsd, budgetUsd) {
   el("usage-ring").style.setProperty("--pct", pct);
 }
 
-function openLessons() {
-  initLessons({ ...currentSession, onJustChat: openChat, onChatAboutIt: openChat });
+async function openLessons() {
+  await initLessons({ ...currentSession, onJustChat: openChat, onChatAboutIt: openChat });
   showScreen("lesson");
 }
 
