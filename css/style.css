@@ -3250,6 +3250,41 @@ body.mascot-theme .chat-bubble--assistant {
   padding: 0.35rem 0.6rem;
 }
 
+/* On-demand Romanian aid (js/lessons.js setupRoHint). A quiet opt-in button
+   during the question; the revealed line reads like a gentle hint, not an
+   answer. */
+.lesson-ro-hint {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  margin: 10px 0 2px;
+}
+.ro-hint-btn {
+  align-self: center;
+  padding: 7px 14px;
+  border-radius: var(--r-pill);
+  border: 1px dashed var(--line-strong);
+  background: transparent;
+  color: var(--text-muted);
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+.ro-hint-btn:hover { color: var(--text); border-color: var(--text-faint); }
+.ro-hint-btn:active { transform: translateY(1px); }
+.ro-hint-line {
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  color: var(--text-muted);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm);
+  padding: 0.4rem 0.7rem;
+  text-align: center;
+}
+
 /* End-of-lesson recap */
 .lesson-summary {
   width: 100%;

@@ -391,7 +391,13 @@
       <div id="lesson-say-area" class="lesson-say-area" hidden>
         <button id="lesson-mic-btn" type="button" class="mic-btn" aria-label="Say it"><span class="icon-slot" data-icon="mic"></span></button>
         <p id="lesson-say-status" class="lesson-say-status"></p>
-        <button id="lesson-say-skip-btn" type="button" class="btn btn-small">Sar peste · Skip</button>
+        <button id="lesson-say-skip-btn" type="button" class="btn btn-small">Skip</button>
+      </div>
+      <!-- Optional Romanian aid for a stuck learner (shown only on safe types;
+           see setupRoHint in js/lessons.js). Tapping reveals the line below. -->
+      <div class="lesson-ro-hint">
+        <button id="lesson-ro-hint-btn" type="button" class="ro-hint-btn" hidden></button>
+        <p id="lesson-ro-hint-line" class="ro-hint-line" hidden></p>
       </div>
       <div class="lesson-mascot-reaction">
         <span class="mascot-figure">
