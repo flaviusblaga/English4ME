@@ -148,19 +148,9 @@
 :root[data-theme="dark"] .streak-dot { background: #ffffff1f; border-color: #7a5a30; }
 :root[data-theme="dark"] .dyk-card--featured { background: var(--surface-raised); }
 
-/* The illustrated light scene (sky + hills) would stay bright under white
-   dark-mode text, making the login/picker headings unreadable. Dim it behind a
-   near-opaque dark scrim on every screen that paints it, so a faint hint of the
-   scene remains but text keeps full contrast. */
-:root[data-theme="dark"] #screen-login,
-:root[data-theme="dark"] #screen-profile-picker,
-:root[data-theme="dark"] #screen-level-picker,
-:root[data-theme="dark"] #screen-placement {
-  background:
-    linear-gradient(rgba(10, 9, 8, 0.88), rgba(10, 9, 8, 0.95)),
-    url("../assets/socatei/login-scene.svg") center bottom / cover no-repeat,
-    var(--surface);
-}
+/* The shared entry screens (login, profile picker, placement, level-picker) use
+   a fixed premium DARK hero — see the `.premium-entry` scope further down — so
+   they no longer paint the kid sky/hills scene and need no dark-mode scrim. */
 :root[data-theme="dark"] body[data-usertype="teen"] #screen-parent-view,
 :root[data-theme="dark"] body[data-usertype="teen"] #screen-reading {
   background:
@@ -1808,9 +1798,42 @@ body[data-usertype="adult"] .tool-tab--active {
   align-items: center;
   padding: var(--sp-6) var(--sp-5) calc(var(--sp-6) + env(safe-area-inset-bottom, 0px));
   position: relative;
-  /* Illustrated backdrop: soft sky, rolling hills and leaves at the base — the
-     content sits on top. Falls back to the plain canvas if the SVG is missing. */
-  background: url("../assets/socatei/login-scene.svg") center bottom / cover no-repeat, var(--surface);
+}
+
+/* ---------- Premium dark entry hero ----------
+   The shared pre-profile screens (sign in → who's learning → placement → level)
+   are a deliberate, fixed DARK brand hero regardless of the viewer's light/dark
+   setting — a premium Business-English first impression, not a kids' app. The
+   local token overrides re-skin every card, text and tile inside to the dark
+   palette; Signal Orange and Clear Cyan are kept (they pop on Ink). Child
+   mascots never appear here — only on the kid lesson screens. */
+#screen-login,
+#screen-profile-picker,
+#screen-level-picker,
+#screen-placement {
+  --surface-raised: #211E1B;   /* cards */
+  --surface-tint: #211E1B;
+  --line: #3A352F;
+  --line-strong: #4A443C;
+  --text: #F7F5F2;
+  --text-muted: #B8B2AA;
+  --text-faint: #8A8580;
+  --primary-text: #FF9A5C;     /* light orange for accent text on dark */
+  --primary-soft: #3A2415;
+  --primary-tint: #2A1B10;
+  --tile-coral: #3A2415; --tile-blue: #14304A; --tile-green: #0E3B2E; --tile-yellow: #3A2F10;
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.45);
+  --shadow-md: 0 10px 30px rgba(0, 0, 0, 0.55);
+  --shadow-lg: 0 16px 40px rgba(0, 0, 0, 0.65);
+  color: var(--text);
+  background:
+    radial-gradient(1100px 620px at 15% -12%, rgba(255, 107, 26, 0.20), transparent 60%),
+    radial-gradient(900px 520px at 95% 112%, rgba(20, 184, 212, 0.16), transparent 58%),
+    linear-gradient(165deg, #1B1917 0%, #0C0B0A 100%);
+}
+/* The app logo gets a soft orange glow so it reads as a premium mark on dark. */
+#screen-login .login-logo {
+  filter: drop-shadow(0 6px 22px rgba(255, 107, 26, 0.45));
 }
 
 .login-card {
@@ -1859,65 +1882,34 @@ body[data-usertype="adult"] .tool-tab--active {
 .wordmark .wm-4 { color: var(--primary); font-weight: 800; }
 .wordmark .wm-me { color: var(--text); font-weight: 800; }
 
-.login-headline {
-  font-family: var(--font-display);
-  font-weight: 700;
-  font-size: 2rem;
-  line-height: 1.15;
-  letter-spacing: -0.02em;
-  color: var(--text);
+/* Small uppercase mono eyebrow above the headline — the premium "product line"
+   label (Business English). */
+.login-eyebrow {
+  font-family: var(--font-mono);
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  font-size: 0.72rem;
+  color: var(--primary-text);
   margin: var(--sp-5) 0 0;
 }
-.login-headline .hl-accent { color: var(--primary-text); }
+.login-headline {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 2.3rem;
+  line-height: 1.1;
+  letter-spacing: -0.03em;
+  color: var(--text);
+  margin: var(--sp-2) 0 0;
+}
+.login-headline .hl-accent { color: var(--primary); }
 
 .subtitle {
   color: var(--text-muted);
   font-weight: 500;
-  margin: var(--sp-3) auto 0;
-  max-width: 340px;
+  margin: var(--sp-4) auto var(--sp-2);
+  max-width: 330px;
   font-size: 1rem;
-  line-height: 1.5;
-}
-/* All mascot names on ONE row — nowrap, and the font scales down on narrow
-   screens so six names still fit without wrapping. */
-.subtitle-names {
-  display: inline-block;
-  white-space: nowrap;
-  font-size: clamp(0.72rem, 3.3vw, 0.95rem);
-}
-.subtitle .nm { font-weight: 700; }
-.subtitle .nm-bobo { color: var(--primary-text); }
-.subtitle .nm-sushi { color: var(--secondary); }
-.subtitle .nm-fizz { color: var(--kid-teal); }
-.subtitle .nm-friends { color: var(--text-muted); font-weight: 600; }
-
-/* The three die-cut stickers standing on the CSS grass mound. Sushi slightly
-   larger and overlapping in the middle. */
-.login-mascots {
-  /* soft cyan mound so the stickers look grounded, not floating on white */
-  background: radial-gradient(125% 82% at 50% 100%, #a9ddf2 0%, #d2eefb 46%, transparent 72%);
-  padding: var(--sp-4) 0 var(--sp-2);
-  display: flex;
-  justify-content: center;
-  align-items: flex-end;
-  gap: 2px;
-  width: 100%;
-  margin: var(--sp-5) 0;
-}
-.mascot-sticker-hero {
-  width: 24%;
-  height: auto;
-  filter: drop-shadow(0 10px 16px rgba(15, 23, 42, 0.12));
-}
-.mascot-sticker-hero.mid {
-  width: 26%;
-  margin: 0 -4px;
-  z-index: 1;
-}
-.login-mascots .mascot-avatar--emoji-fallback {
-  width: 72px;
-  height: 72px;
-  margin: 0 -4px;
+  line-height: 1.55;
 }
 
 /* White Google button, 56px, soft shadow, coloured G mark. */
@@ -1980,10 +1972,7 @@ body[data-usertype="adult"] .tool-tab--active {
 #screen-profile-picker,
 #screen-level-picker {
   padding: 26px 20px;
-  /* Same illustrated backdrop as the login screen, so the whole family gateway
-     (sign in → who's learning → pick a level) shares one calm scene. The member
-     and level cards below have solid backgrounds, so they stay readable. */
-  background: url("../assets/socatei/login-scene.svg") center bottom / cover no-repeat, var(--surface);
+  /* Background comes from the premium dark-hero scope above. */
 }
 
 .card {
@@ -2340,14 +2329,9 @@ body[data-usertype="teen"] .identity-avatar { border-radius: 14px; background: l
 }
 
 /* ---------- Placement test ---------- */
-/* The level test is a kid onboarding activity, so it shares the same premium
-   illustrated backdrop as the rest of the child app. */
+/* An entry screen: background comes from the premium dark-hero scope above. */
 #screen-placement {
   padding: 0;
-  background:
-    linear-gradient(rgba(248, 250, 252, 0.62), rgba(248, 250, 252, 0.82)),
-    url("../assets/socatei/login-scene.svg") center top / cover no-repeat fixed,
-    var(--surface);
 }
 #placement-quiz-view { padding: var(--sp-4) var(--sp-4) var(--sp-6); max-width: 460px; margin: 0 auto; width: 100%; }
 .placement-intro { margin: var(--sp-3) 0 var(--sp-4); text-align: center; }

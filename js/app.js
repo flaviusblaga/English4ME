@@ -260,7 +260,7 @@ async function renderProfilePicker() {
   if (kids.length) {
     const sec = document.createElement("div");
     sec.className = "picker-section";
-    sec.appendChild(sectionLabel("kids", iconSvg("smile"), "Copii"));
+    sec.appendChild(sectionLabel("kids", iconSvg("smile"), "Kids"));
     const grid = document.createElement("div");
     grid.className = "kids-grid";
     for (const member of kids) grid.appendChild(renderKidCard(member, remembered, levelLabel));
