@@ -154,6 +154,14 @@ let currentLesson = null;
 const PART_SIZE = 10;
 let isDailyPractice = false; // true while running a spaced-repetition session
 
+// On-demand Romanian hint (a learning aid for a stuck learner). Only offered on
+// exercise types where the prompt is English and showing the item's Romanian
+// does NOT give away the answer: en-ro (the answer IS the Romanian),
+// translation/spell (Romanian already shown as the prompt), listen/listen-
+// sentence (pure recognition) and the grammar types (no `ro`) are excluded.
+const RO_HINT_TYPES = new Set(["picture", "say", "fill-blank", "picture-sentence", "say-sentence", "unscramble"]);
+let roHintAuto = false; // once the learner reveals one hint, auto-reveal for the rest of the session
+
 function el(id) {
   return document.getElementById(id);
 }
@@ -440,6 +448,7 @@ function updateLessonMascotSelectUi() {
 
 export async function initLessons({ accessToken, userEmail, displayName, fileId, state, profile, avatar, onJustChat, onChatAboutIt }) {
   session = { accessToken, userEmail, displayName, fileId, state, profile, avatar };
+  roHintAuto = false; // a fresh lesson session starts by offering the hint, not auto-showing it
   // Advanced/Expert/Teen lessons live in the lazy-loaded grammar banks; pull
   // them in before anything reads the grammar structure (migration below, the
   // menu render, resolving a lesson's items). Beginner/Intermediate skip this
@@ -1157,6 +1166,39 @@ function startLesson(lessonId) {
   renderQuestion();
 }
 
+// Offers the "🇷🇴 Romanian" hint for the current question when it is a safe type
+// (see RO_HINT_TYPES) and the item has a Romanian translation. Tapping reveals
+// the translation and remembers the choice (roHintAuto) so it auto-reveals for
+// the rest of the session — a learner who wants the aid shouldn't have to tap
+// it on every question. Nothing shows for the excluded types, so the exercise
+// is never trivially solved by the hint.
+function setupRoHint(question) {
+  const btn = el("lesson-ro-hint-btn");
+  const line = el("lesson-ro-hint-line");
+  if (!btn || !line) return; // stale-cache HTML without the hint elements
+  const ro = RO_HINT_TYPES.has(question.type) ? getItemTranslation(question) : null;
+  if (!ro) {
+    btn.hidden = true;
+    line.hidden = true;
+    return;
+  }
+  const reveal = () => {
+    line.textContent = `🇷🇴 ${ro}`;
+    line.hidden = false;
+    btn.hidden = true;
+    roHintAuto = true;
+  };
+  btn.innerHTML = `🇷🇴 ${t("lesson.roHint")}`;
+  btn.onclick = reveal;
+  if (roHintAuto) {
+    reveal();
+  } else {
+    btn.hidden = false;
+    line.hidden = true;
+    line.textContent = "";
+  }
+}
+
 function renderQuestion() {
   const question = currentQueue[currentIndex];
   const tier = currentTierConfig();
@@ -1191,6 +1233,7 @@ function renderQuestion() {
   const unscrambleArea = el("lesson-unscramble-area");
   const sayArea = el("lesson-say-area");
   if (sayArea) sayArea.hidden = true;
+  setupRoHint(question);
 
   if (question.type === "unscramble") {
     stem.hidden = true;

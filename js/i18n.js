@@ -119,6 +119,7 @@ const STRINGS = {
     justChatPlain: "Back to chat",
     exitAria: "Exit lesson",
     skip: "Skip",
+    roHint: "Romanian",
     hearAgain: "Hear again",
     next: "Next",
     seeResults: "See results!",
