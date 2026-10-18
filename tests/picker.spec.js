@@ -22,14 +22,28 @@ test.beforeEach(async ({ page }) => {
   }, STATIC_FAMILY_SESSION);
 });
 
-test("restores to the profile picker from a cached session", async ({ page }) => {
+test("super-admin lands on the section hub and can drill into a group", async ({ page }) => {
   const errors = [];
   page.on("pageerror", (e) => errors.push(e.message));
 
   await page.goto("/index.html");
 
+  // The seeded account (flaviusblaga@gmail.com) is a super-admin, so it lands on
+  // the sectioned hub (Adult / Teens / Kids / Admin), NOT the member tiles.
   await expect(page.locator("#screen-profile-picker")).toBeVisible();
+  await expect(page.locator(".section-card--adult")).toBeVisible();
+  await expect(page.locator(".section-card--kid")).toBeVisible();
+  await expect(page.locator(".section-card--admin")).toBeVisible();
+  // Members are not shown until a section is opened.
+  await expect(page.locator("#profile-picker-list")).not.toContainText("Flavius");
+
+  // Drilling into Adult reveals the adult member(s); Back returns to the hub,
+  // and Kids reveals the children.
+  await page.locator(".section-card--adult").click();
   await expect(page.locator("#profile-picker-list")).toContainText("Flavius");
+  await page.locator(".section-back").click();
+  await expect(page.locator(".section-card--kid")).toBeVisible();
+  await page.locator(".section-card--kid").click();
   await expect(page.locator("#profile-picker-list")).toContainText("Darius");
 
   expect(errors, `uncaught page errors:\n${errors.join("\n")}`).toEqual([]);
@@ -62,6 +76,9 @@ test("avatar-picker dialog opens, then closes on Escape", async ({ page }) => {
   await page.goto("/index.html");
   await expect(page.locator("#screen-profile-picker")).toBeVisible();
 
+  // Member tiles (and their "change picture" edit badge) live inside a hub
+  // section for the super-admin, so open the Adults section first.
+  await page.locator(".section-card--adult").click();
   await page.locator(".profile-avatar-edit").first().click();
   await expect(page.locator("#avatar-picker")).toBeVisible();
 
