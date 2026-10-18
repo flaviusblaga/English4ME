@@ -29,6 +29,12 @@ let currentUser = null; // { email, name } — set after sign-in, used once a pr
 let currentSession = null; // { accessToken, userEmail, displayName, fileId, state, profile } — reused across lesson<->chat navigation
 let currentMember = null; // which family member is active — lets "Levels" return to this kid's level picker
 let currentFamilyMembers = []; // members shown in the picker (static OR admin-added via KV)
+// The super-admin lands on a sectioned hub (Adult / Teens / Kids / Admin) so
+// they can step into each user experience or the admin area separately. This
+// tracks which the hub is showing: "hub" (the four cards), or a group key
+// ("adult"/"teen"/"kid") drilled into to pick a member. Non-super-admins never
+// see the hub — it stays "hub" but renderProfilePicker ignores it for them.
+let pickerMode = "hub";
 
 function el(id) {
   return document.getElementById(id);
@@ -182,6 +188,7 @@ async function handleLogin() {
 
   try {
     currentUser = await signIn();
+    pickerMode = "hub";
     showScreen("profile-picker");
     await renderProfilePicker();
   } catch (err) {
@@ -213,8 +220,10 @@ async function renderProfilePicker() {
   }
   currentFamilyMembers = visibleMembers;
 
-  // Only the super-admin gets the "manage families" entry point.
-  renderAdminEntry();
+  const superAdmin = !!(currentUser && isSuperAdmin(currentUser.email));
+  // The standalone "Control panel" button is replaced by the hub's Admin card.
+  const adminBtn = el("admin-entry-btn");
+  if (adminBtn) adminBtn.hidden = true;
 
   if (visibleMembers.length === 0) {
     // The Worker refuses this account too, so this is an explanation rather
@@ -228,45 +237,121 @@ async function renderProfilePicker() {
     return;
   }
 
-  // Grouped like a Netflix profile switcher: grown-ups in a sober row up top,
-  // kids in a big colourful grid below. A kid signed in with their own account
-  // only ever has their own tile, so a section renders only when it has members.
   const adults = visibleMembers.filter((m) => m.kind === "adult");
   const teens = visibleMembers.filter((m) => m.kind === "teen");
   const kids = visibleMembers.filter((m) => m.kind === "kid");
 
-  if (adults.length) {
-    const sec = document.createElement("div");
-    sec.className = "picker-section";
-    sec.appendChild(sectionLabel("adults", iconSvg("users"), "Adults"));
-    const wrap = document.createElement("div");
-    wrap.className = "adult-wrap";
-    for (const member of adults) wrap.appendChild(renderAdultCard(member, remembered));
-    sec.appendChild(wrap);
-    list.appendChild(sec);
+  // Super-admin lands on the sectioned hub (Adult / Teens / Kids / Admin), so
+  // each user experience and the admin area are reached separately.
+  if (superAdmin && pickerMode === "hub") {
+    setPickerSub(t("sections.chooseSub"));
+    renderSectionHub(list, { adults, teens, kids });
+    return;
   }
 
-  if (teens.length) {
+  // Renders one member group (grown-ups in a row, kids in a colourful grid).
+  // The kids' section gets the playful 4-mascot sticker row above the tiles —
+  // the mascots live only on the kids' surfaces.
+  const renderGroup = (kind, label, icon, members, render) => {
+    if (!members.length) return;
     const sec = document.createElement("div");
     sec.className = "picker-section";
-    sec.appendChild(sectionLabel("teens", iconSvg("graduation-cap"), "Teens"));
+    sec.appendChild(sectionLabel(kind, iconSvg(icon), label));
+    if (kind === "kids") sec.appendChild(kidsMascotRow());
     const wrap = document.createElement("div");
-    wrap.className = "teen-wrap";
-    for (const member of teens) wrap.appendChild(renderTeenCard(member, remembered));
+    wrap.className = kind === "kids" ? "kids-grid" : kind === "teens" ? "teen-wrap" : "adult-wrap";
+    for (const m of members) wrap.appendChild(render(m));
     sec.appendChild(wrap);
     list.appendChild(sec);
+  };
+
+  if (superAdmin) {
+    // Drilled into one section from the hub: a "back" link + just that group.
+    setPickerSub(t("sections.choose"));
+    list.appendChild(backToHubButton());
+    if (pickerMode === "adult") renderGroup("adults", "Adults", "users", adults, (m) => renderAdultCard(m, remembered));
+    else if (pickerMode === "teen") renderGroup("teens", "Teens", "graduation-cap", teens, (m) => renderTeenCard(m, remembered));
+    else if (pickerMode === "kid") renderGroup("kids", "Kids", "smile", kids, (m) => renderKidCard(m, remembered, levelLabel));
+    return;
   }
 
-  if (kids.length) {
-    const sec = document.createElement("div");
-    sec.className = "picker-section";
-    sec.appendChild(sectionLabel("kids", iconSvg("smile"), "Kids"));
-    const grid = document.createElement("div");
-    grid.className = "kids-grid";
-    for (const member of kids) grid.appendChild(renderKidCard(member, remembered, levelLabel));
-    sec.appendChild(grid);
-    list.appendChild(sec);
+  // Everyone else: the plain grouped picker — a kid on their own account only
+  // ever has their own tile, so a section renders only when it has members.
+  setPickerSub(t("picker.chooseProfile"));
+  renderGroup("adults", "Adults", "users", adults, (m) => renderAdultCard(m, remembered));
+  renderGroup("teens", "Teens", "graduation-cap", teens, (m) => renderTeenCard(m, remembered));
+  renderGroup("kids", "Kids", "smile", kids, (m) => renderKidCard(m, remembered, levelLabel));
+}
+
+// The super-admin's top-level chooser: one card per user experience (only for
+// groups that have members) plus Admin. Adult/Teens/Kids drill into that
+// group's tiles; Admin opens the Control Panel.
+function renderSectionHub(list, groups) {
+  const hub = document.createElement("div");
+  hub.className = "section-hub";
+
+  const card = (kind, icon, title, sub, onClick) => {
+    const b = document.createElement("button");
+    b.type = "button";
+    b.className = `section-card section-card--${kind}`;
+    b.innerHTML =
+      `<span class="section-ico">${iconSvg(icon)}</span>` +
+      `<span class="section-text"><strong></strong><span class="section-sub"></span></span>` +
+      `<span class="section-go">${PICKER_CHEVRON}</span>`;
+    b.querySelector("strong").textContent = title;
+    b.querySelector(".section-sub").textContent = sub;
+    b.addEventListener("click", onClick);
+    return b;
+  };
+  const enter = (mode) => { pickerMode = mode; renderProfilePicker(); };
+
+  if (groups.adults.length) hub.appendChild(card("adult", "users", t("sections.adult"), t("sections.adultSub"), () => enter("adult")));
+  if (groups.teens.length) hub.appendChild(card("teen", "graduation-cap", t("sections.teens"), t("sections.teensSub"), () => enter("teen")));
+  if (groups.kids.length) hub.appendChild(card("kid", "smile", t("sections.kids"), t("sections.kidsSub"), () => enter("kid")));
+  hub.appendChild(card("admin", "settings", t("sections.admin"), t("sections.adminSub"), () => openControlPanel()));
+
+  list.appendChild(hub);
+}
+
+// The four kids' mascots as a playful die-cut row (Bobo, Fizz, Sushi, Maki) —
+// a decorative header for the kids' section, modelled on the old login hero.
+// Maki is a sticker only (unlike Bobo/Fizz/Sushi it isn't a teaching mascot
+// with a face + voice), so it appears here but never speaks a lesson.
+const KIDS_MASCOT_STICKERS = [
+  { name: "Bobo", img: "assets/socatei/bobo-sticker.png", emoji: "🦫" },
+  { name: "Fizz", img: "assets/socatei/fizz-sticker.png", emoji: "🐿️" },
+  { name: "Sushi", img: "assets/socatei/sushi-sticker.png", emoji: "🐱" },
+  { name: "Maki", img: "assets/socatei/maki-sticker.png", emoji: "🐱" },
+];
+function kidsMascotRow() {
+  const row = document.createElement("div");
+  row.className = "kids-mascots";
+  for (const m of KIDS_MASCOT_STICKERS) {
+    const img = document.createElement("img");
+    img.className = "kids-mascot-sticker";
+    img.src = m.img;
+    img.alt = m.name;
+    img.onerror = function () {
+      this.replaceWith(Object.assign(document.createElement("span"), { className: "kids-mascot-emoji", textContent: m.emoji }));
+    };
+    row.appendChild(img);
   }
+  return row;
+}
+
+// "Back" from a drilled-in group to the four-card hub.
+function backToHubButton() {
+  const b = document.createElement("button");
+  b.type = "button";
+  b.className = "btn btn-small section-back";
+  b.innerHTML = `${iconSvg("arrow-left")} ${t("sections.back")}`;
+  b.addEventListener("click", () => { pickerMode = "hub"; renderProfilePicker(); });
+  return b;
+}
+
+function setPickerSub(text) {
+  const sub = document.querySelector(".profile-picker-sub");
+  if (sub) sub.textContent = text;
 }
 
 const PICKER_CHEVRON =
@@ -456,14 +541,9 @@ function openAvatarPicker(member) {
 }
 
 // ---- Super-admin family manager ----------------------------------------
-// The entry point shows only for a super-admin; the Worker re-checks on every
-// call, so this is convenience, not security.
-function renderAdminEntry() {
-  const btn = el("admin-entry-btn");
-  if (!btn) return;
-  btn.hidden = !(currentUser && isSuperAdmin(currentUser.email));
-}
-
+// Admin is reached from the hub's Admin card (renderSectionHub); the Worker
+// re-checks super-admin on every call, so the client gating is convenience,
+// not security.
 function closeAdminMenu() {
   el("admin-panel").hidden = true;
 }
@@ -903,6 +983,7 @@ function goToMemberPicker() {
   document.body.className = "";
   document.body.dataset.usertype = "child";
   currentMember = null;
+  pickerMode = "hub"; // return to the sectioned hub (super-admin), not a sub-list
   renderProfilePicker();
   showScreen("profile-picker");
 }
@@ -939,6 +1020,7 @@ function restoreOrShowLogin() {
   const restored = restoreSession();
   if (restored) {
     currentUser = restored;
+    pickerMode = "hub";
     renderProfilePicker();
     showScreen("profile-picker");
     return true;
@@ -962,14 +1044,12 @@ function storedThemePref() {
   }
 }
 
-function systemPrefersDark() {
-  return !!(window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches);
-}
-
 function effectiveTheme() {
+  // Default is DARK (the premium brand look); the system preference is no longer
+  // followed — only an explicit saved choice overrides the dark default.
   return document.documentElement.getAttribute("data-theme")
     || storedThemePref()
-    || (systemPrefersDark() ? "dark" : "light");
+    || "dark";
 }
 
 // Each toggle button offers the OPPOSITE of the current theme (what a tap does).
@@ -987,7 +1067,8 @@ function updateThemeToggleLabels(theme) {
 function applyTheme(theme) {
   document.documentElement.setAttribute("data-theme", theme);
   const meta = document.querySelector('meta[name="theme-color"]');
-  if (meta) meta.setAttribute("content", theme === "dark" ? "#0f172a" : "#0a8fc4");
+  // Brand chrome colour: Ink in dark, Signal Orange in light.
+  if (meta) meta.setAttribute("content", theme === "dark" ? "#141311" : "#FF6B1A");
   updateThemeToggleLabels(theme);
 }
 
@@ -1000,12 +1081,8 @@ function toggleTheme() {
 function initTheme() {
   applyTheme(effectiveTheme());
   document.querySelectorAll(".theme-toggle").forEach((btn) => btn.addEventListener("click", toggleTheme));
-  // Follow the system live, but only while the user hasn't made an explicit choice.
-  if (window.matchMedia) {
-    window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", (e) => {
-      if (!storedThemePref()) applyTheme(e.matches ? "dark" : "light");
-    });
-  }
+  // The app defaults to dark and no longer follows the system setting live; only
+  // the explicit toggle (saved to localStorage) changes the theme from here.
 }
 
 window.addEventListener("DOMContentLoaded", async () => {

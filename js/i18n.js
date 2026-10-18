@@ -34,6 +34,22 @@ const STRINGS = {
     signInToSee: "Sign in to see who's learning today.",
     levelTitle: "Choose your adventure, {name}!",
     recommended: "Recommended",
+    chooseProfile: "Choose a profile to continue.",
+  },
+
+  // The super-admin's top-level sections (Adult / Teens / Kids / Admin).
+  sections: {
+    chooseSub: "Choose a section",
+    choose: "Choose a profile",
+    back: "All sections",
+    adult: "Adult",
+    adultSub: "The adult Business English experience",
+    teens: "Teens",
+    teensSub: "The teen lessons (14–18)",
+    kids: "Kids",
+    kidsSub: "The kids' lessons",
+    admin: "Admin",
+    adminSub: "Billing, families and kids' progress",
   },
 
   admin: {

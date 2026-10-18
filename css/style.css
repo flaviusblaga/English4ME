@@ -1800,40 +1800,35 @@ body[data-usertype="adult"] .tool-tab--active {
   position: relative;
 }
 
-/* ---------- Premium dark entry hero ----------
+/* ---------- Premium entry hero ----------
    The shared pre-profile screens (sign in → who's learning → placement → level)
-   are a deliberate, fixed DARK brand hero regardless of the viewer's light/dark
-   setting — a premium Business-English first impression, not a kids' app. The
-   local token overrides re-skin every card, text and tile inside to the dark
-   palette; Signal Orange and Clear Cyan are kept (they pop on Ink). Child
-   mascots never appear here — only on the kid lesson screens. */
+   are a premium, mascot-free brand hero. They FOLLOW the app's light/dark
+   setting like every other screen — the global :root / :root[data-theme="dark"]
+   palette drives all the tokens — so only the BACKGROUND is set here, per theme:
+   a warm wash with faint Signal-Orange/Clear-Cyan tints in light, and an Ink
+   gradient with stronger glows in dark (the default). Dark is the premium first
+   impression; switching to light re-skins these screens too, consistently. */
 #screen-login,
 #screen-profile-picker,
 #screen-level-picker,
 #screen-placement {
-  --surface-raised: #211E1B;   /* cards */
-  --surface-tint: #211E1B;
-  --line: #3A352F;
-  --line-strong: #4A443C;
-  --text: #F7F5F2;
-  --text-muted: #B8B2AA;
-  --text-faint: #8A8580;
-  --primary-text: #FF9A5C;     /* light orange for accent text on dark */
-  --primary-soft: #3A2415;
-  --primary-tint: #2A1B10;
-  --tile-coral: #3A2415; --tile-blue: #14304A; --tile-green: #0E3B2E; --tile-yellow: #3A2F10;
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.45);
-  --shadow-md: 0 10px 30px rgba(0, 0, 0, 0.55);
-  --shadow-lg: 0 16px 40px rgba(0, 0, 0, 0.65);
-  color: var(--text);
+  background:
+    radial-gradient(1100px 620px at 15% -12%, rgba(255, 107, 26, 0.10), transparent 60%),
+    radial-gradient(900px 520px at 95% 112%, rgba(20, 184, 212, 0.10), transparent 58%),
+    var(--surface);
+}
+:root[data-theme="dark"] #screen-login,
+:root[data-theme="dark"] #screen-profile-picker,
+:root[data-theme="dark"] #screen-level-picker,
+:root[data-theme="dark"] #screen-placement {
   background:
     radial-gradient(1100px 620px at 15% -12%, rgba(255, 107, 26, 0.20), transparent 60%),
     radial-gradient(900px 520px at 95% 112%, rgba(20, 184, 212, 0.16), transparent 58%),
     linear-gradient(165deg, #1B1917 0%, #0C0B0A 100%);
 }
-/* The app logo gets a soft orange glow so it reads as a premium mark on dark. */
+/* A soft orange glow so the app logo reads as a premium mark in either theme. */
 #screen-login .login-logo {
-  filter: drop-shadow(0 6px 22px rgba(255, 107, 26, 0.45));
+  filter: drop-shadow(0 6px 22px rgba(255, 107, 26, 0.40));
 }
 
 .login-card {
@@ -2003,6 +1998,72 @@ body[data-usertype="adult"] .tool-tab--active {
   flex-direction: column;
   gap: 12px;
 }
+
+/* ---------- Super-admin section hub (Adult / Teens / Kids / Admin) ---------- */
+.section-hub {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.section-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  padding: 18px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  background: var(--surface-raised);
+  box-shadow: var(--shadow-sm);
+  cursor: pointer;
+  text-align: left;
+  font: inherit;
+  color: var(--text);
+  transition: transform 120ms var(--ease-out), box-shadow 120ms var(--ease-out), border-color 120ms var(--ease-out);
+}
+.section-card:hover { border-color: var(--line-strong); box-shadow: var(--shadow-md); }
+.section-card:active { transform: scale(0.99); }
+.section-ico {
+  width: 54px; height: 54px; flex-shrink: 0;
+  display: grid; place-items: center;
+  border-radius: 16px;
+  background: var(--primary-soft); color: var(--primary-text);
+}
+.section-ico .icon { width: 26px; height: 26px; }
+.section-card--teen .section-ico { background: var(--tile-blue); color: var(--secondary); }
+.section-card--kid .section-ico { background: #ffe6f2; color: var(--kid-pink-dark); }
+:root[data-theme="dark"] .section-card--kid .section-ico { background: #3a1f30; color: #f9a8d4; }
+.section-card--admin .section-ico { background: var(--surface-tint); color: var(--text-muted); border: 1px solid var(--line); }
+.section-text { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.section-text strong { font-family: var(--font-display); font-weight: 700; font-size: 1.1rem; }
+.section-sub { font-size: 0.82rem; color: var(--text-muted); line-height: 1.3; }
+.section-go { margin-left: auto; color: var(--text-faint); display: flex; }
+.section-back {
+  align-self: flex-start;
+  margin-bottom: 4px;
+  gap: 6px;
+}
+
+/* The kids' section mascot row: Bobo, Fizz, Sushi, Maki as die-cut stickers
+   standing on a soft cyan mound — modelled on the old login hero, now scoped to
+   the kids' surface. */
+.kids-mascots {
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  gap: 2px;
+  width: 100%;
+  margin: 2px 0 14px;
+  padding: 14px 0 8px;
+  border-radius: var(--r-lg);
+  background: radial-gradient(130% 84% at 50% 100%, rgba(20, 184, 212, 0.20) 0%, rgba(20, 184, 212, 0.08) 48%, transparent 74%);
+}
+.kids-mascot-sticker {
+  width: 23%;
+  height: auto;
+  filter: drop-shadow(0 8px 14px rgba(0, 0, 0, 0.18));
+}
+.kids-mascot-emoji { font-size: 44px; line-height: 1; }
 
 /* ===================== Redesigned profile switcher ===================== */
 .grp-label {
