@@ -1,0 +1,379 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>english4Me — Design System</title>
+<meta name="description" content="The living brand + UI reference for english4Me. Every value is read straight from css/style.css, so this page never drifts from the app." />
+
+<!-- The real brand typefaces (same link the app uses). -->
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;700;800&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap" />
+
+<!-- The app's real stylesheet — the single source of truth for every token and
+     component below. This page re-reads the tokens live, so it stays in sync. -->
+<link rel="stylesheet" href="css/style.css" />
+
+<style>
+  /* Page-local layout only — namespaced `ds-` so it never collides with the
+     app's component classes, which are shown below exactly as they render. */
+  html, body { height: auto; }
+  body {
+    margin: 0;
+    background: var(--surface);
+    color: var(--text);
+    font-family: var(--font-body);
+    -webkit-font-smoothing: antialiased;
+  }
+  .ds-wrap { max-width: 1040px; margin: 0 auto; padding: 24px 16px 80px; }
+  .ds-topbar { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; margin-bottom: 8px; }
+  .ds-wordmark { font-family: var(--font-display); font-weight: 800; font-size: 1.9rem; letter-spacing: -0.02em; }
+  .ds-wordmark .w4 { color: var(--primary); }
+  .ds-wordmark .wme { color: var(--text); }
+  .ds-kicker { font-family: var(--font-mono); font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.12em; color: var(--text-faint); }
+  .ds-lead { color: var(--text-muted); max-width: 62ch; margin: 4px 0 0; }
+  .ds-theme-toggle {
+    font-family: var(--font-display); font-weight: 700; font-size: 0.85rem;
+    padding: 8px 14px; border-radius: var(--r-pill); cursor: pointer;
+    background: var(--surface-raised); color: var(--text); border: 1px solid var(--line);
+  }
+  .ds-theme-toggle:active { transform: translateY(1px); }
+
+  .ds-section { margin-top: 44px; }
+  .ds-section > h2 {
+    font-family: var(--font-display); font-weight: 800; font-size: 1.3rem; margin: 0 0 4px;
+    display: flex; align-items: baseline; gap: 10px;
+  }
+  .ds-section > h2 .ds-num { font-family: var(--font-mono); font-size: 0.8rem; color: var(--primary-text); }
+  .ds-section > p { color: var(--text-muted); margin: 0 0 18px; max-width: 70ch; }
+
+  .ds-grid { display: grid; gap: 14px; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); }
+
+  .ds-swatch { border: 1px solid var(--line); border-radius: var(--r-md); overflow: hidden; background: var(--surface-raised); }
+  .ds-swatch .chip { height: 66px; border-bottom: 1px solid var(--line); }
+  .ds-swatch .meta { padding: 9px 11px; }
+  .ds-swatch .nm { font-family: var(--font-mono); font-size: 0.72rem; color: var(--text); word-break: break-all; }
+  .ds-swatch .hx { font-family: var(--font-mono); font-size: 0.72rem; color: var(--text-faint); text-transform: uppercase; }
+  .ds-swatch .ds-desc { font-size: 0.74rem; color: var(--text-muted); margin-top: 4px; line-height: 1.35; }
+
+  /* Contrast table */
+  .ds-pairs { display: grid; gap: 10px; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); }
+  .ds-pair { border: 1px solid var(--line); border-radius: var(--r-md); overflow: hidden; }
+  .ds-pair .sample { padding: 16px; font-weight: 600; font-size: 0.95rem; }
+  .ds-pair .pfoot { padding: 8px 11px; background: var(--surface-raised); display: flex; align-items: center; justify-content: space-between; gap: 8px; border-top: 1px solid var(--line); }
+  .ds-pair .pfoot .lbl { font-size: 0.74rem; color: var(--text-muted); }
+  .ds-ratio { font-family: var(--font-mono); font-size: 0.72rem; font-weight: 700; padding: 2px 8px; border-radius: var(--r-pill); white-space: nowrap; }
+  .ds-ratio.pass { background: var(--success-soft); color: var(--success-text); }
+  .ds-ratio.large { background: var(--chip-warm-bg); color: var(--chip-warm-text); }
+  .ds-ratio.fail { background: var(--danger-soft); color: var(--danger-text); }
+
+  /* Type scale */
+  .ds-type-row { display: flex; align-items: baseline; gap: 16px; padding: 10px 0; border-bottom: 1px dashed var(--line); }
+  .ds-type-row .tk { font-family: var(--font-mono); font-size: 0.72rem; color: var(--text-faint); width: 112px; flex: none; }
+  .ds-type-row .tx { font-family: var(--font-display); font-weight: 700; color: var(--text); line-height: 1.1; }
+
+  /* Spacing + radius */
+  .ds-scale-row { display: flex; align-items: center; gap: 14px; padding: 7px 0; }
+  .ds-scale-row .tk { font-family: var(--font-mono); font-size: 0.72rem; color: var(--text-faint); width: 112px; flex: none; }
+  .ds-scale-row .bar { height: 16px; background: var(--primary); border-radius: 4px; }
+  .ds-radii { display: flex; gap: 16px; flex-wrap: wrap; }
+  .ds-radii .r { width: 96px; height: 72px; background: var(--primary-soft); border: 1.5px solid var(--primary); display: flex; align-items: flex-end; justify-content: center; padding-bottom: 6px; font-family: var(--font-mono); font-size: 0.7rem; color: var(--primary-text); }
+  .ds-shadows { display: flex; gap: 20px; flex-wrap: wrap; }
+  .ds-shadows .sh { width: 150px; height: 84px; background: var(--surface-raised); border-radius: var(--r-md); display: flex; align-items: center; justify-content: center; font-family: var(--font-mono); font-size: 0.72rem; color: var(--text-muted); }
+
+  .ds-row { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
+  .ds-card-demo { background: var(--surface-raised); border: 1px solid var(--line); border-radius: var(--r-xl); padding: 16px 18px; box-shadow: var(--shadow-md); max-width: 320px; }
+  .ds-card-demo h4 { font-family: var(--font-display); margin: 0 0 6px; }
+  .ds-card-demo p { margin: 0; color: var(--text-muted); font-size: 0.9rem; }
+
+  .ds-pill { display: inline-flex; align-items: center; gap: 6px; padding: 5px 12px; border-radius: var(--r-pill); font-weight: 700; font-size: 0.8rem; font-family: var(--font-display); }
+  .ds-pill--points { background: var(--chip-warm-bg); color: var(--chip-warm-text); }
+  .ds-pill--streak { background: var(--chip-hot-bg); color: var(--chip-hot-text); }
+  .ds-pill--good { background: var(--success-soft); color: var(--success-text); }
+  .ds-pill--danger { background: var(--danger-soft); color: var(--danger-text); }
+  .ds-pill--primary { background: var(--primary-soft); color: var(--primary-text); }
+
+  .ds-progress { height: 7px; width: 240px; border-radius: var(--r-pill); background: var(--line); overflow: hidden; }
+  .ds-progress > i { display: block; height: 100%; border-radius: var(--r-pill); background: linear-gradient(90deg, var(--primary), var(--primary-bright)); }
+
+  .ds-note { font-size: 0.82rem; color: var(--text-muted); background: var(--primary-tint); border: 1px solid var(--line); border-radius: var(--r-md); padding: 12px 14px; }
+  .ds-foot { margin-top: 56px; padding-top: 18px; border-top: 1px solid var(--line); font-size: 0.8rem; color: var(--text-faint); }
+  code { font-family: var(--font-mono); font-size: 0.85em; background: var(--primary-soft); color: var(--primary-text); padding: 1px 5px; border-radius: 5px; }
+</style>
+</head>
+<body>
+<div class="ds-wrap">
+
+  <div class="ds-topbar">
+    <div>
+      <p class="ds-kicker">Brand book v1 · living reference</p>
+      <div class="ds-wordmark">english<span class="w4">4</span><span class="wme">Me</span> <span style="font-weight:500;color:var(--text-muted);font-size:1.1rem;">Design System</span></div>
+    </div>
+    <button type="button" class="ds-theme-toggle" id="theme-toggle">Switch to dark</button>
+  </div>
+  <p class="ds-lead">Every colour, size and component below is read live from <code>css/style.css</code> — the app's single source of truth. Change a token there and this page changes with it, so the reference can never drift from what ships.</p>
+
+  <section class="ds-section" id="sec-colors">
+    <h2><span class="ds-num">01</span> Colour</h2>
+    <p>Semantic tokens drive the whole UI. <b>Signal Orange</b> is action/primary, <b>Clear Cyan</b> is progress/accent, on Ink + Paper neutrals. Hex values shown are read from the current theme.</p>
+    <div class="ds-grid" id="color-grid"></div>
+  </section>
+
+  <section class="ds-section" id="sec-contrast">
+    <h2><span class="ds-num">02</span> Colour roles &amp; contrast</h2>
+    <p>The key text/background pairings with their measured WCAG contrast ratio. <b>AA</b> needs ≥ 4.5:1 for body text (≥ 3:1 for large/bold ≥ 24px). This is why primary buttons use <b>Ink text on Signal Orange</b> and orange <em>text</em> on light uses Orange Deep — computed below, not asserted.</p>
+    <div class="ds-pairs" id="contrast-grid"></div>
+  </section>
+
+  <section class="ds-section" id="sec-type">
+    <h2><span class="ds-num">03</span> Typography</h2>
+    <p><b>Plus Jakarta Sans</b> for display / wordmark / buttons · <b>Inter</b> for body &amp; UI · <b>JetBrains Mono</b> for small mono labels. The scale is the <code>--fs-*</code> tokens, rendered at their real sizes.</p>
+    <div id="type-scale"></div>
+  </section>
+
+  <section class="ds-section" id="sec-space">
+    <h2><span class="ds-num">04</span> Spacing &amp; radius</h2>
+    <p>An 8px spacing system (<code>--sp-*</code>) and the corner radii (<code>--r-*</code>): cards 24, buttons 18, inputs/panels 16.</p>
+    <div id="space-scale" style="margin-bottom:22px;"></div>
+    <div class="ds-radii" id="radii"></div>
+  </section>
+
+  <section class="ds-section" id="sec-elevation">
+    <h2><span class="ds-num">05</span> Elevation</h2>
+    <p>Three very subtle shadow tokens (<code>--shadow-sm/md/lg</code>); on dark they deepen to stay visible.</p>
+    <div class="ds-shadows">
+      <div class="sh" style="box-shadow:var(--shadow-sm)">shadow-sm</div>
+      <div class="sh" style="box-shadow:var(--shadow-md)">shadow-md</div>
+      <div class="sh" style="box-shadow:var(--shadow-lg)">shadow-lg</div>
+    </div>
+  </section>
+
+  <section class="ds-section" id="sec-components">
+    <h2><span class="ds-num">06</span> Components</h2>
+    <p>Rendered with the app's own classes from <code>css/style.css</code> — what you see is what ships.</p>
+
+    <h3 style="font-family:var(--font-display);margin:18px 0 10px;">Buttons</h3>
+    <div class="ds-row">
+      <button class="btn btn-primary">Primary action</button>
+      <button class="btn btn-small">Small</button>
+      <button class="btn btn-primary" disabled>Disabled</button>
+    </div>
+    <p class="ds-note" style="margin-top:12px;">Primary buttons are <b>Ink (#111) on Signal Orange</b> — the AA-passing pairing (white on Signal Orange fails). See §02.</p>
+
+    <h3 style="font-family:var(--font-display);margin:22px 0 10px;">Pills &amp; status chips</h3>
+    <div class="ds-row">
+      <span class="ds-pill ds-pill--points">★ 120 points</span>
+      <span class="ds-pill ds-pill--streak">🔥 7-day streak</span>
+      <span class="ds-pill ds-pill--primary">Advanced</span>
+      <span class="ds-pill ds-pill--good">Mastered</span>
+      <span class="ds-pill ds-pill--danger">Needs review</span>
+    </div>
+
+    <h3 style="font-family:var(--font-display);margin:22px 0 10px;">Card &amp; progress</h3>
+    <div class="ds-row" style="align-items:flex-start;">
+      <div class="ds-card-demo">
+        <h4>Lessons by module</h4>
+        <p>Cards use <code>--r-xl</code> (24px) corners, <code>--shadow-md</code>, a <code>--line</code> border, on <code>--surface-raised</code>.</p>
+        <div style="margin-top:12px;">
+          <div style="display:flex;justify-content:space-between;font-size:0.82rem;color:var(--text-muted);margin-bottom:6px;"><span>Everyday life</span><b style="color:var(--text);">3/5</b></div>
+          <div class="ds-progress"><i style="width:60%"></i></div>
+        </div>
+      </div>
+      <div class="ds-note" style="max-width:320px;">Data-viz (e.g. the practice-activity chart in <code>js/activity-chart.js</code>) is a single hue — brand orange on a recessive <code>--line</code> track — so identity never rests on colour alone. The progress bar left is the same primitive.</div>
+    </div>
+  </section>
+
+  <p class="ds-foot" id="foot"></p>
+</div>
+
+<script>
+  const root = document.documentElement;
+  const css = (name) => getComputedStyle(root).getPropertyValue(name).trim();
+
+  // ---- Colour groups (name, token, short role) ----
+  const COLOR_GROUPS = [
+    ["Surfaces", [
+      ["--backdrop", "Canvas behind the phone column"],
+      ["--surface", "Warm Paper — screen canvas"],
+      ["--surface-raised", "Paper — cards"],
+      ["--line", "Borders, separators"],
+      ["--line-strong", "Stronger dividers"],
+    ]],
+    ["Text (Ink family)", [
+      ["--text", "Primary text — Ink"],
+      ["--text-muted", "Secondary text"],
+      ["--text-faint", "Labels / inactive"],
+    ]],
+    ["Primary — Signal Orange", [
+      ["--primary", "Action: buttons, logo"],
+      ["--primary-dark", "Hover / pressed · Orange Deep"],
+      ["--primary-bright", "Gradient end, warm accent"],
+      ["--primary-text", "Orange TEXT on surface (AA)"],
+      ["--primary-soft", "Chip / card tint"],
+      ["--primary-tint", "Subtle panel wash"],
+    ]],
+    ["Secondary — Clear Cyan", [
+      ["--secondary", "Progress, active, “Me”"],
+      ["--e4m-cyan-deep", "Cyan deep"],
+      ["--e4m-cyan-tint", "Cyan tint"],
+    ]],
+    ["Status", [
+      ["--success", "Success"],
+      ["--success-text", "Success text"],
+      ["--danger", "Danger"],
+      ["--danger-text", "Danger text"],
+      ["--star-gold", "Reward stars"],
+    ]],
+    ["Warm chips", [
+      ["--chip-warm-bg", "Points chip bg"],
+      ["--chip-warm-text", "Points chip text"],
+      ["--chip-hot-bg", "Streak chip bg"],
+      ["--chip-hot-text", "Streak chip text"],
+    ]],
+  ];
+
+  function renderColors() {
+    const grid = document.getElementById("color-grid");
+    grid.innerHTML = "";
+    for (const [group, tokens] of COLOR_GROUPS) {
+      const head = document.createElement("div");
+      head.style.cssText = "grid-column:1/-1;font-family:var(--font-mono);font-size:0.72rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--text-faint);margin-top:8px;";
+      head.textContent = group;
+      grid.appendChild(head);
+      for (const [tok, desc] of tokens) {
+        const val = css(tok);
+        const el = document.createElement("div");
+        el.className = "ds-swatch";
+        el.innerHTML =
+          `<div class="chip" style="background:${val}"></div>` +
+          `<div class="meta"><div class="nm">${tok}</div><div class="hx">${val || "—"}</div>` +
+          `<div class="ds-desc">${desc}</div></div>`;
+        grid.appendChild(el);
+      }
+    }
+  }
+
+  // ---- Contrast (WCAG 2.1 relative luminance) ----
+  function toRgb(hex) {
+    let h = hex.replace("#", "").trim();
+    if (h.length === 3) h = h.split("").map((c) => c + c).join("");
+    if (h.length !== 6) return null;
+    return [0, 2, 4].map((i) => parseInt(h.slice(i, i + 2), 16));
+  }
+  function relLum([r, g, b]) {
+    const f = (c) => { c /= 255; return c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4); };
+    return 0.2126 * f(r) + 0.7152 * f(g) + 0.0722 * f(b);
+  }
+  function ratio(fgHex, bgHex) {
+    const a = toRgb(fgHex), b = toRgb(bgHex);
+    if (!a || !b) return null;
+    const la = relLum(a), lb = relLum(b);
+    return (Math.max(la, lb) + 0.05) / (Math.min(la, lb) + 0.05);
+  }
+
+  const PAIRS = [
+    ["--text", "--surface-raised", "Body text on a card"],
+    ["--text", "--surface", "Body text on the canvas"],
+    ["--text-muted", "--surface", "Secondary text on canvas"],
+    ["--text-faint", "--surface", "Faint label on canvas"],
+    ["#111111", "--primary", "Ink on Signal Orange — primary button"],
+    ["#FFFFFF", "--primary", "White on Signal Orange (rejected)"],
+    ["--primary-text", "--surface-raised", "Orange accent text on a card"],
+    ["--secondary", "--surface-raised", "Cyan as text (use for fills)"],
+  ];
+
+  function badge(r) {
+    if (r == null) return ['fail', '—'];
+    const v = r.toFixed(2) + ":1";
+    if (r >= 4.5) return ['pass', 'AA ' + v];
+    if (r >= 3) return ['large', 'AA-lg ' + v];
+    return ['fail', 'fail ' + v];
+  }
+  function resolve(tokenOrHex) { return tokenOrHex.startsWith("--") ? css(tokenOrHex) : tokenOrHex; }
+
+  function renderContrast() {
+    const grid = document.getElementById("contrast-grid");
+    grid.innerHTML = "";
+    for (const [fg, bg, label] of PAIRS) {
+      const fgv = resolve(fg), bgv = resolve(bg);
+      const r = ratio(fgv, bgv);
+      const [cls, txt] = badge(r);
+      const el = document.createElement("div");
+      el.className = "ds-pair";
+      el.innerHTML =
+        `<div class="sample" style="background:${bgv};color:${fgv};">The quick brown fox</div>` +
+        `<div class="pfoot"><span class="lbl">${label}</span><span class="ds-ratio ${cls}">${txt}</span></div>`;
+      grid.appendChild(el);
+    }
+  }
+
+  // ---- Type scale ----
+  const TYPE = [
+    ["--fs-2xl", "Display"],
+    ["--fs-xl", "Page title"],
+    ["--fs-lg", "Section title"],
+    ["--fs-md", "Lead / large body"],
+    ["--fs-base", "Body"],
+    ["--fs-sm", "Small / captions"],
+    ["--fs-xs", "Micro labels"],
+  ];
+  function renderType() {
+    const box = document.getElementById("type-scale");
+    box.innerHTML = "";
+    for (const [tok, name] of TYPE) {
+      const val = css(tok);
+      const row = document.createElement("div");
+      row.className = "ds-type-row";
+      row.innerHTML =
+        `<span class="tk">${tok} · ${val}</span>` +
+        `<span class="tx" style="font-size:${val}">${name} — english4Me</span>`;
+      box.appendChild(row);
+    }
+  }
+
+  // ---- Spacing + radius ----
+  const SPACE = ["--sp-1", "--sp-2", "--sp-3", "--sp-4", "--sp-5", "--sp-6", "--sp-7", "--sp-8", "--sp-10"];
+  function renderSpace() {
+    const box = document.getElementById("space-scale");
+    box.innerHTML = "";
+    for (const tok of SPACE) {
+      const val = css(tok);
+      const row = document.createElement("div");
+      row.className = "ds-scale-row";
+      row.innerHTML = `<span class="tk">${tok} · ${val}</span><span class="bar" style="width:${val}"></span>`;
+      box.appendChild(row);
+    }
+    const RADII = ["--r-sm", "--r-md", "--r-lg", "--r-xl", "--r-pill"];
+    const rbox = document.getElementById("radii");
+    rbox.innerHTML = "";
+    for (const tok of RADII) {
+      const val = css(tok);
+      const d = document.createElement("div");
+      d.className = "r";
+      d.style.borderRadius = tok === "--r-pill" ? "24px / 999px" : val;
+      d.textContent = `${tok.replace("--r-", "")} · ${val}`;
+      rbox.appendChild(d);
+    }
+  }
+
+  function renderAll() {
+    renderColors();
+    renderContrast();
+    renderType();
+    renderSpace();
+    document.getElementById("foot").textContent =
+      `Generated live from css/style.css · theme: ${root.getAttribute("data-theme")} · ${new Date().toISOString().slice(0, 10)}`;
+  }
+
+  document.getElementById("theme-toggle").addEventListener("click", () => {
+    const dark = root.getAttribute("data-theme") === "dark";
+    root.setAttribute("data-theme", dark ? "light" : "dark");
+    document.getElementById("theme-toggle").textContent = dark ? "Switch to dark" : "Switch to light";
+    renderAll();
+  });
+
+  renderAll();
+</script>
+</body>
+</html>
