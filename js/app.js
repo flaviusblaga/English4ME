@@ -250,11 +250,14 @@ async function renderProfilePicker() {
   }
 
   // Renders one member group (grown-ups in a row, kids in a colourful grid).
+  // The kids' section gets the playful 4-mascot sticker row above the tiles —
+  // the mascots live only on the kids' surfaces.
   const renderGroup = (kind, label, icon, members, render) => {
     if (!members.length) return;
     const sec = document.createElement("div");
     sec.className = "picker-section";
     sec.appendChild(sectionLabel(kind, iconSvg(icon), label));
+    if (kind === "kids") sec.appendChild(kidsMascotRow());
     const wrap = document.createElement("div");
     wrap.className = kind === "kids" ? "kids-grid" : kind === "teens" ? "teen-wrap" : "adult-wrap";
     for (const m of members) wrap.appendChild(render(m));
@@ -308,6 +311,32 @@ function renderSectionHub(list, groups) {
   hub.appendChild(card("admin", "settings", t("sections.admin"), t("sections.adminSub"), () => openControlPanel()));
 
   list.appendChild(hub);
+}
+
+// The four kids' mascots as a playful die-cut row (Bobo, Fizz, Sushi, Maki) —
+// a decorative header for the kids' section, modelled on the old login hero.
+// Maki is a sticker only (unlike Bobo/Fizz/Sushi it isn't a teaching mascot
+// with a face + voice), so it appears here but never speaks a lesson.
+const KIDS_MASCOT_STICKERS = [
+  { name: "Bobo", img: "assets/socatei/bobo-sticker.png", emoji: "🦫" },
+  { name: "Fizz", img: "assets/socatei/fizz-sticker.png", emoji: "🐿️" },
+  { name: "Sushi", img: "assets/socatei/sushi-sticker.png", emoji: "🐱" },
+  { name: "Maki", img: "assets/socatei/maki-sticker.png", emoji: "🐱" },
+];
+function kidsMascotRow() {
+  const row = document.createElement("div");
+  row.className = "kids-mascots";
+  for (const m of KIDS_MASCOT_STICKERS) {
+    const img = document.createElement("img");
+    img.className = "kids-mascot-sticker";
+    img.src = m.img;
+    img.alt = m.name;
+    img.onerror = function () {
+      this.replaceWith(Object.assign(document.createElement("span"), { className: "kids-mascot-emoji", textContent: m.emoji }));
+    };
+    row.appendChild(img);
+  }
+  return row;
 }
 
 // "Back" from a drilled-in group to the four-card hub.
