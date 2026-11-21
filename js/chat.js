@@ -58,7 +58,7 @@ export function setMascotPreference(pref) {
 // adult gender dropdown (which frames a professional roleplay counterpart,
 // not a cartoon mascot). Exported: js/lessons.js reuses the same tuning so
 // the lesson screens sound consistent with free-chat.
-export const KIDS_VOICE_OPTIONS = { pitch: 1.35, rate: 1.05 };
+export const KIDS_VOICE_OPTIONS = { pitch: 1.35, rate: 1.05, voice: "bobo" };
 
 // Per-mascot voices, in the spirit of the hyperactive possum-brothers energy
 // the characters are inspired by: Bobo is squeaky-high and fast (the
@@ -72,10 +72,13 @@ export const KIDS_VOICE_OPTIONS = { pitch: 1.35, rate: 1.05 };
 // Sushi sits between the two in pitch but is the fastest talker — she's the
 // theatrical one, and rate is what keeps her distinct from Bobo without going
 // near the 1.5 ceiling that breaks Windows' local SAPI voices.
+// `voice` is the LOGICAL key sent to the Worker's ElevenLabs proxy (js/voice.js
+// → /tts); pitch/rate are only used by the browser-engine fallback. Maki reuses
+// Sushi's voice (per design), and the Worker maps each key to a real voice id.
 export const MASCOT_VOICES = {
-  Bobo: { pitch: 1.45, rate: 1.1 },
-  Fizz: { pitch: 1.15, rate: 0.98 },
-  Sushi: { pitch: 1.25, rate: 1.2 },
+  Bobo: { pitch: 1.45, rate: 1.1, voice: "bobo" },
+  Fizz: { pitch: 1.15, rate: 0.98, voice: "fizz" },
+  Sushi: { pitch: 1.25, rate: 1.2, voice: "sushi" },
 };
 
 function parseMascotLines(text) {

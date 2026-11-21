@@ -6,4 +6,12 @@ export const CONFIG = {
 
   // Paste your deployed Cloudflare Worker URL here (from `wrangler deploy`).
   WORKER_URL: "https://english4me.flaviusblaga.workers.dev",
+
+  // Use ElevenLabs voices (via the Worker's /tts endpoint) instead of the
+  // browser's built-in speech. Leave false until the Worker /tts route is
+  // deployed AND the 5 voice IDs are set in the Worker; flip to true to switch
+  // the app over. The browser voice always remains the automatic fallback (if
+  // the Worker is unreachable, over its monthly cap, or errors), so lessons are
+  // never silent. The ElevenLabs API key and voice IDs live ONLY in the Worker.
+  ELEVENLABS_TTS: false,
 };
