@@ -8,10 +8,13 @@ export const CONFIG = {
   WORKER_URL: "https://english4me.flaviusblaga.workers.dev",
 
   // Use ElevenLabs voices (via the Worker's /tts endpoint) instead of the
-  // browser's built-in speech. Leave false until the Worker /tts route is
-  // deployed AND the 5 voice IDs are set in the Worker; flip to true to switch
-  // the app over. The browser voice always remains the automatic fallback (if
-  // the Worker is unreachable, over its monthly cap, or errors), so lessons are
-  // never silent. The ElevenLabs API key and voice IDs live ONLY in the Worker.
-  ELEVENLABS_TTS: false,
+  // browser's built-in speech. This is ON: the app will request ElevenLabs
+  // audio for every spoken line. It only actually speaks with ElevenLabs once
+  // the Worker /tts route is deployed with the 5 voice IDs + the ELEVENLABS_API_KEY
+  // secret; until then (or if the Worker is unreachable, over its monthly cap,
+  // or errors) the app automatically falls back to the browser voice, so
+  // lessons are never silent. Deploy the Worker BEFORE this ships to avoid a
+  // brief browser-fallback window. The API key and voice IDs live ONLY in the
+  // Worker — never here.
+  ELEVENLABS_TTS: true,
 };
