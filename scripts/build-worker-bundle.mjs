@@ -38,6 +38,7 @@ const MODULES = [
   "progress.js",
   "resets.js",
   "state-store.js",
+  "tts.js",
   "index.js",
 ];
 
