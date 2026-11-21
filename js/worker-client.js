@@ -30,6 +30,22 @@ async function failFrom(response) {
   return err;
 }
 
+// Text-to-speech via the Worker's ElevenLabs proxy. Sends only a LOGICAL voice
+// key ("male" | "female" | "bobo" | "fizz" | "sushi"); the Worker maps it to a
+// real ElevenLabs voice id, applies the model + monthly cap, caches the result,
+// and returns the MP3 bytes. Throws on any non-OK (not deployed, over cap,
+// upstream error) so js/voice.js can fall back to the browser voice. Returns an
+// audio Blob on success.
+export async function fetchTtsAudio(text, voice) {
+  const response = await fetch(`${CONFIG.WORKER_URL}/tts`, {
+    method: "POST",
+    headers: authHeaders({ "content-type": "application/json" }),
+    body: JSON.stringify({ text, voice }),
+  });
+  if (!response.ok) throw await failFrom(response);
+  return response.blob();
+}
+
 export async function sendChatMessage({ profileId, messages, conversationSummary, scenarioId, documentContext, lessonWordList, mascotPreference }) {
   const response = await fetch(`${CONFIG.WORKER_URL}/chat`, {
     method: "POST",

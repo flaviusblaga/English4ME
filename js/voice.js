@@ -1,5 +1,10 @@
-// Thin wrapper around the browser-native Web Speech API. chat.js is the only
-// caller; this module owns no chat state and never touches session/Drive.
+// Text-to-speech + speech recognition wrapper. Speech synthesis prefers the
+// Worker's ElevenLabs voices (far more natural than the browser engine) and
+// falls back to the browser's Web Speech API whenever ElevenLabs is off,
+// unreachable, over its monthly cap, or errors — so lessons are never silent.
+// Speech recognition (the "say" exercises) stays browser-native.
+import { CONFIG } from "./config.js";
+import { fetchTtsAudio } from "./worker-client.js";
 
 const SpeechRecognitionCtor = window.SpeechRecognition || window.webkitSpeechRecognition;
 const TTS_MUTE_KEY = "engleza-familie-tts-muted";
@@ -253,6 +258,85 @@ function pickBestVoice(gender) {
   return candidates[0];
 }
 
+// ---------------------------------------------------------------------------
+// ElevenLabs path (via the Worker). Kept entirely separate from the browser
+// engine below; speak()/speakLines() try this first and fall back on any miss.
+// ---------------------------------------------------------------------------
+
+// The <audio> element currently playing an ElevenLabs clip (module scope so a
+// new call can stop the previous one, mirroring speechSynthesis.cancel()).
+let currentAudio = null;
+
+function stopCurrentAudio() {
+  if (currentAudio) {
+    try { currentAudio.pause(); } catch { /* already gone */ }
+    currentAudio = null;
+  }
+}
+
+// Logical voice key for a speak() call: an explicit mascot/role voice if the
+// caller gave one, else the adult male/female preference.
+function resolveVoiceKey(voice) {
+  return voice || getVoiceGenderPreference();
+}
+
+// Plays one MP3 blob. Resolves true once it has finished (or failed after it
+// started), false if it never started — so the caller can fall back to the
+// browser engine. onstart/onend mirror the SpeechSynthesis callbacks.
+function playBlob(blob, { onstart, onend } = {}) {
+  return new Promise((resolve) => {
+    const url = URL.createObjectURL(blob);
+    const audio = new Audio(url);
+    currentAudio = audio;
+    let started = false;
+    let settled = false;
+    const finish = (value, callEnd) => {
+      if (settled) return;
+      settled = true;
+      URL.revokeObjectURL(url);
+      if (currentAudio === audio) currentAudio = null;
+      if (callEnd && onend) onend();
+      resolve(value);
+    };
+    audio.onplay = () => { started = true; if (onstart) onstart(); };
+    audio.onended = () => finish(true, true);
+    audio.onerror = () => finish(started, started); // started → treat as spoken; else let caller fall back
+    audio.play().catch(() => finish(false, false));  // autoplay blocked / decode error → fall back
+  });
+}
+
+// Fetches + plays one line via the Worker. Returns true if it played, false to
+// fall back. Never throws.
+async function speakViaWorker(text, voiceKey, cbs) {
+  if (!CONFIG.ELEVENLABS_TTS) return false;
+  let blob;
+  try {
+    blob = await fetchTtsAudio(text, voiceKey);
+  } catch {
+    return false; // worker off, over cap, or upstream error → browser fallback
+  }
+  if (!blob || !blob.size) return false;
+  return playBlob(blob, cbs);
+}
+
+// Fetches ALL segments up front (so a mid-sequence miss can't half-switch
+// engines), then plays them in order. Returns false if any fetch fails, so the
+// caller falls back to the browser engine for the whole sequence.
+async function speakSequenceViaWorker(segments) {
+  if (!CONFIG.ELEVENLABS_TTS) return false;
+  let blobs;
+  try {
+    blobs = await Promise.all(segments.map((s) => fetchTtsAudio(s.text, resolveVoiceKey(s.voice))));
+  } catch {
+    return false;
+  }
+  if (blobs.some((b) => !b || !b.size)) return false;
+  for (let i = 0; i < segments.length; i++) {
+    await playBlob(blobs[i], { onstart: segments[i].onstart, onend: segments[i].onend });
+  }
+  return true;
+}
+
 // No-op if unsupported or muted. Cancels any in-flight utterance first so
 // replies don't queue up and read out of order if the user sends fast.
 // Async so it can wait for the voice list — chat.js calls this without
@@ -260,8 +344,16 @@ function pickBestVoice(gender) {
 // `onstart`/`onend` (both optional) let the caller animate a mascot avatar
 // exactly while its line is being spoken; `onend` also fires on error and
 // cancel so a "talking" CSS class never gets stuck on.
-export async function speak(text, { pitch = 1.0, rate = 1.0, onstart, onend } = {}) {
-  if (!isSpeechSynthesisSupported() || isTtsMuted() || !text) return;
+export async function speak(text, { pitch = 1.0, rate = 1.0, voice, onstart, onend } = {}) {
+  if (isTtsMuted() || !text) return;
+
+  // Stop whatever is currently speaking on either engine, then try ElevenLabs
+  // first; fall through to the browser engine on any miss.
+  stopCurrentAudio();
+  if (isSpeechSynthesisSupported()) window.speechSynthesis.cancel();
+  if (await speakViaWorker(text, resolveVoiceKey(voice), { onstart, onend })) return;
+
+  if (!isSpeechSynthesisSupported()) { if (onend) onend(); return; }
 
   await ensureVoicesLoaded();
 
@@ -271,8 +363,8 @@ export async function speak(text, { pitch = 1.0, rate = 1.0, onstart, onend } = 
   currentUtterance.lang = "en-US";
   currentUtterance.pitch = pitch;
   currentUtterance.rate = rate;
-  const voice = pickBestVoice(getVoiceGenderPreference());
-  if (voice) currentUtterance.voice = voice;
+  const pickedVoice = pickBestVoice(voice === "male" || voice === "female" ? voice : getVoiceGenderPreference());
+  if (pickedVoice) currentUtterance.voice = pickedVoice;
   if (onstart) currentUtterance.onstart = () => onstart();
   currentUtterance.onend = () => {
     currentUtterance = null;
@@ -301,15 +393,24 @@ let currentSequence = [];
 // voices within one reply. Cancels anything in flight once, then queues all
 // segments (the browser plays queued utterances in order).
 export async function speakLines(segments) {
-  if (!isSpeechSynthesisSupported() || isTtsMuted() || !segments || segments.length === 0) return;
+  if (isTtsMuted() || !segments || segments.length === 0) return;
+  const clean = segments.filter((s) => s.text);
+  if (!clean.length) return;
+
+  // Stop both engines, then try the ElevenLabs sequence; fall back to the
+  // browser engine for the whole sequence on any miss.
+  stopCurrentAudio();
+  if (isSpeechSynthesisSupported()) window.speechSynthesis.cancel();
+  if (await speakSequenceViaWorker(clean)) return;
+
+  if (!isSpeechSynthesisSupported()) return;
 
   await ensureVoicesLoaded();
 
   window.speechSynthesis.cancel();
 
   const voice = pickBestVoice(getVoiceGenderPreference());
-  currentSequence = segments
-    .filter((s) => s.text)
+  currentSequence = clean
     .map((segment) => {
       const utterance = new SpeechSynthesisUtterance(segment.text);
       utterance.lang = "en-US";
