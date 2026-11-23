@@ -1091,7 +1091,7 @@ async function handleSend() {
       scenarioId: currentScenarioId,
       documentContext: documentEntry ? documentEntry.text : null,
       lessonWordList: session.lessonWordList,
-      mascotPreference: getMascotPreference(),
+      mascotPreference: session.profile.features.mascots ? getMascotPreference() : null,
     });
 
     if (result.budgetStatus === "soft_block") {
@@ -1205,7 +1205,7 @@ async function handleWritingSend(draft) {
       scenarioId: null,
       documentContext: null,
       lessonWordList: null,
-      mascotPreference: getMascotPreference(),
+      mascotPreference: session.profile.features.mascots ? getMascotPreference() : null,
     });
 
     if (result.budgetStatus === "soft_block") {
@@ -1276,7 +1276,7 @@ async function handleDebrief() {
       scenarioId: null,
       documentContext: null,
       lessonWordList: null,
-      mascotPreference: getMascotPreference(),
+      mascotPreference: session.profile.features.mascots ? getMascotPreference() : null,
     });
 
     if (result.budgetStatus === "soft_block") {
