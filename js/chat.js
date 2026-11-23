@@ -15,6 +15,7 @@ import {
   setTtsMuted,
   getVoiceGenderPreference,
   setVoiceGenderPreference,
+  learnerVoiceKey,
   initVoiceInput,
   startListening,
   stopListening,
@@ -1100,7 +1101,7 @@ async function handleSend() {
       if (session.profile.features.mascots) {
         speakLines(buildSpokenSegments(result.reply));
       } else {
-        speak(result.reply);
+        speak(result.reply, { voice: learnerVoiceKey(session.profile) });
       }
       const assistantTurn = { role: "assistant", text: result.reply, ts: new Date().toISOString() };
       session.state.conversation.recentTurns.push(assistantTurn);

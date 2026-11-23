@@ -32,7 +32,7 @@ import {
   getMascotPreference,
   setMascotPreference,
 } from "./chat.js";
-import { speak, recognizeOnce, isSpeechInputAvailable } from "./voice.js";
+import { speak, recognizeOnce, isSpeechInputAvailable, learnerVoiceKey } from "./voice.js";
 import { renderDidYouKnow } from "./lessons-didyouknow.js";
 import { renderActivityChart } from "./activity-chart.js";
 import { iconSvg } from "./icons.js";
@@ -1284,7 +1284,9 @@ function renderQuestion() {
     unscrambleArea.hidden = true;
 
     // Hear it first, then repeat it — model before production.
-    const askerVoice = MASCOT_VOICES[asker] || KIDS_VOICE_OPTIONS;
+    const askerVoice = usesMascots
+      ? MASCOT_VOICES[asker] || KIDS_VOICE_OPTIONS
+      : { voice: learnerVoiceKey(session.profile) };
     stem.style.cursor = "pointer";
     stem.onclick = () => speakAsMascot(target, askerVoice, promptAvatar);
     speakAsMascot(target, askerVoice, promptAvatar);
@@ -1342,7 +1344,9 @@ function renderQuestion() {
   // answering, so they stay silent until the reaction (see finalizeAnswer).
   if (canReplayNow) {
     // Spoken in the asking mascot's own voice, so who you see is who you hear.
-    const askerVoice = MASCOT_VOICES[asker] || KIDS_VOICE_OPTIONS;
+    const askerVoice = usesMascots
+      ? MASCOT_VOICES[asker] || KIDS_VOICE_OPTIONS
+      : { voice: learnerVoiceKey(session.profile) };
     promptAvatar.style.cursor = "pointer";
     promptAvatar.onclick = () => speakAsMascot(spokenTarget, askerVoice, promptAvatar);
     stem.style.cursor = "pointer";
@@ -1585,7 +1589,7 @@ function finalizeAnswer(question, wasCorrect) {
     const verdict = wasCorrect ? "Correct!" : "Not quite.";
     const explanation = question.mcq && question.mcq.explain ? ` ${question.mcq.explain}` : "";
     el("lesson-reaction-line").textContent = `${verdict}${explanation}`;
-    replayVoice = {}; // default voice, normal pitch — no cartoon voice for teens
+    replayVoice = { voice: learnerVoiceKey(session.profile) }; // teen/adult voice, not a cartoon one
     speak(spokenAnswer, replayVoice);
   }
 
