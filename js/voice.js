@@ -185,6 +185,19 @@ export function setVoiceGenderPreference(gender) {
   localStorage.setItem(VOICE_GENDER_KEY, gender === "male" ? "male" : "female");
 }
 
+// The base (non-mascot) voice KEY for a profile's spoken content. The young
+// no-mascot tiers (teen / advanced / expert) get a youthful "teen" voice so
+// they don't sound like a 40-year-old business voice; the adult profile uses
+// the plain male/female voice. The kid tiers speak in their mascot voices and
+// never call this. The Worker maps these keys ("male" | "female" |
+// "teen-male" | "teen-female") to real voices.
+export function learnerVoiceKey(profile) {
+  const gender = getVoiceGenderPreference();
+  const tier = profile && profile.contentTier;
+  if (tier === "teen" || tier === "advanced" || tier === "expert") return `teen-${gender}`;
+  return gender;
+}
+
 // Kept at module scope — Chrome silently drops speech if the
 // SpeechSynthesisUtterance object is garbage-collected before it finishes
 // (a long-standing browser bug), which easily happens if the only reference
